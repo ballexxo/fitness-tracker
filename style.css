@@ -13,7 +13,7 @@ body {
   background: #071225;
   color: #ffffff;
   min-height: 100vh;
-  padding: 18px;
+  padding: 14px;
 }
 
 /* ------------------------------------------------ */
@@ -22,7 +22,8 @@ body {
 
 .container,
 .page-shell,
-.dashboard-shell {
+.dashboard-shell,
+.auth-layout {
   width: 100%;
   max-width: 760px;
   margin: 0 auto;
@@ -43,60 +44,7 @@ body {
 }
 
 /* ------------------------------------------------ */
-/* GEMEINSAME BUTTON-STYLES */
-/* ------------------------------------------------ */
-
-.pill-button,
-.tab-btn,
-button.primary,
-button.logout {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  cursor: pointer;
-
-  padding: 14px 22px;
-  border-radius: 999px;
-  border: 2px solid #28c267;
-  background: #0d2a1d;
-  color: #b9f7cf;
-  font-weight: 800;
-  font-size: 1rem;
-
-  transition: all 0.25s ease;
-
-  box-shadow:
-    0 0 10px rgba(40, 194, 103, 0.28),
-    inset 0 0 8px rgba(40, 194, 103, 0.08);
-}
-
-.pill-button:hover,
-.tab-btn:hover,
-button.primary:hover,
-button.logout:hover {
-  transform: translateY(-1px) scale(1.02);
-  background: #123423;
-  box-shadow:
-    0 0 14px rgba(40, 194, 103, 0.42),
-    0 0 24px rgba(40, 194, 103, 0.18);
-}
-
-.pill-button:active,
-.tab-btn:active,
-button.primary:active,
-button.logout:active {
-  transform: scale(0.98);
-}
-
-button.primary,
-button.logout {
-  border: 2px solid #28c267;
-  outline: none;
-}
-
-/* ------------------------------------------------ */
-/* LOGIN / REGISTER */
+/* HEADER LOGIN */
 /* ------------------------------------------------ */
 
 .app-header {
@@ -107,18 +55,16 @@ button.logout {
   margin-bottom: 24px;
 }
 
+/* ------------------------------------------------ */
+/* LOGIN / REGISTER CARD */
+/* ------------------------------------------------ */
+
 .auth-card {
   background: rgba(17, 24, 39, 0.88);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 28px;
   padding: 28px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
-}
-
-.auth-layout {
-  width: 100%;
-  max-width: 760px;
-  margin: 0 auto;
 }
 
 .auth-card h2 {
@@ -130,6 +76,10 @@ button.logout {
   margin-bottom: 18px;
 }
 
+/* ------------------------------------------------ */
+/* TABS */
+/* ------------------------------------------------ */
+
 .tabs {
   display: flex;
   gap: 12px;
@@ -138,8 +88,34 @@ button.logout {
 }
 
 .tab-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 145px;
+  padding: 14px 22px;
+  border-radius: 999px;
   border: 2px solid #28c267;
+  background: #0d2a1d;
+  color: #b9f7cf;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow:
+    0 0 10px rgba(40, 194, 103, 0.28),
+    inset 0 0 8px rgba(40, 194, 103, 0.08);
+}
+
+.tab-btn:hover {
+  transform: translateY(-1px) scale(1.02);
+  background: #123423;
+  box-shadow:
+    0 0 14px rgba(40, 194, 103, 0.42),
+    0 0 24px rgba(40, 194, 103, 0.18);
+}
+
+.tab-btn:active {
+  transform: scale(0.98);
 }
 
 .tab-btn.active {
@@ -149,6 +125,10 @@ button.logout {
     0 0 14px rgba(40, 194, 103, 0.48),
     0 0 24px rgba(40, 194, 103, 0.18);
 }
+
+/* ------------------------------------------------ */
+/* FORM */
+/* ------------------------------------------------ */
 
 .auth-form {
   display: flex;
@@ -179,18 +159,162 @@ input:focus {
   box-shadow: 0 0 0 3px rgba(40, 194, 103, 0.15);
 }
 
+/* ------------------------------------------------ */
+/* GRÜNE STANDARD-BUTTONS */
+/* ------------------------------------------------ */
+
+button.primary,
+.pill-button,
+.main-button {
+  border: 2px solid #28c267;
+  background: #0d2a1d;
+  color: #b9f7cf;
+  outline: none;
+}
+
+/* Login / Registrieren */
 button.primary {
   width: 100%;
   min-height: 64px;
   margin-top: 10px;
+  padding: 14px 22px;
+  border-radius: 999px;
   font-size: 1.08rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow:
+    0 0 10px rgba(40, 194, 103, 0.28),
+    inset 0 0 8px rgba(40, 194, 103, 0.08);
 }
 
-button.primary:disabled,
-button.logout:disabled {
+button.primary:hover {
+  transform: translateY(-1px) scale(1.02);
+  background: #123423;
+  box-shadow:
+    0 0 14px rgba(40, 194, 103, 0.42),
+    0 0 24px rgba(40, 194, 103, 0.18);
+}
+
+button.primary:active {
+  transform: scale(0.98);
+}
+
+button.primary:disabled {
   opacity: 0.78;
   cursor: not-allowed;
 }
+
+/* Dashboard-Link / Unterseiten-Link */
+.pill-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  padding: 14px 22px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow:
+    0 0 10px rgba(40, 194, 103, 0.28),
+    inset 0 0 8px rgba(40, 194, 103, 0.08);
+}
+
+.pill-button:hover {
+  transform: translateY(-1px) scale(1.02);
+  background: #123423;
+  box-shadow:
+    0 0 14px rgba(40, 194, 103, 0.42),
+    0 0 24px rgba(40, 194, 103, 0.18);
+}
+
+.pill-button:active {
+  transform: scale(0.98);
+}
+
+.pill-button:link,
+.pill-button:visited {
+  color: #b9f7cf;
+  text-decoration: none;
+}
+
+/* Große Dashboard-Buttons */
+.main-button {
+  width: 100%;
+  min-height: 88px;
+  padding: 18px 24px;
+  border-radius: 32px;
+  text-decoration: none;
+  font-size: 1.6rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: all 0.25s ease;
+  box-shadow:
+    0 0 10px rgba(40, 194, 103, 0.28),
+    inset 0 0 8px rgba(40, 194, 103, 0.08);
+}
+
+.main-button:hover {
+  transform: translateY(-1px) scale(1.02);
+  background: #123423;
+  box-shadow:
+    0 0 14px rgba(40, 194, 103, 0.42),
+    0 0 24px rgba(40, 194, 103, 0.18);
+}
+
+.main-button:active {
+  transform: scale(0.98);
+}
+
+.main-button:link,
+.main-button:visited {
+  color: #b9f7cf;
+  text-decoration: none;
+}
+
+/* ------------------------------------------------ */
+/* LOGOUT BUTTON - NUR ROT */
+/* ------------------------------------------------ */
+
+button.logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 22px;
+  border-radius: 999px;
+  border: 2px solid #ef4444;
+  background: #2a0d0d;
+  color: #fecaca;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  outline: none;
+  box-shadow:
+    0 0 10px rgba(239, 68, 68, 0.28),
+    inset 0 0 8px rgba(239, 68, 68, 0.08);
+}
+
+button.logout:hover {
+  transform: translateY(-1px) scale(1.02);
+  background: #3a1111;
+  box-shadow:
+    0 0 14px rgba(239, 68, 68, 0.42),
+    0 0 24px rgba(239, 68, 68, 0.18);
+}
+
+button.logout:active {
+  transform: scale(0.98);
+}
+
+/* ------------------------------------------------ */
+/* STATUS */
+/* ------------------------------------------------ */
 
 .status {
   min-height: 24px;
@@ -288,65 +412,38 @@ button.logout:disabled {
   margin-top: 6px;
 }
 
-.main-button {
-  width: 100%;
-  min-height: 88px;
-  padding: 18px 24px;
-  border-radius: 32px;
-  border: 2px solid #28c267;
-  background: #0d2a1d;
-  color: #b9f7cf;
-  text-decoration: none;
-  font-size: 1.6rem;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  transition: all 0.25s ease;
-  box-shadow:
-    0 0 10px rgba(40, 194, 103, 0.28),
-    inset 0 0 8px rgba(40, 194, 103, 0.08);
-}
-
-.main-button:hover {
-  transform: translateY(-1px) scale(1.02);
-  background: #123423;
-  box-shadow:
-    0 0 14px rgba(40, 194, 103, 0.42),
-    0 0 24px rgba(40, 194, 103, 0.18);
-}
-
-.main-button:active {
-  transform: scale(0.98);
-}
-
 /* ------------------------------------------------ */
 /* UNTERSEITEN */
 /* ------------------------------------------------ */
 
 .page-header {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 22px;
+
+display:flex;
+flex-direction:column;
+align-items:flex-start;
+
+gap:16px;
+margin-bottom:22px;
+
 }
 
 .page-header .dashboard-button {
   justify-self: start;
 }
 
-.page-header .logout {
-  justify-self: end;
-}
-
 .page-title {
-  text-align: center;
-  font-size: 1.7rem;
-  font-weight: 900;
-  color: #28c267;
-  text-shadow: 0 0 10px rgba(40, 194, 103, 0.25);
+
+width:100%;
+
+text-align:center;
+
+font-size:1.7rem;
+font-weight:900;
+
+color:#28c267;
+
+text-shadow:0 0 10px rgba(40,194,103,.25);
+
 }
 
 .page-card {
@@ -443,13 +540,8 @@ button.logout:disabled {
     grid-template-columns: 1fr;
   }
 
-  .page-header .dashboard-button,
-  .page-header .logout {
-    justify-self: stretch;
-  }
-
   .page-title {
-    order: -1;
+    font-size: 1.45rem;
   }
 
   .pill-button,
