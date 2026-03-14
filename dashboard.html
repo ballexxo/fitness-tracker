@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fitness Tracker - Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="dashboard-shell">
+    <div class="dashboard-topbar">
+      <button id="logoutBtn" class="logout">Logout</button>
+    </div>
+
+    <main class="dashboard-main">
+      <div class="dashboard-title">
+        Hallo <span id="userName"></span>
+      </div>
+
+      <div class="info-box date-box">
+        <div id="currentWeekday">Donnerstag</div>
+        <div id="currentDate">12.3.2026</div>
+      </div>
+
+      <div class="info-box streak-box">
+        <div class="streak-label">Live Streak</div>
+        <div class="streak-value" id="streakValue">🔥 3 Tage</div>
+        <div class="streak-text" id="streakText">Starker Anfang. Bleib dran.</div>
+      </div>
+
+      <div class="dashboard-buttons">
+        <a href="trainingsplan.html" class="main-button">Trainingsplan erstellen</a>
+        <a href="personal-data.html" class="main-button">Persönliche Daten</a>
+        <a href="training.html" class="main-button">Training</a>
+        <a href="statistik.html" class="main-button">Statistik</a>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="auth-layout">
+    <header class="app-header simple-header">
+      <div>
+        <div class="brand">Fitness Tracker</div>
+        <div class="muted">Login und Registrierung</div>
+      </div>
+    </header>
+
+    <div class="auth-card">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="login" type="button">Login</button>
+        <button class="tab-btn" data-tab="register" type="button">Registrieren</button>
+      </div>
+
+      <div id="loginTab">
+        <h2>Anmelden</h2>
+        <p class="muted">Melde dich mit deiner E-Mail und deinem Passwort an.</p>
+
+        <form id="loginForm" class="auth-form">
+          <label>
+            E-Mail
+            <input id="loginEmail" type="email" required>
+          </label>
+
+          <label>
+            Passwort
+            <input id="loginPassword" type="password" required>
+          </label>
+
+          <button id="loginBtn" class="primary" type="submit">Einloggen</button>
+        </form>
+
+        <div id="loginStatus" class="status hidden"></div>
+      </div>
+
+      <div id="registerTab" class="hidden">
+        <h2>Registrieren</h2>
+        <p class="muted">Erstelle dein Konto mit Name, E-Mail und Passwort.</p>
+
+        <form id="registerForm" class="auth-form">
+          <label>
+            Name
+            <input id="registerName" type="text" required>
+          </label>
+
+          <label>
+            E-Mail
+            <input id="registerEmail" type="email" required>
+          </label>
+
+          <label>
+            Passwort
+            <input id="registerPassword" type="password" required>
+          </label>
+
+          <button id="registerBtn" class="primary" type="submit">Registrieren</button>
+        </form>
+
+        <div id="registerStatus" class="status hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="auth.js"></script>
+</body>
+</html>
