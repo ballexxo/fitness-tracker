@@ -5,19 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fitness Tracker - Trainingsplan erstellen</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#28c267">
+  <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
   <div class="page-shell">
     <header class="page-header">
       <a class="pill-button dashboard-button" href="dashboard.html">← Dashboard</a>
-      <div class="page-title">Trainingsplan erstellen</div>
-      
     </header>
+
+    <div class="page-title">Trainingsplan erstellen</div>
 
     <section class="page-card">
       <div class="module-badge">Modul 1</div>
-      <h1>Trainingsplan erstellen</h1>
-      <p>Hier kann man später Trainingspläne anlegen, bearbeiten und verwalten.</p>
+      <h1>Trainingspläne verwalten</h1>
+      <p>Wähle aus, ob du einen neuen Trainingsplan anlegen oder bestehende Trainingspläne bearbeiten möchtest.</p>
+
+      <div class="dashboard-buttons" style="margin-top: 24px;">
+        <a href="trainingsplan-add.html" class="main-button">Trainingsplan hinzufügen</a>
+        <a href="trainingsplan-edit-list.html" class="main-button">Trainingsplan bearbeiten</a>
+      </div>
     </section>
   </div>
 

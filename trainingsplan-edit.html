@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fitness Tracker - Trainingsplan bearbeiten</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#28c267">
+  <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="page-header">
+      <button class="pill-button dashboard-button" type="button" onclick="history.back()">← Zurück</button>
+    </header>
+
+    <div class="page-title">Trainingsplan bearbeiten</div>
+
+    <section class="page-card">
+      <div class="module-badge">Plan bearbeiten</div>
+
+      <form class="auth-form">
+        <label>
+          Trainingsplan Name
+          <input id="editPlanName" type="text" required>
+        </label>
+      </form>
+
+      <div style="margin-top: 20px;">
+        <button id="addExerciseBtn" class="primary" type="button">+ Übung hinzufügen</button>
+      </div>
+
+      <div id="editExerciseList" style="margin-top: 24px;"></div>
+
+      <div id="editPlanStatus" class="status hidden"></div>
+
+      <div style="margin-top: 24px;">
+        <button id="saveEditedPlanBtn" class="primary" type="button">Änderungen speichern</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="editExerciseModal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <h2 id="editModalTitle">Übung bearbeiten</h2>
+
+      <form class="auth-form">
+        <label>
+          Übung
+          <input id="editExerciseName" type="text" required>
+        </label>
+
+        <label>
+          Sätze
+          <select id="editExerciseSets" required>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+          </select>
+        </label>
+
+        <div class="two-col-grid">
+          <label>
+            Wiederholungen min
+            <input id="editExerciseRepsMin" type="number" min="1" required>
+          </label>
+
+          <label>
+            Wiederholungen max
+            <input id="editExerciseRepsMax" type="number" min="1" required>
+          </label>
+        </div>
+
+        <label>
+          Pause in Sekunden
+          <input id="editExerciseRest" type="number" min="0" required>
+        </label>
+      </form>
+
+      <div class="modal-actions">
+        <button id="cancelEditExerciseBtn" class="logout" type="button">Abbrechen</button>
+        <button id="confirmEditExerciseBtn" class="primary" type="button">Speichern</button>
+      </div>
+
+      <div id="editExerciseStatus" class="status hidden"></div>
+    </div>
+  </div>
+
+  <script type="module" src="trainingsplan-edit.js"></script>
+</body>
+</html>

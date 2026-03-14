@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fitness Tracker - Trainingspläne bearbeiten</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#28c267">
+  <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="page-header">
+      <button class="pill-button dashboard-button" type="button" onclick="history.back()">← Zurück</button>
+    </header>
+
+    <div class="page-title">Trainingspläne bearbeiten</div>
+
+    <section class="page-card">
+      <div class="module-badge">Bearbeiten</div>
+      <h1>Gespeicherte Trainingspläne</h1>
+      <p>Hier kannst du vorhandene Trainingspläne bearbeiten oder löschen.</p>
+
+      <div id="planListStatus" class="status hidden"></div>
+      <div id="planList" style="margin-top: 24px;"></div>
+    </section>
+  </div>
+
+  <script type="module" src="trainingsplan-edit-list.js"></script>
+</body>
+</html>
