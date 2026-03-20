@@ -2,23 +2,30 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fitness Tracker - Persönliche Daten</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Persönliche Daten</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
   <div class="page-shell">
+
     <header class="page-header">
-      <a class="pill-button dashboard-button" href="dashboard.html">← Dashboard</a>
-      <div class="page-title">Persönliche Daten</div>
-     
+      <button class="pill-button dashboard-button" type="button" onclick="history.back()">← Dashboard</button>
     </header>
 
-    <section class="page-card">
-      <div class="module-badge">Modul 2</div>
-      <h1>Persönliche Daten</h1>
-      <p>Hier kommen später Größe, Gewicht, Ziel, Kalorienbedarf und weitere persönliche Daten hinein.</p>
+    <div class="page-title">Persönliche Daten</div>
+
+    <section class="info-box personal-overview-box">
+      <div id="profileOverview">Lade Daten...</div>
     </section>
+
+    <div class="personal-actions">
+      <a href="personal-data-form.html" class="main-button">Daten eintragen</a>
+      <a href="calorie-calculator.html" class="main-button">Kalorienrechner</a>
+      <a href="weekly-report.html" class="main-button">Wochenbericht</a>
+    </div>
+
   </div>
 
   <script type="module" src="personal-data.js"></script>

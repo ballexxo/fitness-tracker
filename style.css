@@ -572,6 +572,11 @@ select {
   outline: none;
 }
 
+select:focus {
+  border-color: #28c267;
+  box-shadow: 0 0 0 3px rgba(40, 194, 103, 0.15);
+}
+
 .two-col-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -639,4 +644,240 @@ select {
 .exercise-actions .pill-button {
   min-width: 54px;
   padding: 12px 16px;
+}
+
+.last-training-box {
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(15, 23, 38, 0.9);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.performance-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.performance-good {
+  background: rgba(40, 194, 103, 0.16);
+  border: 1px solid rgba(40, 194, 103, 0.35);
+  color: #86efac;
+}
+
+.performance-neutral {
+  background: rgba(148, 163, 184, 0.12);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
+}
+
+.training-live-card {
+  align-items: flex-start;
+}
+
+.set-row {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(12, 22, 38, 0.8);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.set-row-title {
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.summary-block {
+  color: #e2e8f0;
+  line-height: 1.5;
+}
+
+.summary-exercise-box {
+  padding: 14px;
+  margin-top: 10px;
+  border-radius: 18px;
+  background: rgba(12, 22, 38, 0.8);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+#sessionTimer {
+  color: #28c267;
+  font-size: 1.7rem;
+  font-weight: 800;
+}
+
+#lastTrainingDate {
+  color: #28c267;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.improvement-positive {
+  color: #86efac;
+  font-weight: 800;
+}
+
+.improvement-negative {
+  color: #fca5a5;
+  font-weight: 800;
+}
+
+.history-toolbar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 14px;
+  align-items: center;
+}
+
+.history-range-box {
+  text-align: center;
+  padding: 14px 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(12, 22, 38, 0.8);
+}
+
+.history-range-text {
+  margin-top: 6px;
+  color: #28c267;
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+@media (max-width: 700px) {
+  .history-toolbar {
+    grid-template-columns: 1fr;
+  }
+}
+.manual-entry-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+
+  min-height: 64px;
+  padding: 14px 20px;
+  border-radius: 32px;
+  border: 2px solid #f59e0b;
+  background: #3b2a08;
+  color: #fde68a;
+  font-size: 1.1rem;
+  font-weight: 800;
+  transition: all 0.25s ease;
+  box-shadow:
+    0 0 10px rgba(245, 158, 11, 0.28),
+    inset 0 0 8px rgba(245, 158, 11, 0.08);
+}
+
+.manual-entry-button:hover {
+  transform: translateY(-1px) scale(1.02);
+  background: #51390b;
+  box-shadow:
+    0 0 14px rgba(245, 158, 11, 0.42),
+    0 0 24px rgba(245, 158, 11, 0.18);
+}
+
+.manual-entry-button:active {
+  transform: scale(0.98);
+}
+
+.small-action-button {
+  min-height: 64px;
+  font-size: 1.1rem;
+  padding: 14px 20px;
+}
+
+.exercise-actions.training-plan-actions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.exercise-actions.training-plan-actions .small-action-button,
+.exercise-actions.training-plan-actions .manual-entry-button {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 560px) {
+  .exercise-actions.training-plan-actions {
+    flex-direction: column;
+    flex-wrap: wrap;
+  }
+
+  .exercise-actions.training-plan-actions .small-action-button,
+  .exercise-actions.training-plan-actions .manual-entry-button {
+    width: 100%;
+  }
+}
+
+.personal-overview-box {
+  max-width: 100%;
+  margin-bottom: 28px;
+}
+
+.personal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  text-align: left;
+}
+
+.profile-item {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(12, 22, 38, 0.78);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.profile-label {
+  display: block;
+  font-size: 0.9rem;
+  color: #94a3b8;
+  margin-bottom: 6px;
+}
+
+.profile-value {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.profile-warning-box {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: #fde68a;
+  font-weight: 700;
+  text-align: center;
+}
+
+.empty-state-box {
+  text-align: center;
+  color: #e2e8f0;
+  line-height: 1.6;
+}
+
+@media (max-width: 700px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
 }

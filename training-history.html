@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fitness Tracker - Training Historie</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#28c267">
+  <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="page-header">
+      <button class="pill-button dashboard-button" type="button" onclick="history.back()">← Zurück</button>
+    </header>
+
+    <div class="page-title">Training Historie</div>
+
+    <section class="page-card">
+      <div class="module-badge">Historie</div>
+
+      <div class="history-toolbar">
+        <button id="prevWeekBtn" class="pill-button" type="button">← Woche zurück</button>
+        <div class="history-range-box">
+          <div class="muted">Angezeigte Woche</div>
+          <div id="historyRangeText" class="history-range-text">-</div>
+        </div>
+        <button id="nextWeekBtn" class="pill-button" type="button">Woche vor →</button>
+      </div>
+
+      <div id="historyStatus" class="status hidden"></div>
+      <div id="historyList" style="margin-top: 24px;"></div>
+    </section>
+  </div>
+
+  <!-- Anzeigen Modal -->
+  <div id="viewHistoryModal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <h2>Training anzeigen</h2>
+      <div id="viewHistoryContent" style="margin-top:16px;"></div>
+      <div class="modal-actions" style="margin-top:20px;">
+        <button id="closeViewHistoryBtn" class="primary" type="button">Schließen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bearbeiten Modal -->
+  <div id="editHistoryModal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <h2>Training bearbeiten</h2>
+      <div id="editHistoryContent" style="margin-top:16px;"></div>
+      <div id="editHistoryStatus" class="status hidden"></div>
+      <div class="modal-actions" style="margin-top:20px;">
+        <button id="cancelEditHistoryBtn" class="logout" type="button">Abbrechen</button>
+        <button id="saveEditHistoryBtn" class="primary" type="button">Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="training-history.js"></script>
+</body>
+</html>

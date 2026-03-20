@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fitness Tracker - Trainingseinheit</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#28c267">
+  <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="page-header">
+      <button class="pill-button dashboard-button" type="button" onclick="history.back()">← Zurück</button>
+    </header>
+
+    <div class="page-title">Trainingseinheit</div>
+
+    <section class="page-card">
+      <div class="module-badge">Aktives Training</div>
+
+      <div class="info-box" style="max-width:100%; margin-bottom: 24px;">
+        <div class="streak-label">Aktueller Trainingsplan</div>
+        <div class="streak-value" id="sessionPlanName">-</div>
+        <div class="streak-text">Trainingszeit: <span id="sessionTimer">00:00:00</span></div>
+      </div>
+
+      <div id="sessionStatus" class="status hidden"></div>
+      <div id="sessionExerciseList"></div>
+
+      <div style="margin-top:24px;">
+        <button id="finishTrainingBtn" class="primary" type="button">Training Beenden</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="sessionSummaryModal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <h2>Training abgeschlossen</h2>
+
+      <div id="sessionSummaryContent" style="margin-top:16px;"></div>
+
+      <div class="modal-actions" style="margin-top:20px;">
+        <button id="sessionSummaryOkBtn" class="primary" type="button">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="training-session.js"></script>
+</body>
+</html>

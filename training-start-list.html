@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fitness Tracker - Training Starten</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#28c267">
+  <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="page-header">
+      <button class="pill-button dashboard-button" type="button" onclick="history.back()">← Zurück</button>
+    </header>
+
+    <div class="page-title">Training Starten</div>
+
+    <section class="page-card">
+      <div class="module-badge">Trainingspläne</div>
+      <h1>Plan auswählen</h1>
+      <p>Wähle den Trainingsplan aus, den du jetzt starten möchtest.</p>
+
+      <div id="trainingPlanListStatus" class="status hidden"></div>
+      <div id="trainingPlanList" style="margin-top: 24px;"></div>
+    </section>
+  </div>
+
+  <script type="module" src="training-start-list.js"></script>
+</body>
+</html>

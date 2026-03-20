@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fitness Tracker - Training nachtragen</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#28c267">
+  <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="page-header">
+      <button class="pill-button dashboard-button" type="button" onclick="history.back()">← Zurück</button>
+    </header>
+
+    <div class="page-title">Training nachtragen</div>
+
+    <section class="page-card">
+      <div class="module-badge">Nachtragen</div>
+
+      <div class="info-box" style="max-width:100%; margin-bottom: 24px;">
+        <div class="streak-label">Trainingsplan</div>
+        <div class="streak-value" id="manualPlanName">-</div>
+      </div>
+
+      <form class="auth-form">
+        <label>
+          Datum des Trainings
+          <input id="manualTrainingDate" type="date" required>
+        </label>
+
+        <label>
+          Dauer in Minuten
+          <input id="manualDurationMinutes" type="number" min="1" placeholder="Zum Beispiel 75" required>
+        </label>
+      </form>
+
+      <div id="manualSessionStatus" class="status hidden"></div>
+      <div id="manualExerciseList" style="margin-top: 24px;"></div>
+
+      <div style="margin-top:24px;">
+        <button id="saveManualTrainingBtn" class="primary" type="button">Training speichern</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="manualSummaryModal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <h2>Training nachgetragen</h2>
+      <div id="manualSummaryContent" style="margin-top:16px;"></div>
+      <div class="modal-actions" style="margin-top:20px;">
+        <button id="manualSummaryOkBtn" class="primary" type="button">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="training-manual-entry.js"></script>
+</body>
+</html>
