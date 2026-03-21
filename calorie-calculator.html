@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kalorienrechner</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="page-shell">
+
+    <header class="page-header">
+      <button class="pill-button dashboard-button" type="button" onclick="history.back()">← Zurück</button>
+    </header>
+
+    <div class="page-title">Kalorienrechner</div>
+
+    <section class="page-card">
+      <div class="module-badge">Kalorien & Makros</div>
+
+      <form id="calculatorForm" class="auth-form">
+        <label>
+          Ziel
+          <select id="goalSelect" required>
+            <option value="">Bitte auswählen</option>
+            <option value="cut">Abnehmen</option>
+            <option value="maintain">Gewicht halten</option>
+            <option value="bulk">Zunehmen</option>
+          </select>
+        </label>
+
+        <label>
+          Ernährungsform
+          <select id="dietTypeSelect" required>
+            <option value="">Bitte auswählen</option>
+            <option value="balanced">Ausgewogen</option>
+            <option value="low_carb">Low Carb</option>
+            <option value="low_fat">Low Fat</option>
+          </select>
+        </label>
+
+        <label class="checkbox-row">
+          <input id="manualCaloriesToggle" type="checkbox">
+          <span>Kalorienziel selbst festlegen</span>
+        </label>
+
+        <div id="automaticCalculationFields">
+          <label>
+            Aktivitätslevel
+            <select id="activityLevel" required>
+              <option value="">Bitte auswählen</option>
+              <option value="low">Sehr wenig aktiv</option>
+              <option value="light">Leicht aktiv</option>
+              <option value="moderate">Moderat aktiv</option>
+              <option value="high">Sehr aktiv</option>
+            </select>
+          </label>
+
+
+          <div class="activity-info-box">
+  <div><strong>Sehr wenig aktiv:</strong> Bürojob, kaum Bewegung</div>
+  <div><strong>Leicht aktiv:</strong> Wenig Bewegung + leichtes Training</div>
+  <div><strong>Moderat aktiv:</strong> Regelmäßiges Training (3–5x/Woche)</div>
+  <div><strong>Sehr aktiv:</strong> Viel Training oder körperliche Arbeit</div>
+</div>
+
+
+          <label>
+            Trainingstage pro Woche
+            <select id="trainingDaysPerWeek" required>
+              <option value="">Bitte auswählen</option>
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+            </select>
+          </label>
+
+          <label>
+            Durchschnittliche Trainingsdauer in Minuten
+            <input id="avgTrainingMinutes" type="number" min="0" max="300" placeholder="Zum Beispiel 75" required>
+          </label>
+        </div>
+
+        <div id="manualCaloriesField" class="hidden">
+          <label>
+            Eigenes Kalorienziel
+            <input id="manualCaloriesInput" type="number" min="500" max="10000" placeholder="Zum Beispiel 2000">
+          </label>
+        </div>
+
+        <div id="calculatorStatus" class="status hidden"></div>
+
+        <button id="calculateBtn" class="primary" type="submit">Berechnen und speichern</button>
+      </form>
+
+      <div id="calculatorResult" class="calculator-result-box hidden"></div>
+    </section>
+
+  </div>
+
+  <script type="module" src="calorie-calculator.js"></script>
+</body>
+</html>

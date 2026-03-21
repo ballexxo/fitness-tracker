@@ -12,8 +12,6 @@ const profileBirthdate = document.getElementById('profileBirthdate');
 const profileSex = document.getElementById('profileSex');
 const profileHeight = document.getElementById('profileHeight');
 const profileWeight = document.getElementById('profileWeight');
-const profileGoal = document.getElementById('profileGoal');
-const profileDietType = document.getElementById('profileDietType');
 
 function setStatus(element, message, type = '') {
   element.textContent = message;
@@ -49,8 +47,6 @@ async function loadExistingProfile() {
   profileSex.value = data.sex || '';
   profileHeight.value = data.height_cm || '';
   profileWeight.value = data.current_weight_kg || '';
-  profileGoal.value = data.goal || '';
-  profileDietType.value = data.diet_type || '';
 }
 
 profileForm.addEventListener('submit', async (event) => {
@@ -67,8 +63,6 @@ profileForm.addEventListener('submit', async (event) => {
     sex: profileSex.value,
     height_cm: Number(profileHeight.value),
     current_weight_kg: Number(profileWeight.value),
-    goal: profileGoal.value,
-    diet_type: profileDietType.value,
     updated_at: new Date().toISOString(),
   };
 
