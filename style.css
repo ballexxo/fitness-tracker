@@ -14,6 +14,7 @@ body {
   color: #ffffff;
   min-height: 100vh;
   padding: 14px;
+  overflow-x: hidden;
 }
 
 .container,
@@ -41,7 +42,7 @@ body {
 
 .app-header,
 .simple-header {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 /* ------------------------------------------------ */
@@ -55,6 +56,7 @@ body {
   border-radius: 28px;
   padding: 28px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
 }
 
 .auth-card h2,
@@ -77,21 +79,21 @@ body {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 .back-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   border-radius: 999px;
   border: 2px solid #28c267;
   background: #0d2a1d;
   color: #b9f7cf;
   text-decoration: none;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: 800;
   cursor: pointer;
   transition: all 0.25s ease;
@@ -118,7 +120,6 @@ body {
   text-decoration: none;
 }
 
-/* Falls alte Header Buttons irgendwo noch drin sind */
 .page-header .pill-button,
 .page-header .dashboard-button {
   width: auto !important;
@@ -126,7 +127,6 @@ body {
   padding: 0 !important;
 }
 
-/* Unterseiten-Titel und Modulbadges ausblenden */
 .page-title {
   display: none;
 }
@@ -142,7 +142,7 @@ body {
 .tabs {
   display: flex;
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
 }
 
@@ -232,6 +232,9 @@ input[type="date"] {
   width: 100%;
   max-width: 100%;
   display: block;
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 54px;
 }
 
 textarea {
@@ -239,7 +242,7 @@ textarea {
 }
 
 /* ------------------------------------------------ */
-/* STANDARD BUTTONS */
+/* BUTTONS */
 /* ------------------------------------------------ */
 
 button.primary,
@@ -319,11 +322,11 @@ button.primary:disabled {
 
 .main-button {
   width: 100%;
-  min-height: 88px;
-  padding: 18px 24px;
-  border-radius: 32px;
+  min-height: 82px;
+  padding: 16px 22px;
+  border-radius: 28px;
   text-decoration: none;
-  font-size: 1.6rem;
+  font-size: 1.45rem;
   font-weight: 800;
   display: flex;
   align-items: center;
@@ -353,7 +356,6 @@ button.primary:disabled {
   text-decoration: none;
 }
 
-/* Logout rot */
 button.logout {
   display: inline-flex;
   align-items: center;
@@ -385,7 +387,6 @@ button.logout:active {
   transform: scale(0.98);
 }
 
-/* Goldener Nachtragen Button */
 .manual-entry-button {
   display: inline-flex;
   align-items: center;
@@ -420,8 +421,8 @@ button.logout:active {
 
 .small-action-button {
   min-height: 64px;
-  font-size: 1.1rem;
-  padding: 14px 20px;
+  font-size: 1.05rem;
+  padding: 14px 18px;
 }
 
 /* ------------------------------------------------ */
@@ -456,7 +457,7 @@ button.logout:active {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
+  gap: 16px;
 }
 
 .dashboard-title {
@@ -476,8 +477,8 @@ button.logout:active {
   width: 100%;
   max-width: 620px;
   text-align: center;
-  padding: 22px 20px;
-  border-radius: 26px;
+  padding: 20px 18px;
+  border-radius: 24px;
   border: 2px solid #28c267;
   background: rgba(32, 44, 64, 0.88);
   box-shadow:
@@ -486,14 +487,14 @@ button.logout:active {
 }
 
 #currentWeekday {
-  font-size: 2rem;
+  font-size: 1.9rem;
   font-weight: 800;
   color: #28c267;
   margin-bottom: 4px;
 }
 
 #currentDate {
-  font-size: 1.35rem;
+  font-size: 1.2rem;
   color: #dbe5f1;
 }
 
@@ -505,7 +506,7 @@ button.logout:active {
 
 #lastTrainingDate {
   color: #28c267;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 700;
 }
 
@@ -516,14 +517,14 @@ button.logout:active {
 }
 
 .streak-value {
-  font-size: 2.2rem;
+  font-size: 2rem;
   font-weight: 900;
   color: #28c267;
   margin-bottom: 6px;
 }
 
 .streak-text {
-  font-size: 1.05rem;
+  font-size: 1rem;
   color: #dbe5f1;
 }
 
@@ -532,12 +533,12 @@ button.logout:active {
   max-width: 620px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  margin-top: 6px;
+  gap: 16px;
+  margin-top: 4px;
 }
 
 /* ------------------------------------------------ */
-/* MODAL */
+/* MODALS */
 /* ------------------------------------------------ */
 
 .modal-overlay {
@@ -562,7 +563,7 @@ button.logout:active {
   background: rgba(17, 24, 39, 0.96);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 28px;
-  padding: 24px;
+  padding: 22px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
 }
 
@@ -586,10 +587,10 @@ button.logout:active {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 16px;
-  padding: 18px;
-  margin-bottom: 14px;
-  border-radius: 22px;
+  gap: 14px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border-radius: 20px;
   background: rgba(18, 30, 46, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
@@ -613,10 +614,10 @@ button.logout:active {
 }
 
 .mini-action-button {
-  min-height: 44px;
+  min-height: 42px;
   padding: 10px 14px;
   border-radius: 18px;
-  font-size: 1rem;
+  font-size: 0.98rem;
   font-weight: 800;
 }
 
@@ -624,13 +625,13 @@ button.logout:active {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 52px;
-  height: 44px;
-  border-radius: 18px;
+  width: 48px;
+  height: 42px;
+  border-radius: 16px;
   border: 2px solid #28c267;
   background: #0d2a1d;
   color: #b9f7cf;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 800;
   cursor: pointer;
   transition: all 0.25s ease;
@@ -657,6 +658,9 @@ button.logout:active {
   border-radius: 18px;
   background: rgba(15, 23, 38, 0.9);
   border: 1px solid rgba(255,255,255,0.06);
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
 }
 
 .performance-badge {
@@ -667,6 +671,7 @@ button.logout:active {
   border-radius: 999px;
   font-weight: 700;
   font-size: 0.92rem;
+  white-space: normal;
 }
 
 .performance-good {
@@ -686,7 +691,7 @@ button.logout:active {
 }
 
 .set-row {
-  margin-top: 14px;
+  margin-top: 12px;
   padding: 14px;
   border-radius: 18px;
   background: rgba(12, 22, 38, 0.8);
@@ -727,8 +732,8 @@ button.logout:active {
 
 .calculator-result-box {
   margin-top: 24px;
-  padding: 18px;
-  border-radius: 22px;
+  padding: 16px;
+  border-radius: 20px;
   background: rgba(12, 22, 38, 0.8);
   border: 1px solid rgba(255,255,255,0.06);
 }
@@ -744,17 +749,17 @@ button.logout:active {
 
 .personal-overview-box {
   max-width: 100%;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 .personal-actions {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 }
 
 .profile-section {
-  margin-bottom: 26px;
+  margin-bottom: 22px;
 }
 
 .profile-section-title {
@@ -772,21 +777,21 @@ button.logout:active {
 
 .profile-section-title .line {
   flex: 1;
-  max-width: 180px;
+  max-width: 140px;
   height: 2px;
   background: #28c267;
   opacity: 0.8;
 }
 
 .profile-text-block {
-  line-height: 1.8;
+  line-height: 1.7;
   color: #e2e8f0;
 }
 
 .profile-name {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 800;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   color: #ffffff;
 }
 
@@ -811,7 +816,11 @@ button.logout:active {
 
 .profile-macros {
   margin-top: 14px;
-  line-height: 1.8;
+  line-height: 1.5;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .macro-separator {
@@ -965,7 +974,7 @@ button.logout:active {
 
 @media (max-width: 700px) {
   body {
-    padding: 14px;
+    padding: 12px;
   }
 
   .container,
@@ -981,7 +990,7 @@ button.logout:active {
 
   .auth-card,
   .page-card {
-    padding: 22px;
+    padding: 18px;
     border-radius: 24px;
   }
 
@@ -991,35 +1000,41 @@ button.logout:active {
 
   .tab-btn {
     width: 100%;
-    min-height: 58px;
+    min-height: 56px;
   }
 
   .dashboard-title {
-    font-size: 2.4rem;
+    font-size: 2.2rem;
   }
 
   #currentWeekday {
-    font-size: 1.6rem;
+    font-size: 1.55rem;
   }
 
   #currentDate {
-    font-size: 1.15rem;
+    font-size: 1.05rem;
   }
 
   .streak-value {
-    font-size: 1.9rem;
+    font-size: 1.8rem;
   }
 
   .main-button {
-    min-height: 82px;
-    font-size: 1.35rem;
-    padding: 16px 18px;
+    min-height: 72px;
+    font-size: 1.2rem;
+    padding: 14px 16px;
+    border-radius: 26px;
+  }
+
+  .info-box {
+    padding: 18px 14px;
+    border-radius: 22px;
   }
 
   .back-button {
-    width: 46px;
-    height: 46px;
-    font-size: 1.25rem;
+    width: 44px;
+    height: 44px;
+    font-size: 1.2rem;
   }
 
   .page-header .pill-button,
@@ -1029,7 +1044,11 @@ button.logout:active {
     padding: 0 !important;
   }
 
-    .modal-overlay {
+  .two-col-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-overlay {
     align-items: flex-start;
     padding: 12px;
   }
@@ -1037,10 +1056,7 @@ button.logout:active {
   .modal-card {
     max-height: calc(100vh - 24px);
     border-radius: 24px;
-  }
-
-  .two-col-grid {
-    grid-template-columns: 1fr;
+    padding: 18px;
   }
 
   .modal-actions {
@@ -1051,6 +1067,9 @@ button.logout:active {
   .exercise-item {
     flex-direction: column;
     align-items: stretch;
+    padding: 14px;
+    margin-bottom: 12px;
+    border-radius: 18px;
   }
 
   .exercise-actions {
@@ -1070,35 +1089,48 @@ button.logout:active {
   .exercise-main-row .pill-button,
   .exercise-main-row .logout {
     flex: 1;
-    min-height: 48px;
-    padding: 12px 14px;
-    font-size: 1rem;
+    min-height: 46px;
+    padding: 12px 12px;
+    font-size: 0.96rem;
   }
 
   .history-toolbar {
-    grid-template-columns: 46px minmax(0, 1fr) 46px;
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
     gap: 10px;
   }
 
   .week-nav-button {
-    width: 46px;
-    height: 46px;
-    font-size: 1.1rem;
+    width: 44px;
+    height: 44px;
+    font-size: 1.05rem;
   }
 
   .history-range-box {
-    padding: 12px 14px;
+    padding: 12px 10px;
   }
 
   .history-range-text {
-    font-size: 0.95rem;
+    font-size: 0.92rem;
   }
 
   .profile-section-title .line {
-    max-width: 80px;
+    max-width: 56px;
+  }
+
+  .profile-text-block {
+    text-align: center;
+  }
+
+  .profile-macros {
+    font-size: 0.82rem;
+  }
+
+  .last-training-box {
+    font-size: 0.9rem;
   }
 
   input[type="date"] {
     font-size: 16px;
+    padding-right: 12px;
   }
 }
