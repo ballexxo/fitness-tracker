@@ -411,16 +411,16 @@ async function loadPlanAndCreateDraft() {
 
 async function fetchProfileWeight() {
   const { data, error } = await supabase
-    .from('profiles')
-    .select('body_weight_kg')
-    .eq('id', currentUser.id)
+    .from('user_profile_data')
+    .select('current_weight_kg')
+    .eq('user_id', currentUser.id)
     .maybeSingle();
 
-  if (error || !data?.body_weight_kg) {
+  if (error || !data?.current_weight_kg) {
     return null;
   }
 
-  return Number(data.body_weight_kg);
+  return Number(data.current_weight_kg);
 }
 
 function estimateCalories(durationSeconds, bodyWeightKg) {
