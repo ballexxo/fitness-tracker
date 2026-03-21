@@ -486,7 +486,7 @@ const { data: sessionRow, error: sessionError } = await supabase
 
 manualSummaryOkBtn.addEventListener('click', () => {
   manualSummaryModal.classList.add('hidden');
-  window.location.href = './training.html';
+  window.location.replace('./training.html');
 });
 
 loadPlan();

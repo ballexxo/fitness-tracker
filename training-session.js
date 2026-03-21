@@ -570,7 +570,7 @@ finishTrainingBtn.addEventListener('click', finishTraining);
 
 sessionSummaryOkBtn.addEventListener('click', () => {
   sessionSummaryModal.classList.add('hidden');
-  window.location.href = './training.html';
+  window.location.replace('./training.html');
 });
 
 loadPlanAndCreateDraft();
