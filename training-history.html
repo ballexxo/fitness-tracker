@@ -12,21 +12,19 @@
 <body>
   <div class="page-shell">
     <header class="page-header">
-      <button class="pill-button dashboard-button" type="button" onclick="history.back()">← Zurück</button>
+      <button class="back-button" type="button" onclick="history.back()">←</button>
     </header>
 
-    <div class="page-title">Training Historie</div>
-
     <section class="page-card">
-      <div class="module-badge">Historie</div>
-
       <div class="history-toolbar">
-        <button id="prevWeekBtn" class="pill-button" type="button">← Woche zurück</button>
+        <button id="prevWeekBtn" class="week-nav-button" type="button" aria-label="Vorherige Woche">←</button>
+
         <div class="history-range-box">
           <div class="muted">Angezeigte Woche</div>
           <div id="historyRangeText" class="history-range-text">-</div>
         </div>
-        <button id="nextWeekBtn" class="pill-button" type="button">Woche vor →</button>
+
+        <button id="nextWeekBtn" class="week-nav-button" type="button" aria-label="Nächste Woche">→</button>
       </div>
 
       <div id="historyStatus" class="status hidden"></div>
@@ -34,7 +32,6 @@
     </section>
   </div>
 
-  <!-- Anzeigen Modal -->
   <div id="viewHistoryModal" class="modal-overlay hidden">
     <div class="modal-card">
       <h2>Training anzeigen</h2>
@@ -45,7 +42,6 @@
     </div>
   </div>
 
-  <!-- Bearbeiten Modal -->
   <div id="editHistoryModal" class="modal-overlay hidden">
     <div class="modal-card">
       <h2>Training bearbeiten</h2>

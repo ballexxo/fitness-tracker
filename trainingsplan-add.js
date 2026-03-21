@@ -85,10 +85,20 @@ function renderExercises() {
       </div>
 
       <div class="exercise-actions">
-        <button class="pill-button move-up-btn" data-index="${index}" type="button">↑</button>
-        <button class="pill-button move-down-btn" data-index="${index}" type="button">↓</button>
-        <button class="pill-button edit-exercise-btn" data-index="${index}" type="button">Bearbeiten</button>
-        <button class="logout delete-exercise-btn" data-index="${index}" type="button">Löschen</button>
+        <div class="exercise-move-row">
+          <button class="mini-square-button move-up-btn" data-index="${index}" type="button">↑</button>
+          <button class="mini-square-button move-down-btn" data-index="${index}" type="button">↓</button>
+        </div>
+
+        <div class="exercise-main-row">
+          <button class="pill-button mini-action-button edit-exercise-btn" data-index="${index}" type="button">
+            Bearbeiten
+          </button>
+
+          <button class="logout mini-action-button delete-exercise-btn" data-index="${index}" type="button">
+            Löschen
+          </button>
+        </div>
       </div>
     </div>
   `).join('');
@@ -137,7 +147,6 @@ function renderExercises() {
     });
   });
 }
-
 // ------------------------------------------------------------
 // Modal Events
 // ------------------------------------------------------------
