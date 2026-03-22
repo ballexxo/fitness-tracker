@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fitness Tracker - Training planen</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#28c267">
+  <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="page-header">
+      <button class="back-button" type="button" onclick="history.back()">←</button>
+    </header>
+
+    <section class="page-card">
+      <div class="history-toolbar">
+        <button id="prevWeekBtn" class="week-nav-button" type="button" aria-label="Vorherige Woche">←</button>
+
+        <div class="history-range-box">
+          <div class="muted">Trainingswoche</div>
+          <div id="plannerRangeText" class="history-range-text">-</div>
+        </div>
+
+        <button id="nextWeekBtn" class="week-nav-button" type="button" aria-label="Nächste Woche">→</button>
+      </div>
+
+      <div id="plannerStatus" class="status hidden"></div>
+      <div id="plannerList" style="margin-top: 24px;"></div>
+    </section>
+  </div>
+
+  <div id="plannerModal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <h2>Trainingsplan auswählen</h2>
+      <div id="plannerModalText" class="muted" style="margin-top:8px;"></div>
+      <div id="plannerPlanList" style="margin-top:16px;"></div>
+      <div class="modal-actions">
+        <button id="closePlannerModalBtn" class="logout" type="button">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="training-planner.js"></script>
+</body>
+</html>

@@ -5,35 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fitness Tracker - Dashboard</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#28c267">
+  <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
   <div class="dashboard-shell">
     <div class="dashboard-topbar">
-      <button id="logoutBtn" class="logout">Logout</button>
+      <button id="logoutBtn" class="logout" type="button">Logout</button>
     </div>
 
     <main class="dashboard-main">
-      <div class="dashboard-title">
-        Hallo <span id="userName"></span>
-      </div>
+      <h1 class="dashboard-title" id="helloText">Hallo</h1>
 
-      <div class="info-box date-box">
-        <div id="currentWeekday">Donnerstag</div>
-        <div id="currentDate">12.3.2026</div>
-      </div>
+      <section class="info-box dashboard-planner-box">
+        <div id="currentWeekday">-</div>
+        <div id="currentDate">-</div>
 
-      <div class="info-box streak-box">
-        <div class="streak-label">Live Streak</div>
-        <div class="streak-value" id="streakValue">🔥 3 Tage</div>
-        <div class="streak-text" id="streakText">Starker Anfang. Bleib dran.</div>
-      </div>
+        <div id="plannerDashboardContent" style="margin-top: 18px;"></div>
+      </section>
 
-      <div class="dashboard-buttons">
-        <a href="trainingsplan.html" class="main-button">Trainingsplan erstellen</a>
+      <section class="dashboard-buttons">
         <a href="personal-data.html" class="main-button">Persönliche Daten</a>
+        <a href="trainingsplan.html" class="main-button">Trainingsplan Erstellen</a>
         <a href="training.html" class="main-button">Training</a>
         <a href="statistik.html" class="main-button">Statistik</a>
-      </div>
+      </section>
     </main>
   </div>
 

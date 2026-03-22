@@ -303,24 +303,55 @@ async function loadHistory() {
     });
   });
 
-  document.querySelectorAll('.delete-session-btn').forEach((button) => {
-    button.addEventListener('click', async () => {
-      const sessionId = button.dataset.id;
+ document.querySelectorAll('.delete-session-btn').forEach((button) => {
+  button.addEventListener('click', async () => {
+    const sessionId = button.dataset.id;
 
-      const { error: deleteError } = await supabase
-        .from('workout_sessions')
-        .delete()
-        .eq('id', sessionId);
+    // Falls diese Session mit einer geplanten Einheit verknüpft war:
+    const { data: linkedPlannedWorkout, error: linkedError } = await supabase
+      .from('planned_workouts')
+      .select('id, planned_date, status, completed_session_id')
+      .eq('completed_session_id', sessionId)
+      .maybeSingle();
 
-      if (deleteError) {
-        console.error(deleteError);
-        setStatus(historyStatus, 'Training konnte nicht gelöscht werden.', 'error');
-        return;
+    if (linkedError) {
+      console.error(linkedError);
+    }
+
+    const { error: deleteError } = await supabase
+      .from('workout_sessions')
+      .delete()
+      .eq('id', sessionId);
+
+    if (deleteError) {
+      console.error(deleteError);
+      setStatus(historyStatus, 'Training konnte nicht gelöscht werden.', 'error');
+      return;
+    }
+
+    // Wenn es eine verknüpfte Planung gab, wieder auf planned zurücksetzen
+    if (linkedPlannedWorkout) {
+      const today = new Date();
+      const localTodayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+      const newStatus = linkedPlannedWorkout.planned_date < localTodayString ? 'missed' : 'planned';
+
+      const { error: resetError } = await supabase
+        .from('planned_workouts')
+        .update({
+          status: newStatus,
+          completed_session_id: null,
+        })
+        .eq('id', linkedPlannedWorkout.id);
+
+      if (resetError) {
+        console.error(resetError);
       }
+    }
 
-      await loadHistory();
-    });
+    await loadHistory();
   });
+});
 }
 
 // ------------------------------------------------------------

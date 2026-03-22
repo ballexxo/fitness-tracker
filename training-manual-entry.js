@@ -14,6 +14,11 @@ const manualSummaryModal = document.getElementById('manualSummaryModal');
 const manualSummaryContent = document.getElementById('manualSummaryContent');
 const manualSummaryOkBtn = document.getElementById('manualSummaryOkBtn');
 
+const plannedTrainingWarningModal = document.getElementById('plannedTrainingWarningModal');
+const plannedTrainingWarningText = document.getElementById('plannedTrainingWarningText');
+const cancelPlannedTrainingBtn = document.getElementById('cancelPlannedTrainingBtn');
+const continuePlannedTrainingBtn = document.getElementById('continuePlannedTrainingBtn');
+
 let currentUser = null;
 let currentPlanId = null;
 let currentPlanName = '';
@@ -28,6 +33,13 @@ function setStatus(element, message, type = '') {
 function getPlanIdFromUrl() {
   const params = new URLSearchParams(window.location.search);
   return params.get('planId');
+}
+
+function getLocalDateString(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 function formatSeconds(totalSeconds) {
@@ -47,6 +59,39 @@ async function guardPage() {
 
   currentUser = data.session.user;
   return currentUser;
+}
+
+async function checkPlannedTrainingConflict(planId) {
+  const today = getLocalDateString();
+
+  const { data, error } = await supabase
+    .from('planned_workouts')
+    .select('id, plan_id, plan_name, planned_date, status')
+    .eq('user_id', currentUser.id)
+    .eq('planned_date', today)
+    .eq('status', 'planned')
+    .maybeSingle();
+
+  if (error) {
+    console.error('Fehler beim Prüfen des geplanten Trainings:', error);
+    return true;
+  }
+
+  if (!data) {
+    return true;
+  }
+
+  if (data.plan_id === planId) {
+    return true;
+  }
+
+  plannedTrainingWarningText.textContent =
+    `Heute ist ${data.plan_name} geplant. Plane dein Training um, da sonst deine Live Streak kaputt geht.`;
+
+  plannedTrainingWarningModal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+
+  return false;
 }
 
 async function fetchLastExerciseData(exerciseName) {
@@ -92,6 +137,20 @@ async function fetchLastExerciseData(exerciseName) {
   return null;
 }
 
+function getPerformanceBadge(lastData, repsMax) {
+  if (!lastData || !lastData.sets || lastData.sets.length === 0) {
+    return '<span class="performance-badge performance-neutral">Keine Historie</span>';
+  }
+
+  const allReachedMax = lastData.sets.every((setItem) => Number(setItem.reps_done) >= Number(repsMax));
+
+  if (allReachedMax) {
+    return '<span class="performance-badge performance-good">Gewicht erhöhen möglich</span>';
+  }
+
+  return '<span class="performance-badge performance-neutral">Gewicht beibehalten</span>';
+}
+
 function getCompactLastTrainingLine(lastData) {
   return lastData.sets
     .map((setItem) => `${setItem.reps_done ?? '-'} Wdh · ${setItem.weight_used ?? '-'} kg`)
@@ -107,7 +166,50 @@ function calculateExerciseVolume(exercise) {
 }
 
 async function calculateExerciseImprovement(exercise, excludeSessionId = null) {
-  const lastData = await fetchLastExerciseData(exercise.exercise_name, excludeSessionId);
+  const { data: sessions, error: sessionsError } = await supabase
+    .from('workout_sessions')
+    .select('id, training_date, finished_at')
+    .eq('user_id', currentUser.id)
+    .not('finished_at', 'is', null)
+    .order('finished_at', { ascending: false });
+
+  if (sessionsError || !sessions || sessions.length === 0) {
+    return {
+      text: 'Steigerung zum letzten Training: keine Vergleichsdaten',
+      className: '',
+    };
+  }
+
+  let lastData = null;
+
+  for (const session of sessions) {
+    if (excludeSessionId && session.id === excludeSessionId) continue;
+
+    const { data: exerciseRows, error: exerciseError } = await supabase
+      .from('workout_session_exercises')
+      .select('id, exercise_name')
+      .eq('session_id', session.id)
+      .eq('exercise_name', exercise.exercise_name)
+      .limit(1);
+
+    if (exerciseError || !exerciseRows || exerciseRows.length === 0) continue;
+
+    const exerciseRow = exerciseRows[0];
+
+    const { data: setRows, error: setError } = await supabase
+      .from('workout_session_sets')
+      .select('set_number, reps_done, weight_used')
+      .eq('session_exercise_id', exerciseRow.id)
+      .order('set_number', { ascending: true });
+
+    if (setError) break;
+
+    lastData = {
+      date: session.training_date,
+      sets: setRows || [],
+    };
+    break;
+  }
 
   if (!lastData || !lastData.sets || lastData.sets.length === 0) {
     return {
@@ -125,9 +227,7 @@ async function calculateExerciseImprovement(exercise, excludeSessionId = null) {
   }, 0);
 
   const currentAvgWeight =
-    manualSession.exercises
-      .find((item) => item.exercise_name === exercise.exercise_name)
-      .sets.reduce((sum, setItem) => sum + Number(setItem.weight_used || 0), 0) /
+    exercise.sets.reduce((sum, setItem) => sum + Number(setItem.weight_used || 0), 0) /
     Math.max(exercise.sets.length, 1);
 
   const lastAvgWeight =
@@ -185,18 +285,42 @@ function estimateCalories(durationSeconds, bodyWeightKg) {
   return Math.round(met * bodyWeightKg * durationHours);
 }
 
-function getPerformanceBadge(lastData, repsMax) {
-  if (!lastData || !lastData.sets || lastData.sets.length === 0) {
-    return '<span class="performance-badge performance-neutral">Keine Historie</span>';
+async function markPlannedWorkoutAsCompleted(sessionRow, selectedDate) {
+  const today = getLocalDateString();
+
+  if (selectedDate !== today) {
+    return;
   }
 
-  const allReachedMax = lastData.sets.every((setItem) => Number(setItem.reps_done) >= Number(repsMax));
+  const { data: plannedWorkout, error: plannedError } = await supabase
+    .from('planned_workouts')
+    .select('id, plan_id, planned_date, status')
+    .eq('user_id', currentUser.id)
+    .eq('planned_date', selectedDate)
+    .eq('plan_id', manualSession.plan_id)
+    .eq('status', 'planned')
+    .maybeSingle();
 
-  if (allReachedMax) {
-    return '<span class="performance-badge performance-good">Gewicht erhöhen möglich</span>';
+  if (plannedError) {
+    console.error('Fehler beim Suchen des geplanten Trainings:', plannedError);
+    return;
   }
 
-  return '<span class="performance-badge performance-neutral">Gewicht beibehalten</span>';
+  if (!plannedWorkout) {
+    return;
+  }
+
+  const { error: updateError } = await supabase
+    .from('planned_workouts')
+    .update({
+      status: 'completed',
+      completed_session_id: sessionRow.id,
+    })
+    .eq('id', plannedWorkout.id);
+
+  if (updateError) {
+    console.error('Fehler beim Aktualisieren des geplanten Trainings:', updateError);
+  }
 }
 
 async function renderManualExercises() {
@@ -210,15 +334,15 @@ async function renderManualExercises() {
     if (!lastData) {
       lastTrainingHtml = `<div class="muted" style="margin-top:10px;">Noch keine Datensätze aus dem letzten Training vorhanden.</div>`;
     } else {
-    lastTrainingHtml = `
-  <div class="last-training-box">
-    <div class="muted">Letztes Training</div>
-    <div style="margin-top:8px;">${getCompactLastTrainingLine(lastData)}</div>
-    <div style="margin-top:10px;">
-      ${getPerformanceBadge(lastData, exercise.reps_max)}
-    </div>
-  </div>
-`;
+      lastTrainingHtml = `
+        <div class="last-training-box">
+          <div class="muted">Letztes Training</div>
+          <div style="margin-top:8px;">${getCompactLastTrainingLine(lastData)}</div>
+          <div style="margin-top:10px;">
+            ${getPerformanceBadge(lastData, exercise.reps_max)}
+          </div>
+        </div>
+      `;
     }
 
     let setsHtml = '';
@@ -292,16 +416,17 @@ async function renderManualExercises() {
 }
 
 async function loadPlan() {
-  await guardPage();
+  if (!currentUser) {
+    await guardPage();
+  }
 
   currentPlanId = getPlanIdFromUrl();
   if (!currentPlanId) {
-    window.location.href = './training-start-list.html';
+    window.location.replace('./training-start-list.html');
     return;
   }
 
-  const today = new Date().toISOString().slice(0, 10);
-  manualTrainingDate.value = today;
+  manualTrainingDate.value = getLocalDateString();
 
   const { data: planData, error: planError } = await supabase
     .from('training_plans')
@@ -374,28 +499,30 @@ saveManualTrainingBtn.addEventListener('click', async () => {
     const finishedAt = new Date(startedAt.getTime() + durationSeconds * 1000);
 
     const bodyWeightKg = await fetchProfileWeight();
-const estimatedCalories = bodyWeightKg ? estimateCalories(durationSeconds, bodyWeightKg) : null;
+    const estimatedCalories = bodyWeightKg ? estimateCalories(durationSeconds, bodyWeightKg) : null;
 
-const { data: sessionRow, error: sessionError } = await supabase
-  .from('workout_sessions')
-  .insert({
-    user_id: currentUser.id,
-    plan_id: manualSession.plan_id,
-    plan_name: manualSession.plan_name,
-    started_at: startedAt.toISOString(),
-    finished_at: finishedAt.toISOString(),
-    duration_seconds: durationSeconds,
-    training_date: selectedDate,
-    calories_burned: estimatedCalories,
-  })
-  .select()
-  .single();
+    const { data: sessionRow, error: sessionError } = await supabase
+      .from('workout_sessions')
+      .insert({
+        user_id: currentUser.id,
+        plan_id: manualSession.plan_id,
+        plan_name: manualSession.plan_name,
+        started_at: startedAt.toISOString(),
+        finished_at: finishedAt.toISOString(),
+        duration_seconds: durationSeconds,
+        training_date: selectedDate,
+        calories_burned: estimatedCalories,
+      })
+      .select()
+      .single();
 
     if (sessionError) {
       console.error(sessionError);
       setStatus(manualSessionStatus, 'Training konnte nicht gespeichert werden.', 'error');
       return;
     }
+
+    await markPlannedWorkoutAsCompleted(sessionRow, selectedDate);
 
     for (let exerciseIndex = 0; exerciseIndex < manualSession.exercises.length; exerciseIndex++) {
       const exercise = manualSession.exercises[exerciseIndex];
@@ -437,8 +564,6 @@ const { data: sessionRow, error: sessionError } = await supabase
         return;
       }
     }
-
-
 
     const summaryParts = [];
     summaryParts.push(`
@@ -492,4 +617,32 @@ manualSummaryOkBtn.addEventListener('click', () => {
   window.location.replace('./training.html');
 });
 
-loadPlan();
+continuePlannedTrainingBtn.addEventListener('click', async () => {
+  plannedTrainingWarningModal.classList.add('hidden');
+  document.body.style.overflow = '';
+  await loadPlan();
+});
+
+cancelPlannedTrainingBtn.addEventListener('click', () => {
+  plannedTrainingWarningModal.classList.add('hidden');
+  document.body.style.overflow = '';
+  window.location.replace('./training-start-list.html');
+});
+
+async function initManualEntry() {
+  await guardPage();
+
+  currentPlanId = getPlanIdFromUrl();
+  if (!currentPlanId) {
+    window.location.replace('./training-start-list.html');
+    return;
+  }
+
+  const canProceed = await checkPlannedTrainingConflict(currentPlanId);
+
+  if (canProceed) {
+    await loadPlan();
+  }
+}
+
+initManualEntry();
