@@ -43,6 +43,22 @@ function formatUpdatedAt(updatedAt) {
   return new Date(updatedAt).toLocaleDateString('de-DE');
 }
 
+function hasGoalData(profile) {
+  return (
+    profile &&
+    profile.goal &&
+    profile.diet_type &&
+    profile.calorie_target !== null &&
+    profile.calorie_target !== undefined &&
+    profile.protein_g !== null &&
+    profile.protein_g !== undefined &&
+    profile.carbs_g !== null &&
+    profile.carbs_g !== undefined &&
+    profile.fat_g !== null &&
+    profile.fat_g !== undefined
+  );
+}
+
 async function loadProfile() {
   try {
     renderMessage('Lade Daten...');
@@ -88,7 +104,7 @@ async function loadProfile() {
       renderMessage(`
         <div class="empty-state-box">
           <strong>Noch keine persönlichen Daten vorhanden.</strong><br><br>
-          Trage zuerst deine Daten ein und berechne danach deinen Kalorienbedarf.
+          Trage zuerst deine Daten ein.
         </div>
       `);
       return;
@@ -98,21 +114,15 @@ async function loadProfile() {
 
     const { data: reports, error: reportsError } = await supabase
       .from('weekly_weight_reports')
-      .select('report_date')
+      .select('week_start_date, report_date')
       .eq('user_id', user.id)
-      .order('report_date', { ascending: false })
+      .order('week_start_date', { ascending: false })
       .limit(1);
 
     if (reportsError) {
       console.error('Fehler beim Laden der Wochenberichte:', reportsError);
-    } else if (!reports || reports.length === 0) {
-      warningHtml = `
-        <div class="profile-warning-box">
-          ⚠ Es liegt noch kein Wochenbericht vor
-        </div>
-      `;
-    } else {
-      const lastDate = new Date(reports[0].report_date);
+    } else if (reports && reports.length > 0) {
+      const lastDate = new Date(reports[0].report_date || reports[0].week_start_date);
       const diffDays = (Date.now() - lastDate.getTime()) / (1000 * 60 * 60 * 24);
 
       if (diffDays > 7) {
@@ -123,6 +133,43 @@ async function loadProfile() {
         `;
       }
     }
+
+    const goalSectionHtml = hasGoalData(profile)
+      ? `
+        <div class="profile-text-block">
+          <span class="profile-label-normal">Ziel:</span>
+          <span class="profile-value-inline">${formatGoal(profile.goal)}</span><br>
+
+          <span class="profile-label-normal">Ernährungsform:</span>
+          <span class="profile-value-inline">${formatDietType(profile.diet_type)}</span><br>
+
+          <span class="profile-label-normal">Kalorienziel:</span>
+          <span class="profile-value-inline">${profile.calorie_target} kcal</span>
+
+          <div class="profile-macros">
+            <span class="profile-label-inline">Eiweiß:</span>
+            <span class="profile-value-inline">${profile.protein_g} g</span>
+            <span class="macro-separator">|</span>
+
+            <span class="profile-label-inline">Kohlenhydrate:</span>
+            <span class="profile-value-inline">${profile.carbs_g} g</span>
+            <span class="macro-separator">|</span>
+
+            <span class="profile-label-inline">Fett:</span>
+            <span class="profile-value-inline">${profile.fat_g} g</span>
+          </div>
+        </div>
+      `
+      : `
+        <div class="profile-text-block" style="text-align:center;">
+          <div class="dashboard-center-text" style="margin-top: 4px;">
+            Noch kein Ziel berechnet.
+          </div>
+          <div style="margin-top: 14px;">
+            <a class="pill-button" href="calorie-calculator.html">Kalorienrechner öffnen</a>
+          </div>
+        </div>
+      `;
 
     renderMessage(`
       <div class="profile-section">
@@ -144,10 +191,10 @@ async function loadProfile() {
             <span class="profile-value-inline">${profile.height_cm ?? '-'} cm</span><br>
 
             <span class="profile-label-normal">Gewicht:</span>
-<span class="profile-value-inline">${profile.current_weight_kg ?? '-'} kg</span><br>
+            <span class="profile-value-inline">${profile.current_weight_kg ?? '-'} kg</span><br>
 
-<span class="profile-label-normal">Letzter Stand:</span>
-<span class="profile-value-inline">${formatUpdatedAt(profile.updated_at)}</span>
+            <span class="profile-label-normal">Letzter Stand:</span>
+            <span class="profile-value-inline">${formatUpdatedAt(profile.updated_at)}</span>
           </div>
         </div>
 
@@ -161,29 +208,7 @@ async function loadProfile() {
           <div class="line"></div>
         </div>
 
-        <div class="profile-text-block">
-          <span class="profile-label-normal">Ziel:</span>
-          <span class="profile-value-inline">${formatGoal(profile.goal)}</span><br>
-
-          <span class="profile-label-normal">Ernährungsform:</span>
-          <span class="profile-value-inline">${formatDietType(profile.diet_type)}</span><br>
-
-          <span class="profile-label-normal">Kalorienziel:</span>
-          <span class="profile-value-inline">${profile.calorie_target ?? 'xxx'} kcal</span>
-
-          <div class="profile-macros">
-            <span class="profile-label-inline">Eiweiß:</span>
-            <span class="profile-value-inline">${profile.protein_g ?? '-'} g</span>
-            <span class="macro-separator">|</span>
-
-            <span class="profile-label-inline">Kohlenhydrate:</span>
-            <span class="profile-value-inline">${profile.carbs_g ?? '-'} g</span>
-            <span class="macro-separator">|</span>
-
-            <span class="profile-label-inline">Fett:</span>
-            <span class="profile-value-inline">${profile.fat_g ?? '-'} g</span>
-          </div>
-        </div>
+        ${goalSectionHtml}
 
       </div>
 

@@ -14,11 +14,35 @@ const saveWeeklyReportBtn = document.getElementById('saveWeeklyReportBtn');
 const weeklyLastEntryBox = document.getElementById('weeklyLastEntryBox');
 
 let currentUser = null;
+let currentWeekReport = null;
 
 function setStatus(element, message, type = '') {
   element.textContent = message;
   element.className = `status ${type}`.trim();
   element.classList.toggle('hidden', !message);
+}
+
+function getLocalDateString(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function getCurrentWeekBounds() {
+  const now = new Date();
+  const day = now.getDay(); // 0 = Sonntag
+  const mondayDistance = day === 0 ? 6 : day - 1;
+
+  const monday = new Date(now);
+  monday.setHours(0, 0, 0, 0);
+  monday.setDate(monday.getDate() - mondayDistance);
+
+  const sunday = new Date(monday);
+  sunday.setDate(sunday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 999);
+
+  return { monday, sunday };
 }
 
 function formatDate(dateString) {
@@ -31,168 +55,8 @@ function formatDate(dateString) {
 
 function getScoreLabel(value) {
   const number = Number(value);
-
-  if (number === 1) return '1 / 5';
-  if (number === 2) return '2 / 5';
-  if (number === 3) return '3 / 5';
-  if (number === 4) return '4 / 5';
-  if (number === 5) return '5 / 5';
-
+  if (number >= 1 && number <= 5) return `${number} / 5`;
   return '-';
-}
-
-function calculateAge(birthdate) {
-  if (!birthdate) return null;
-
-  const today = new Date();
-  const birthDate = new Date(birthdate);
-
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDiff = today.getMonth() - birthDate.getMonth();
-
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-    age--;
-  }
-
-  return age;
-}
-
-function roundNumber(value) {
-  return Math.round(value);
-}
-
-function getActivityFactor(level) {
-  const activityMap = {
-    low: 1.2,
-    light: 1.375,
-    moderate: 1.55,
-    high: 1.725,
-  };
-
-  return activityMap[level] || 1.2;
-}
-
-function calculateBmr({ sex, weightKg, heightCm, age }) {
-  if (sex === 'male') {
-    return 10 * weightKg + 6.25 * heightCm - 5 * age + 5;
-  }
-
-  return 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
-}
-
-function calculateTargetCalories(maintenanceCalories, goal) {
-  if (goal === 'cut') return maintenanceCalories - 500;
-  if (goal === 'bulk') return maintenanceCalories + 500;
-  return maintenanceCalories;
-}
-
-function calculateMacros({ calories, weightKg, dietType }) {
-  const proteinG = roundNumber(weightKg * 2);
-  const proteinCalories = proteinG * 4;
-
-  let fatG = 0;
-  let carbsG = 0;
-
-  if (dietType === 'low_carb') {
-    const carbCalories = calories * 0.20;
-    carbsG = roundNumber(carbCalories / 4);
-    fatG = roundNumber((calories - proteinCalories - carbsG * 4) / 9);
-  } else if (dietType === 'low_fat') {
-    const fatCalories = calories * 0.20;
-    fatG = roundNumber(fatCalories / 9);
-    carbsG = roundNumber((calories - proteinCalories - fatG * 9) / 4);
-  } else {
-    const fatCalories = calories * 0.25;
-    fatG = roundNumber(fatCalories / 9);
-    carbsG = roundNumber((calories - proteinCalories - fatG * 9) / 4);
-  }
-
-  return {
-    proteinG,
-    carbsG,
-    fatG,
-  };
-}
-
-async function recalculateProfileNutrition(profile, newWeightKg) {
-  if (!profile?.sex || !profile?.birthdate || !profile?.height_cm || !profile?.diet_type) {
-    return {
-      calorie_target: profile?.calorie_target ?? null,
-      protein_g: null,
-      carbs_g: null,
-      fat_g: null,
-    };
-  }
-
-  const age = calculateAge(profile.birthdate);
-  if (!age) {
-    return {
-      calorie_target: profile?.calorie_target ?? null,
-      protein_g: null,
-      carbs_g: null,
-      fat_g: null,
-    };
-  }
-
-  // Manueller Modus: Kalorienziel bleibt gleich, nur Makros neu
-  if (profile.manual_calorie_mode) {
-    const calories = Number(profile.calorie_target || 0);
-
-    if (!calories || calories < 500) {
-      return {
-        calorie_target: profile?.calorie_target ?? null,
-        protein_g: null,
-        carbs_g: null,
-        fat_g: null,
-      };
-    }
-
-    const macros = calculateMacros({
-      calories,
-      weightKg: newWeightKg,
-      dietType: profile.diet_type,
-    });
-
-    return {
-      calorie_target: calories,
-      protein_g: macros.proteinG,
-      carbs_g: macros.carbsG,
-      fat_g: macros.fatG,
-    };
-  }
-
-  // Automatischer Modus: alles neu berechnen
-  if (!profile.activity_level || !profile.goal) {
-    return {
-      calorie_target: profile?.calorie_target ?? null,
-      protein_g: null,
-      carbs_g: null,
-      fat_g: null,
-    };
-  }
-
-  const bmr = calculateBmr({
-    sex: profile.sex,
-    weightKg: newWeightKg,
-    heightCm: Number(profile.height_cm),
-    age,
-  });
-
-  const maintenanceCalories = roundNumber(bmr * getActivityFactor(profile.activity_level));
-  const calorieTarget = roundNumber(calculateTargetCalories(maintenanceCalories, profile.goal));
-
-  const macros = calculateMacros({
-    calories: calorieTarget,
-    weightKg: newWeightKg,
-    dietType: profile.diet_type,
-  });
-
-  return {
-    calorie_target: calorieTarget,
-    protein_g: macros.proteinG,
-    carbs_g: macros.carbsG,
-    fat_g: macros.fatG,
-  };
 }
 
 async function guardPage() {
@@ -209,6 +73,11 @@ async function guardPage() {
 
 async function loadWeeklyInfo() {
   await guardPage();
+  setStatus(weeklyReportStatus, '');
+
+  const { monday, sunday } = getCurrentWeekBounds();
+  const weekStartDate = getLocalDateString(monday);
+  const weekEndDate = getLocalDateString(sunday);
 
   const { data: profile } = await supabase
     .from('user_profile_data')
@@ -216,39 +85,64 @@ async function loadWeeklyInfo() {
     .eq('user_id', currentUser.id)
     .maybeSingle();
 
-  const { data: lastReport, error: reportError } = await supabase
+  const { data: currentReport, error: currentReportError } = await supabase
     .from('weekly_weight_reports')
     .select('*')
     .eq('user_id', currentUser.id)
-    .order('report_date', { ascending: false })
-    .limit(1);
+    .eq('week_start_date', weekStartDate)
+    .maybeSingle();
 
-  let infoHtml = '';
-
-  if (profile?.current_weight_kg) {
-    infoHtml += `
-      <div class="weekly-info-title">Aktueller Stand</div>
-      <div class="weekly-info-value">${profile.current_weight_kg} kg</div>
-      <div class="weekly-info-sub">Letztes Update: ${profile.updated_at ? new Date(profile.updated_at).toLocaleDateString('de-DE') : '-'}</div>
-    `;
-    weeklyWeight.value = profile.current_weight_kg;
-  } else {
-    infoHtml += `
-      <div class="weekly-info-title">Aktueller Stand</div>
-      <div class="weekly-info-sub">Noch kein Gewicht hinterlegt</div>
-    `;
+  if (currentReportError) {
+    console.error(currentReportError);
   }
 
-  weeklyReportInfo.innerHTML = infoHtml;
+  currentWeekReport = currentReport || null;
 
-  if (!reportError && lastReport && lastReport.length > 0) {
-    const report = lastReport[0];
+  weeklyReportInfo.innerHTML = `
+    <div class="weekly-info-title">Berichts-Woche</div>
+    <div class="weekly-info-value">${monday.toLocaleDateString('de-DE')} - ${sunday.toLocaleDateString('de-DE')}</div>
+    <div class="weekly-info-sub" style="margin-top: 10px;">
+      ${
+        currentWeekReport
+          ? 'Du kannst deinen Bericht für diese Woche noch bearbeiten.'
+          : 'Für diese Woche wurde noch kein Wochenbericht abgegeben.'
+      }
+    </div>
+  `;
+
+  if (profile?.current_weight_kg) {
+    weeklyWeight.value = profile.current_weight_kg;
+  }
+
+  if (currentWeekReport) {
+    weeklyWeight.value = currentWeekReport.weight_kg ?? profile?.current_weight_kg ?? '';
+    weeklyEnergy.value = currentWeekReport.energy_level ?? '';
+    weeklyFeeling.value = currentWeekReport.body_feeling ?? '';
+    weeklyNote.value = currentWeekReport.note || '';
+
+    saveWeeklyReportBtn.textContent = 'Wochenbericht aktualisieren';
+  } else {
+    weeklyEnergy.value = '';
+    weeklyFeeling.value = '';
+    weeklyNote.value = '';
+    saveWeeklyReportBtn.textContent = 'Wochenbericht speichern';
+  }
+
+  const { data: lastReportList, error: lastReportError } = await supabase
+    .from('weekly_weight_reports')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('week_start_date', { ascending: false })
+    .limit(1);
+
+  if (!lastReportError && lastReportList && lastReportList.length > 0) {
+    const report = lastReportList[0];
 
     weeklyLastEntryBox.innerHTML = `
       <div class="weekly-last-title">Letzter Wochenbericht</div>
       <div class="calculator-result-line">
-        <span class="profile-label-normal">Datum:</span>
-        <span class="profile-value-inline">${formatDate(report.report_date)}</span>
+        <span class="profile-label-normal">Woche:</span>
+        <span class="profile-value-inline">${report.week_start_date} bis ${report.week_end_date}</span>
       </div>
       <div class="calculator-result-line">
         <span class="profile-label-normal">Gewicht:</span>
@@ -266,8 +160,14 @@ async function loadWeeklyInfo() {
         <span class="profile-label-normal">Notiz:</span>
         <span class="profile-value-inline">${report.note || '-'}</span>
       </div>
+      <div class="calculator-result-line">
+        <span class="profile-label-normal">Letzte Änderung:</span>
+        <span class="profile-value-inline">${formatDate(report.report_date)}</span>
+      </div>
     `;
     weeklyLastEntryBox.classList.remove('hidden');
+  } else {
+    weeklyLastEntryBox.classList.add('hidden');
   }
 }
 
@@ -296,42 +196,35 @@ weeklyReportForm.addEventListener('submit', async (event) => {
   saveWeeklyReportBtn.textContent = 'Wird gespeichert...';
 
   try {
-    const today = new Date().toISOString().slice(0, 10);
+    const { monday, sunday } = getCurrentWeekBounds();
+    const weekStartDate = getLocalDateString(monday);
+    const weekEndDate = getLocalDateString(sunday);
+    const today = getLocalDateString();
 
-    const { error: insertError } = await supabase
+    const { error: upsertError } = await supabase
       .from('weekly_weight_reports')
-      .insert({
+      .upsert({
         user_id: currentUser.id,
+        week_start_date: weekStartDate,
+        week_end_date: weekEndDate,
         report_date: today,
         weight_kg: weightValue,
         energy_level: energyValue,
         body_feeling: feelingValue,
         note: noteValue,
-      });
+      }, { onConflict: 'user_id,week_start_date' });
 
-    if (insertError) {
-      console.error(insertError);
+    if (upsertError) {
+      console.error(upsertError);
       setStatus(weeklyReportStatus, 'Wochenbericht konnte nicht gespeichert werden.', 'error');
       return;
     }
-
-    const { data: profile } = await supabase
-      .from('user_profile_data')
-      .select('*')
-      .eq('user_id', currentUser.id)
-      .maybeSingle();
-
-    const recalculated = await recalculateProfileNutrition(profile, weightValue);
 
     const { error: profileUpdateError } = await supabase
       .from('user_profile_data')
       .upsert({
         user_id: currentUser.id,
         current_weight_kg: weightValue,
-        calorie_target: recalculated.calorie_target,
-        protein_g: recalculated.protein_g,
-        carbs_g: recalculated.carbs_g,
-        fat_g: recalculated.fat_g,
         updated_at: new Date().toISOString(),
       }, { onConflict: 'user_id' });
 
@@ -342,18 +235,12 @@ weeklyReportForm.addEventListener('submit', async (event) => {
     }
 
     setStatus(weeklyReportStatus, 'Wochenbericht wurde erfolgreich gespeichert.', 'success');
-
-    weeklyEnergy.value = '';
-    weeklyFeeling.value = '';
-    weeklyNote.value = '';
-
     await loadWeeklyInfo();
   } catch (error) {
     console.error(error);
     setStatus(weeklyReportStatus, 'Beim Speichern ist ein Fehler aufgetreten.', 'error');
   } finally {
     saveWeeklyReportBtn.disabled = false;
-    saveWeeklyReportBtn.textContent = 'Wochenbericht speichern';
   }
 });
 

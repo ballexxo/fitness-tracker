@@ -5,17 +5,57 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fitness Tracker - Statistik</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#28c267">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="page-shell">
     <header class="page-header">
-  <a class="back-button" href="dashboard.html">←</a>
-</header>
+      <a class="back-button" href="dashboard.html">←</a>
+    </header>
 
     <section class="page-card">
-      <div class="module-badge">Modul 4</div>
-      <h1>Statistik</h1>
-      <p>Hier kann man später Wochenberichte, Monatsübersichten, Vergleiche und Diagramme anzeigen.</p>
+      <div class="statistics-hero-box">
+        <div class="dashboard-section-title">
+          <div class="line"></div>
+          <span>Gewichtsverlauf</span>
+          <div class="line"></div>
+        </div>
+
+        <div class="statistics-subtitle">Letzte 3 Monate</div>
+
+        <div class="statistics-chart-wrap">
+          <canvas id="weightChart"></canvas>
+        </div>
+
+        <div id="weightTrendText" class="statistics-trend-text">
+          Lade Statistik...
+        </div>
+      </div>
+
+      <div class="statistics-cards-grid" style="margin-top: 24px;">
+        <div class="statistics-mini-card">
+          <div class="statistics-mini-label">Trainings diese Woche</div>
+          <div id="statsWorkoutsWeek" class="statistics-mini-value">-</div>
+        </div>
+
+        <div class="statistics-mini-card">
+          <div class="statistics-mini-label">Verbrannte kcal diese Woche</div>
+          <div id="statsCaloriesWeek" class="statistics-mini-value">-</div>
+        </div>
+
+        <div class="statistics-mini-card">
+          <div class="statistics-mini-label">Trainingszeit diese Woche</div>
+          <div id="statsDurationWeek" class="statistics-mini-value">-</div>
+        </div>
+
+        <div class="statistics-mini-card">
+          <div class="statistics-mini-label">Längste Live Streak</div>
+          <div id="statsBestStreak" class="statistics-mini-value">-</div>
+        </div>
+      </div>
     </section>
   </div>
 

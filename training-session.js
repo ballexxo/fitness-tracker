@@ -614,7 +614,7 @@ async function finishTraining() {
     summaryParts.push(`
       <div class="summary-block" style="margin-top:10px;">
         ${
-          estimatedCalories
+          estimatedCalories !== null
             ? `<strong>Ca. verbrannte kcal:</strong> ${estimatedCalories} kcal`
             : `Es fehlt dein Gewicht bei Persönliche Daten, um den Kalorienverbrauch zu berechnen.`
         }

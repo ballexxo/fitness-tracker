@@ -104,7 +104,87 @@ async function markMissedPlannedWorkouts(userId) {
   }
 }
 
-function renderEmptyPlanningState() {
+async function getProfileState(userId) {
+  const { data, error } = await supabase
+    .from('user_profile_data')
+    .select('current_weight_kg, updated_at')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Fehler beim Laden der Profildaten:', error);
+    return null;
+  }
+
+  return data || null;
+}
+
+function isDateInCurrentWeek(dateString) {
+  if (!dateString) return false;
+
+  const { monday, sunday } = getWeekBounds();
+  const test = parseLocalDate(dateString);
+
+  monday.setHours(0, 0, 0, 0);
+  sunday.setHours(23, 59, 59, 999);
+
+  return test >= monday && test <= sunday;
+}
+
+async function getDashboardReminderHtml(userId) {
+  const profile = await getProfileState(userId);
+
+  if (!profile || !profile.current_weight_kg) {
+    return `
+      <div class="profile-warning-box" style="margin-top: 22px;">
+        ⚠ Bitte trage zuerst deine persönlichen Daten ein.
+        <div style="margin-top: 12px;">
+          <a class="pill-button" href="personal-data-form.html">Persönliche Daten eintragen</a>
+        </div>
+      </div>
+    `;
+  }
+
+  const { monday } = getWeekBounds();
+  const currentWeekStart = getLocalDateString(monday);
+
+  const { data: weeklyReport, error } = await supabase
+    .from('weekly_weight_reports')
+    .select('week_start_date')
+    .eq('user_id', userId)
+    .eq('week_start_date', currentWeekStart)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Fehler beim Laden des Wochenberichts:', error);
+    return '';
+  }
+
+  if (weeklyReport) {
+    return '';
+  }
+
+  const updatedAtDateString = profile.updated_at
+    ? getLocalDateString(new Date(profile.updated_at))
+    : null;
+
+  if (updatedAtDateString && isDateInCurrentWeek(updatedAtDateString)) {
+    return '';
+  }
+
+  return `
+    <div class="profile-warning-box" style="margin-top: 22px;">
+      ⚠ Bitte aktualisiere deinen Wochenbericht.
+      <div style="margin-top: 12px;">
+        <a class="pill-button" href="weekly-report.html">Aktualisieren</a>
+      </div>
+    </div>
+  `;
+}
+
+async function renderEmptyPlanningState(userId) {
+  const reminderHtml = await getDashboardReminderHtml(userId);
+
   plannerDashboardContent.innerHTML = `
     <div class="dashboard-section-title">
       <div class="line"></div>
@@ -121,10 +201,14 @@ function renderEmptyPlanningState() {
     <div style="margin-top: 14px;">
       <a class="pill-button" href="training-planner.html">Planen</a>
     </div>
+
+    ${reminderHtml}
   `;
 }
 
-function renderPlanningState({ streak, completedThisWeek, totalThisWeek, nextWorkout, todayWorkout }) {
+async function renderPlanningState(userId, { streak, completedThisWeek, totalThisWeek, nextWorkout, todayWorkout }) {
+  const reminderHtml = await getDashboardReminderHtml(userId);
+
   plannerDashboardContent.innerHTML = `
     <div class="dashboard-section-title">
       <div class="line"></div>
@@ -165,6 +249,8 @@ function renderPlanningState({ streak, completedThisWeek, totalThisWeek, nextWor
         `
         : ''
     }
+
+    ${reminderHtml}
   `;
 }
 
@@ -193,7 +279,7 @@ async function loadPlanningDashboard(user) {
   const plans = data || [];
 
   if (!plans.length) {
-    renderEmptyPlanningState();
+    await renderEmptyPlanningState(user.id);
     return;
   }
 
@@ -226,7 +312,7 @@ async function loadPlanningDashboard(user) {
     item.planned_date === today && item.status === 'planned'
   ));
 
-  renderPlanningState({
+  await renderPlanningState(user.id, {
     streak,
     completedThisWeek,
     totalThisWeek,

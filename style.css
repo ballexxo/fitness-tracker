@@ -1249,3 +1249,94 @@ button.logout:active {
     font-size: 0.98rem;
   }
 }
+
+.statistics-hero-box {
+  width: 100%;
+}
+
+.statistics-subtitle {
+  margin-top: 10px;
+  text-align: center;
+  color: #cbd5e1;
+  font-size: 0.95rem;
+}
+
+.statistics-chart-wrap {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  margin-top: 20px;
+  padding: 12px;
+  border-radius: 22px;
+  background: rgba(12, 22, 38, 0.8);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.statistics-trend-text {
+  margin-top: 18px;
+  text-align: center;
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.statistics-trend-positive {
+  color: #28c267;
+}
+
+.statistics-trend-negative {
+  color: #28c267;
+}
+
+@media (max-width: 700px) {
+  .statistics-chart-wrap {
+    height: 260px;
+    padding: 10px;
+  }
+
+  .statistics-trend-text {
+    font-size: 0.98rem;
+  }
+}
+
+.statistics-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.statistics-mini-card {
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(12, 22, 38, 0.8);
+  border: 1px solid rgba(255,255,255,0.06);
+  text-align: center;
+}
+
+.statistics-mini-label {
+  color: #cbd5e1;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.statistics-mini-value {
+  margin-top: 10px;
+  color: #28c267;
+  font-size: 1.4rem;
+  font-weight: 900;
+}
+
+@media (max-width: 700px) {
+  .statistics-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .statistics-mini-card {
+    padding: 16px;
+  }
+
+  .statistics-mini-value {
+    font-size: 1.25rem;
+  }
+}
