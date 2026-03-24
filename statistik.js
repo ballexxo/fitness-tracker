@@ -6,12 +6,19 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const weightTrendText = document.getElementById('weightTrendText');
 const weightChartCanvas = document.getElementById('weightChart');
 
-const statsWorkoutsWeek = document.getElementById('statsWorkoutsWeek');
-const statsCaloriesWeek = document.getElementById('statsCaloriesWeek');
-const statsDurationWeek = document.getElementById('statsDurationWeek');
-const statsBestStreak = document.getElementById('statsBestStreak');
+const statsWorkouts = document.getElementById('statsWorkouts');
+const statsCalories = document.getElementById('statsCalories');
+const statsDuration = document.getElementById('statsDuration');
+const statsStreak = document.getElementById('statsStreak');
 
 let weightChartInstance = null;
+
+const statsCache = {
+  workouts: { week: 0, total: 0 },
+  calories: { week: 0, total: 0 },
+  duration: { week: 0, total: 0 },
+  streak: { current: 0, best: 0 },
+};
 
 function getLocalDateString(date = new Date()) {
   const year = date.getFullYear();
@@ -163,6 +170,42 @@ function renderWeightChart(labels, values) {
   });
 }
 
+function updateStatsDisplay() {
+  statsWorkouts.textContent = statsCache.workouts.week;
+  statsCalories.textContent = `${statsCache.calories.week} kcal`;
+  statsDuration.textContent = formatMinutesFromSeconds(statsCache.duration.week);
+  statsStreak.textContent = statsCache.streak.current;
+}
+
+function attachSwitchListeners() {
+  document.querySelectorAll('.statistics-switch button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.target;
+      const type = btn.dataset.type;
+
+      const parent = btn.parentElement;
+      parent.querySelectorAll('button').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      if (target === 'workouts') {
+        statsWorkouts.textContent = statsCache.workouts[type];
+      }
+
+      if (target === 'calories') {
+        statsCalories.textContent = `${statsCache.calories[type]} kcal`;
+      }
+
+      if (target === 'duration') {
+        statsDuration.textContent = formatMinutesFromSeconds(statsCache.duration[type]);
+      }
+
+      if (target === 'streak') {
+        statsStreak.textContent = statsCache.streak[type];
+      }
+    });
+  });
+}
+
 async function loadWeightStatistics(userId) {
   const startDate = getDateMonthsAgo(3);
 
@@ -213,35 +256,51 @@ async function loadWeightStatistics(userId) {
   renderTrendText(values[0], values[values.length - 1]);
 }
 
-async function loadWeeklyTrainingStats(userId) {
+async function loadTrainingStats(userId) {
   const { monday, sunday } = getWeekBounds();
   const mondayString = getLocalDateString(monday);
   const sundayString = getLocalDateString(sunday);
 
   const { data: sessions, error } = await supabase
     .from('workout_sessions')
-    .select('id, duration_seconds, calories_burned, training_date, finished_at')
+    .select('duration_seconds, calories_burned, training_date, finished_at')
     .eq('user_id', userId)
-    .gte('training_date', mondayString)
-    .lte('training_date', sundayString)
-    .not('finished_at', 'is', null)
-    .order('training_date', { ascending: true });
+    .not('finished_at', 'is', null);
 
   if (error) {
-    console.error('Fehler beim Laden der Wochen-Trainingsdaten:', error);
-    statsWorkoutsWeek.textContent = '-';
-    statsCaloriesWeek.textContent = '-';
-    statsDurationWeek.textContent = '-';
+    console.error('Fehler beim Laden der Trainingsdaten:', error);
     return;
   }
 
-  const workoutCount = (sessions || []).length;
-  const totalCalories = (sessions || []).reduce((sum, session) => sum + Number(session.calories_burned || 0), 0);
-  const totalDurationSeconds = (sessions || []).reduce((sum, session) => sum + Number(session.duration_seconds || 0), 0);
+  const allSessions = sessions || [];
 
-  statsWorkoutsWeek.textContent = String(workoutCount);
-  statsCaloriesWeek.textContent = totalCalories > 0 ? `${totalCalories} kcal` : '0 kcal';
-  statsDurationWeek.textContent = workoutCount > 0 ? formatMinutesFromSeconds(totalDurationSeconds) : '0 Min';
+  const weekSessions = allSessions.filter((session) => (
+    session.training_date >= mondayString &&
+    session.training_date <= sundayString
+  ));
+
+  statsCache.workouts.week = weekSessions.length;
+  statsCache.workouts.total = allSessions.length;
+
+  statsCache.calories.week = weekSessions.reduce(
+    (sum, session) => sum + Number(session.calories_burned || 0),
+    0
+  );
+  statsCache.calories.total = allSessions.reduce(
+    (sum, session) => sum + Number(session.calories_burned || 0),
+    0
+  );
+
+  statsCache.duration.week = weekSessions.reduce(
+    (sum, session) => sum + Number(session.duration_seconds || 0),
+    0
+  );
+  statsCache.duration.total = allSessions.reduce(
+    (sum, session) => sum + Number(session.duration_seconds || 0),
+    0
+  );
+
+  updateStatsDisplay();
 }
 
 function calculateLongestStreak(plans) {
@@ -268,7 +327,29 @@ function calculateLongestStreak(plans) {
   return best;
 }
 
-async function loadBestStreak(userId) {
+function calculateCurrentStreak(plans) {
+  if (!plans || plans.length === 0) return 0;
+
+  const sorted = [...plans].sort((a, b) => {
+    if (a.planned_date < b.planned_date) return -1;
+    if (a.planned_date > b.planned_date) return 1;
+    return 0;
+  });
+
+  let current = 0;
+
+  for (let i = sorted.length - 1; i >= 0; i -= 1) {
+    if (sorted[i].status === 'completed') {
+      current += 1;
+    } else {
+      break;
+    }
+  }
+
+  return current;
+}
+
+async function loadStreakStats(userId) {
   const { data, error } = await supabase
     .from('planned_workouts')
     .select('planned_date, status')
@@ -277,21 +358,25 @@ async function loadBestStreak(userId) {
 
   if (error) {
     console.error('Fehler beim Laden der Streak-Daten:', error);
-    statsBestStreak.textContent = '-';
     return;
   }
 
-  const best = calculateLongestStreak(data || []);
-  statsBestStreak.textContent = String(best);
+  const plans = data || [];
+
+  statsCache.streak.best = calculateLongestStreak(plans);
+  statsCache.streak.current = calculateCurrentStreak(plans);
+
+  updateStatsDisplay();
 }
 
 async function initStatistics() {
   const user = await guardPage();
   if (!user) return;
 
+  attachSwitchListeners();
   await loadWeightStatistics(user.id);
-  await loadWeeklyTrainingStats(user.id);
-  await loadBestStreak(user.id);
+  await loadTrainingStats(user.id);
+  await loadStreakStats(user.id);
 }
 
 initStatistics();

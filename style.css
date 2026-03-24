@@ -1329,8 +1329,10 @@ button.logout:active {
 
 @media (max-width: 700px) {
   .statistics-cards-grid {
-    grid-template-columns: 1fr;
-  }
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
 
   .statistics-mini-card {
     padding: 16px;
@@ -1339,4 +1341,27 @@ button.logout:active {
   .statistics-mini-value {
     font-size: 1.25rem;
   }
+}
+
+.statistics-switch {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.statistics-switch button {
+  border: none;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.05);
+  color: #cbd5e1;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.statistics-switch button.active {
+  background: #28c267;
+  color: #fff;
+  font-weight: 700;
 }

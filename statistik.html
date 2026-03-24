@@ -36,25 +36,43 @@
       </div>
 
       <div class="statistics-cards-grid" style="margin-top: 24px;">
+
         <div class="statistics-mini-card">
-          <div class="statistics-mini-label">Trainings diese Woche</div>
-          <div id="statsWorkoutsWeek" class="statistics-mini-value">-</div>
+          <div class="statistics-switch">
+            <button class="active" data-type="week" data-target="workouts" type="button">Woche</button>
+            <button data-type="total" data-target="workouts" type="button">Gesamt</button>
+          </div>
+          <div class="statistics-mini-label">Trainings</div>
+          <div id="statsWorkouts" class="statistics-mini-value">-</div>
         </div>
 
         <div class="statistics-mini-card">
-          <div class="statistics-mini-label">Verbrannte kcal diese Woche</div>
-          <div id="statsCaloriesWeek" class="statistics-mini-value">-</div>
+          <div class="statistics-switch">
+            <button class="active" data-type="week" data-target="calories" type="button">Woche</button>
+            <button data-type="total" data-target="calories" type="button">Gesamt</button>
+          </div>
+          <div class="statistics-mini-label">Kalorien</div>
+          <div id="statsCalories" class="statistics-mini-value">-</div>
         </div>
 
         <div class="statistics-mini-card">
-          <div class="statistics-mini-label">Trainingszeit diese Woche</div>
-          <div id="statsDurationWeek" class="statistics-mini-value">-</div>
+          <div class="statistics-switch">
+            <button class="active" data-type="week" data-target="duration" type="button">Woche</button>
+            <button data-type="total" data-target="duration" type="button">Gesamt</button>
+          </div>
+          <div class="statistics-mini-label">Trainingszeit</div>
+          <div id="statsDuration" class="statistics-mini-value">-</div>
         </div>
 
         <div class="statistics-mini-card">
-          <div class="statistics-mini-label">Längste Live Streak</div>
-          <div id="statsBestStreak" class="statistics-mini-value">-</div>
+          <div class="statistics-switch">
+            <button class="active" data-type="current" data-target="streak" type="button">Aktuell</button>
+            <button data-type="best" data-target="streak" type="button">Beste</button>
+          </div>
+          <div class="statistics-mini-label">Live Streak</div>
+          <div id="statsStreak" class="statistics-mini-value">-</div>
         </div>
+
       </div>
     </section>
   </div>
