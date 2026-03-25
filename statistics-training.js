@@ -326,28 +326,31 @@ async function loadTrainingVolumeChart() {
   trainingVolumeText.innerHTML = getDiffText(values[0], values[values.length - 1], 'Entwicklung gesamt');
 }
 
-function getCompactTopLine(item) {
-  const weightText = item.type === 'weight'
-    ? `
-      <span class="statistics-compact-label">Gewicht erhöht:</span>
-      <span class="statistics-compact-value-green">+${item.value.toFixed(1)} kg</span>
-    `
-    : `
-      <span class="statistics-compact-label">Volumen:</span>
-      <span class="${item.value >= 0 ? 'statistics-compact-value-green' : 'statistics-compact-value-red'}">
-        ${item.value > 0 ? '+' : ''}${item.value.toFixed(1)}%
-      </span>
-    `;
+function getCompactTopCardHtml(item, index) {
+  const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉';
 
   return `
-    <span class="statistics-compact-name">${item.exerciseName}</span>
-    <span class="statistics-compact-separator">|</span>
-    ${weightText}
-    <span class="statistics-compact-separator">|</span>
-    <span class="statistics-compact-label">Volumen (kg):</span>
-    <span class="statistics-compact-value-yellow">${item.previousVolume} kg</span>
-    <span class="statistics-compact-arrow">→</span>
-    <span class="statistics-compact-value-green">${item.latestVolume} kg</span>
+    <div class="statistics-top-card compact-top-card">
+      <div class="statistics-medal-row">
+        <span class="statistics-medal-emoji">${medal}</span>
+      </div>
+
+      <div class="statistics-top-name-compact">${item.exerciseName}</div>
+
+      <div class="statistics-top-detail-line">
+        <span class="statistics-top-detail-label">Gewicht:</span>
+        <span class="${item.type === 'weight' ? 'statistics-top-detail-value-green' : 'statistics-top-detail-value-white'}">
+          ${item.type === 'weight' ? `+${item.value.toFixed(1)} kg` : 'gleich'}
+        </span>
+      </div>
+
+      <div class="statistics-top-detail-line">
+        <span class="statistics-top-detail-label">Volumen:</span>
+        <span class="statistics-top-detail-value-yellow">${item.previousVolume} kg</span>
+        <span class="statistics-top-detail-arrow">→</span>
+        <span class="statistics-top-detail-value-green">${item.latestVolume} kg</span>
+      </div>
+    </div>
   `;
 }
 
@@ -490,14 +493,13 @@ async function loadTopProgressions() {
     return;
   }
 
-  topProgressionList.innerHTML = topThree.map((item, index) => `
-    <div class="statistics-top-card compact-top-card">
-      <div class="statistics-top-center-rank">${index + 1}</div>
-      <div class="statistics-top-compact-line">
-        ${getCompactTopLine(item)}
-      </div>
+ topProgressionList.innerHTML = topThree
+  .map((item, index) => `
+    <div class="fade-up-item fade-up-delay-${index + 1}">
+      ${getCompactTopCardHtml(item, index)}
     </div>
-  `).join('');
+  `)
+  .join('');
 }
 
 function attachSwitchListeners() {

@@ -1526,6 +1526,38 @@ button.logout:active {
   color: #ffffff;
 }
 
+.all-exercise-card {
+  position: relative;
+}
+
+.statistics-rank-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.statistics-rank-number {
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+@media (max-width: 700px) {
+  .statistics-plan-tabs {
+    gap: 8px;
+  }
+
+  .statistics-plan-tab {
+    font-size: 0.84rem;
+    padding: 9px 12px;
+  }
+
+  .statistics-rank-number {
+    font-size: 1rem;
+  }
+}
+
 .statistics-top-progress-negative {
   color: #f87171;
 }
@@ -1628,70 +1660,115 @@ button.logout:active {
   border: 1px solid rgba(255,255,255,0.06);
 }
 
-.statistics-top-center-rank {
+.statistics-medal-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.statistics-medal-emoji {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.statistics-top-name-compact {
   text-align: center;
-  font-size: 1.05rem;
-  font-weight: 900;
   color: #ffffff;
+  font-size: 1.05rem; /* minimal größer */
+  font-weight: 900; /* stärker */
   margin-bottom: 10px;
 }
 
-.statistics-top-compact-line {
+.statistics-top-detail-line {
   text-align: center;
-  line-height: 1.7;
-  font-size: 0.92rem;
-  color: #ffffff;
+  line-height: 1.6;
+  font-size: 0.82rem; /* kleiner */
+  opacity: 0.9; /* leicht dezenter */
 }
 
-.statistics-compact-name {
-  color: #ffffff;
-  font-weight: 800;
+.statistics-top-detail-label {
+  color: #cbd5e1; /* etwas grauer statt weiß */
+  font-weight: 600;
 }
 
-.statistics-compact-label {
+.statistics-top-detail-value-white {
   color: #ffffff;
-  font-weight: 800;
+  font-weight: 600;
 }
 
-.statistics-compact-value-green {
+.statistics-top-detail-value-green {
   color: #28c267;
-  font-weight: 800;
+  font-weight: 700;
 }
 
-.statistics-compact-value-red {
+.statistics-top-detail-value-red {
   color: #f87171;
-  font-weight: 800;
+  font-weight: 700;
 }
 
-.statistics-compact-value-yellow {
+.statistics-top-detail-value-yellow {
   color: #facc15;
-  font-weight: 800;
+  font-weight: 700;
 }
 
-.statistics-compact-separator {
-  color: #28c267;
-  font-weight: 800;
-  margin: 0 6px;
-}
-
-.statistics-compact-arrow {
+.statistics-top-detail-arrow {
   color: #28c267;
   font-weight: 800;
   margin: 0 6px;
 }
 
 @media (max-width: 700px) {
-  .statistics-section-separator::before,
-  .statistics-section-separator::after {
-    max-width: 70px;
+  .statistics-medal-emoji {
+    font-size: 1.45rem;
   }
 
-  .statistics-top-compact-line {
+  .statistics-top-name-compact {
+    font-size: 0.96rem;
+  }
+
+  .statistics-top-detail-line {
     font-size: 0.84rem;
   }
+}
+.fade-up-item {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeUpCard 0.45s ease forwards;
+}
 
-  .statistics-compact-separator,
-  .statistics-compact-arrow {
-    margin: 0 4px;
+.fade-up-delay-1 { animation-delay: 0.04s; }
+.fade-up-delay-2 { animation-delay: 0.08s; }
+.fade-up-delay-3 { animation-delay: 0.12s; }
+.fade-up-delay-4 { animation-delay: 0.16s; }
+.fade-up-delay-5 { animation-delay: 0.20s; }
+.fade-up-delay-6 { animation-delay: 0.24s; }
+.fade-up-delay-7 { animation-delay: 0.28s; }
+.fade-up-delay-8 { animation-delay: 0.32s; }
+
+@keyframes fadeUpCard {
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
+}
+
+.statistics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.stat-card {
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.05);
+  text-align: center;
+}
+
+.statistics-motivation {
+  margin-top: 20px;
+  text-align: center;
+  line-height: 1.6;
 }

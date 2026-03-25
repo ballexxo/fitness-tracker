@@ -15,9 +15,11 @@ function getDateMonthsAgo(months) {
   const date = new Date();
   date.setMonth(date.getMonth() - months);
   date.setHours(0, 0, 0, 0);
+
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
+
   return `${year}-${month}-${day}`;
 }
 
@@ -53,20 +55,6 @@ function calculateStats(sets) {
     volume: totalVolume,
     avgWeight,
   };
-}
-
-function formatProgressionText(item) {
-  if (item.type === 'weight') {
-    return `Gewicht erhöht (+${item.value.toFixed(1)} kg)`;
-  }
-
-  if (item.type === 'volume') {
-    const sign = item.value > 0 ? '+' : '';
-    return `${sign}${item.value.toFixed(1)}% Volumen`;
-  }
-
-  const sign = item.value > 0 ? '+' : '';
-  return `${sign}${item.value.toFixed(1)}%`;
 }
 
 async function loadTrainingPlans() {
@@ -120,6 +108,7 @@ async function getRelevantExerciseEntries(entries) {
   const sortedEntries = [...entries].sort((a, b) => {
     const dateA = a.workout_sessions.training_date;
     const dateB = b.workout_sessions.training_date;
+
     if (dateA < dateB) return -1;
     if (dateA > dateB) return 1;
     return 0;
@@ -136,7 +125,9 @@ async function getRelevantExerciseEntries(entries) {
   if (currentProgressionRange === 'month') {
     const startDate = getDateMonthsAgo(1);
     const filtered = sortedEntries.filter((entry) => entry.workout_sessions.training_date >= startDate);
+
     if (filtered.length < 2) return null;
+
     return {
       previous: filtered[0],
       latest: filtered[filtered.length - 1],
@@ -154,6 +145,32 @@ async function getRelevantExerciseEntries(entries) {
   return null;
 }
 
+function getAllExerciseCardHtml(item, index) {
+  return `
+    <div class="statistics-top-card compact-top-card all-exercise-card">
+      <div class="statistics-rank-row">
+        <span class="statistics-rank-number">${index + 1}</span>
+      </div>
+
+      <div class="statistics-top-name-compact">${item.exerciseName}</div>
+
+      <div class="statistics-top-detail-line">
+        <span class="statistics-top-detail-label">Gewicht:</span>
+        <span class="${item.type === 'weight' ? 'statistics-top-detail-value-green' : 'statistics-top-detail-value-white'}">
+          ${item.type === 'weight' ? `+${item.value.toFixed(1)} kg` : 'gleich'}
+        </span>
+      </div>
+
+      <div class="statistics-top-detail-line">
+        <span class="statistics-top-detail-label">Volumen:</span>
+        <span class="statistics-top-detail-value-yellow">${item.previousVolume} kg</span>
+        <span class="statistics-top-detail-arrow">→</span>
+        <span class="${item.volumeDelta >= 0 ? 'statistics-top-detail-value-green' : 'statistics-top-detail-value-red'}">${item.latestVolume} kg</span>
+      </div>
+    </div>
+  `;
+}
+
 async function loadAllExerciseProgressions() {
   if (!selectedPlanId) {
     allExerciseProgressionList.innerHTML = '<div class="muted">Kein Trainingsplan ausgewählt.</div>';
@@ -165,8 +182,6 @@ async function loadAllExerciseProgressions() {
     .select(`
       id,
       exercise_name,
-      session_id,
-      plan_exercise_id,
       workout_sessions!inner (
         id,
         user_id,
@@ -245,6 +260,7 @@ async function loadAllExerciseProgressions() {
       value,
       previousVolume: Math.round(previousStats.volume),
       latestVolume: Math.round(latestStats.volume),
+      volumeDelta: latestStats.volume - previousStats.volume,
     });
   }
 
@@ -256,7 +272,7 @@ async function loadAllExerciseProgressions() {
 
   if (!sortedResults.length) {
     allExerciseProgressionList.innerHTML = `
-      <div class="statistics-top-card">
+      <div class="statistics-top-card compact-top-card">
         <div class="muted">Noch nicht genug Trainingsdaten für diesen Trainingsplan vorhanden.</div>
       </div>
     `;
@@ -264,17 +280,8 @@ async function loadAllExerciseProgressions() {
   }
 
   allExerciseProgressionList.innerHTML = sortedResults.map((item, index) => `
-    <div class="statistics-top-card">
-      <div class="statistics-top-rank">#${index + 1}</div>
-      <div class="statistics-top-content">
-        <div class="statistics-top-name">${item.exerciseName}</div>
-        <div class="statistics-top-progress ${item.type === 'regression' ? 'statistics-top-progress-negative' : ''}">
-          ${formatProgressionText(item)}
-        </div>
-        <div class="statistics-top-meta">
-          Volumen: ${item.previousVolume} → ${item.latestVolume}
-        </div>
-      </div>
+    <div class="fade-up-item fade-up-delay-${Math.min(index + 1, 8)}">
+      ${getAllExerciseCardHtml(item, index)}
     </div>
   `).join('');
 }
