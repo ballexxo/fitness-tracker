@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fitness Tracker - Training Statistik</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#28c267">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="page-header">
+      <a class="back-button" href="statistik.html">←</a>
+    </header>
+
+    <section class="page-card">
+
+      <div id="trainingPlanTabs" class="statistics-plan-tabs" style="margin-bottom: 16px;">
+        Lade Trainingspläne...
+      </div>
+
+      <div class="statistics-switch statistics-progression-switch" style="margin-bottom: 14px;">
+        <button class="active" data-progression-range="last" type="button">Letztes Training</button>
+        <button data-progression-range="month" type="button">1 Monat</button>
+        <button data-progression-range="total" type="button">Gesamt</button>
+      </div>
+
+      <div class="statistics-training-hero">
+        <div class="statistics-chart-wrap">
+          <canvas id="trainingVolumeChart"></canvas>
+        </div>
+
+        <div id="trainingVolumeText" class="statistics-trend-text">
+          Lade Trainingsentwicklung...
+        </div>
+      </div>
+
+      <div class="profile-section-title centered-title" style="margin-top: 28px; margin-bottom: 14px;">
+        <div class="line"></div>
+        <span>Deine Top 3 Übungen</span>
+        <div class="line"></div>
+      </div>
+
+      <div class="statistics-switch statistics-top3-switch" style="margin-bottom: 14px;">
+        <button class="active" data-top-range="last" type="button">Letztes Training</button>
+        <button data-top-range="month" type="button">1 Monat</button>
+        <button data-top-range="total" type="button">Gesamt</button>
+      </div>
+
+      <div id="topProgressionList" class="statistics-compact-top-list">
+        Lade Progression...
+      </div>
+
+      <div style="margin-top: 24px;">
+        <a href="statistics-training-all.html" class="statistics-nav-card is-active">
+          <div class="statistics-nav-left">
+            <div class="statistics-nav-title">Alle Übungen</div>
+            <div class="statistics-nav-sub">Alle Übungen nach Trainingsplan und Progression sortiert</div>
+          </div>
+          <div class="statistics-nav-arrow">→</div>
+        </a>
+      </div>
+
+    </section>
+  </div>
+
+  <script type="module" src="statistics-training.js"></script>
+</body>
+</html>

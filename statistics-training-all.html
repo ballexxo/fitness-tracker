@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fitness Tracker - Alle Übungen</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#28c267">
+  <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="page-header">
+      <a class="back-button" href="statistics-training.html">←</a>
+    </header>
+
+    <section class="page-card">
+
+      <div class="statistics-switch statistics-progression-switch" style="margin-bottom: 16px;">
+        <button class="active" data-progression-range="last" type="button">Letztes Training</button>
+        <button data-progression-range="month" type="button">1 Monat</button>
+        <button data-progression-range="total" type="button">Gesamt</button>
+      </div>
+
+      <div id="trainingPlanTabs" class="statistics-plan-tabs">
+        Lade Trainingspläne...
+      </div>
+
+      <div id="allExerciseProgressionList" class="statistics-top-list" style="margin-top: 20px;">
+        Lade Übungen...
+      </div>
+
+    </section>
+  </div>
+
+  <script type="module" src="statistics-training-all.js"></script>
+</body>
+</html>
