@@ -10,7 +10,6 @@ let currentType = 'weight';
 const chartCanvas = document.getElementById('bodyChart');
 const textEl = document.getElementById('bodyText');
 const cardsEl = document.getElementById('bodyCards');
-const motivationEl = document.getElementById('bodyMotivation');
 
 async function getUser() {
   const { data, error } = await supabase.auth.getSession();
@@ -91,13 +90,38 @@ function getTypeLabel() {
   return '';
 }
 
-function getRangeLabel() {
-  if (currentRange === 'last') return 'zum letzten Bericht';
-  if (currentRange === 'month') return 'in den letzten 4 Wochen';
-  return 'insgesamt';
+function average(values) {
+  if (!values.length) return 0;
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
-function getTrendText(values) {
+function getEnergyState(score) {
+  const s = Number(score || 0);
+
+  if (s < 1.5) return { label: 'sehr niedrig', colorClass: 'statistics-trend-negative' };
+  if (s < 2.5) return { label: 'niedrig', colorClass: 'statistics-trend-negative' };
+  if (s < 3.5) return { label: 'mittel', colorClass: 'statistics-trend-warning' };
+  if (s < 4.5) return { label: 'gut', colorClass: 'statistics-trend-positive' };
+  return { label: 'sehr gut', colorClass: 'statistics-trend-positive' };
+}
+
+function getFeelingState(score) {
+  const s = Number(score || 0);
+
+  if (s < 1.5) return { label: 'sehr schlecht', colorClass: 'statistics-trend-negative' };
+  if (s < 2.5) return { label: 'schlecht', colorClass: 'statistics-trend-negative' };
+  if (s < 3.5) return { label: 'neutral', colorClass: 'statistics-trend-warning' };
+  if (s < 4.5) return { label: 'gut', colorClass: 'statistics-trend-positive' };
+  return { label: 'sehr gut', colorClass: 'statistics-trend-positive' };
+}
+
+function getCurrentState(score) {
+  if (currentType === 'energy') return getEnergyState(score);
+  if (currentType === 'feeling') return getFeelingState(score);
+  return { label: '', colorClass: '' };
+}
+
+function getWeightTrendText(values) {
   if (values.length < 2) {
     return 'Noch nicht genug Daten für eine Auswertung vorhanden.';
   }
@@ -105,32 +129,100 @@ function getTrendText(values) {
   const first = values[0];
   const last = values[values.length - 1];
   const diff = last - first;
-
-  if (currentType === 'weight') {
-    const rounded = Math.round(diff * 10) / 10;
-
-    if (rounded > 0) {
-      return `Dein ${getTypeLabel().toLowerCase()} ist ${getRangeLabel()} <span class="statistics-trend-positive">um ${rounded} kg gestiegen</span>.`;
-    }
-
-    if (rounded < 0) {
-      return `Dein ${getTypeLabel().toLowerCase()} ist ${getRangeLabel()} <span class="statistics-trend-negative">um ${Math.abs(rounded)} kg gesunken</span>.`;
-    }
-
-    return `Dein ${getTypeLabel().toLowerCase()} ist ${getRangeLabel()} stabil geblieben.`;
-  }
-
   const rounded = Math.round(diff * 10) / 10;
 
-  if (rounded > 0) {
-    return `Dein ${getTypeLabel().toLowerCase()} ist ${getRangeLabel()} <span class="statistics-trend-positive">um ${rounded} gestiegen</span>.`;
+  let label = 'Veränderung';
+  if (currentRange === 'last') label = 'Vergleich zum letzten Bericht';
+  if (currentRange === 'month') label = 'Veränderung in 4 Wochen';
+  if (currentRange === 'total') label = 'Veränderung gesamt';
+
+  return `${label}: <span class="statistics-text-neutral">${diff > 0 ? '+' : ''}${rounded} kg</span>`;
+}
+
+function getStateTrendText(filteredData) {
+  if (!filteredData.length) {
+    return 'Noch nicht genug Daten für eine Auswertung vorhanden.';
   }
 
-  if (rounded < 0) {
-    return `Dein ${getTypeLabel().toLowerCase()} ist ${getRangeLabel()} <span class="statistics-trend-negative">um ${Math.abs(rounded)} gefallen</span>.`;
+  const values = filteredData.map(getValue);
+  const label = currentType === 'energy' ? 'Dein Energielevel ist' : 'Dein Körpergefühl ist';
+
+  if (currentRange === 'last') {
+    if (values.length < 2) {
+      return 'Noch nicht genug Daten für eine Auswertung vorhanden.';
+    }
+
+    const diff = values[values.length - 1] - values[0];
+
+    if (diff > 0) {
+      return `${label} <span class="statistics-trend-positive">gestiegen</span>.`;
+    }
+    if (diff < 0) {
+      return `${label} <span class="statistics-trend-negative">gesunken</span>.`;
+    }
+    return `${label} <span class="statistics-trend-warning">gleich geblieben</span>.`;
   }
 
-  return `Dein ${getTypeLabel().toLowerCase()} ist ${getRangeLabel()} stabil geblieben.`;
+  const avg = average(values);
+  const state = getCurrentState(avg);
+  const avgLabel = currentType === 'energy'
+    ? 'Dein Durchschnitts-Energielevel ist'
+    : 'Dein Durchschnitts-Körpergefühl ist';
+
+  return `${avgLabel} <span class="${state.colorClass}">${state.label}</span>.`;
+}
+
+function buildChartOptions(values) {
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          color: '#ffffff',
+          font: {
+            size: 13,
+            weight: '700',
+          },
+        },
+      },
+    },
+    scales: {
+      x: {
+        ticks: {
+          color: '#cbd5e1',
+        },
+        grid: {
+          color: 'rgba(255,255,255,0.06)',
+        },
+      },
+      y: {
+        ticks: {
+          color: '#cbd5e1',
+        },
+        grid: {
+          color: 'rgba(255,255,255,0.06)',
+        },
+      },
+    },
+  };
+
+  if (currentType === 'weight' && values.length >= 2) {
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const padding = Math.max(0.5, Math.abs(max - min) * 0.8);
+
+    options.scales.y.min = Math.max(0, min - padding);
+    options.scales.y.max = max + padding;
+  }
+
+  if (currentType !== 'weight') {
+    options.scales.y.min = 0;
+    options.scales.y.max = 5;
+    options.scales.y.ticks.stepSize = 1;
+  }
+
+  return options;
 }
 
 function renderChart(data) {
@@ -141,17 +233,11 @@ function renderChart(data) {
     return;
   }
 
-  const labels = data.map((d, index) => {
-    if (currentRange === 'last' && data.length === 2) {
-      return index === 0 ? 'Vorheriger Bericht' : 'Aktueller Bericht';
-    }
-    return formatShortDate(d.week_start_date);
-  });
-
+  const labels = data.map((d) => formatShortDate(d.week_start_date));
   const values = data.map(getValue);
 
   chart = new Chart(chartCanvas, {
-    type: currentRange === 'last' ? 'bar' : 'line',
+    type: 'line',
     data: {
       labels,
       datasets: [
@@ -160,52 +246,24 @@ function renderChart(data) {
           data: values,
           tension: 0.3,
           borderWidth: 3,
-          pointRadius: currentRange === 'last' ? 0 : 4,
-          pointHoverRadius: currentRange === 'last' ? 0 : 5,
+          pointRadius: 4,
+          pointHoverRadius: 5,
         },
       ],
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          labels: {
-            color: '#ffffff',
-            font: {
-              size: 13,
-              weight: '700',
-            },
-          },
-        },
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: '#cbd5e1',
-          },
-          grid: {
-            color: 'rgba(255,255,255,0.06)',
-          },
-        },
-        y: {
-          ticks: {
-            color: '#cbd5e1',
-          },
-          grid: {
-            color: 'rgba(255,255,255,0.06)',
-          },
-        },
-      },
-    },
+    options: buildChartOptions(values),
   });
 
-  textEl.innerHTML = getTrendText(values);
+  textEl.innerHTML =
+    currentType === 'weight'
+      ? getWeightTrendText(values)
+      : getStateTrendText(data);
 }
 
-function average(values) {
-  if (!values.length) return 0;
-  return values.reduce((sum, value) => sum + value, 0) / values.length;
+function getDeltaClass(value) {
+  if (value > 0) return 'statistics-trend-positive';
+  if (value < 0) return 'statistics-trend-negative';
+  return 'statistics-trend-warning';
 }
 
 function renderCards(allData, filteredData) {
@@ -215,93 +273,82 @@ function renderCards(allData, filteredData) {
   }
 
   const latest = allData[allData.length - 1];
-  const compareBase = filteredData[0] || latest;
 
-  const currentWeight = Number(latest.weight_kg || 0);
-  const weightDiff = currentWeight - Number(compareBase.weight_kg || 0);
+  if (currentType === 'weight') {
+    const currentWeight = Number(latest.weight_kg || 0);
+    const compareBase = filteredData[0] || latest;
+    const weightDiff = currentWeight - Number(compareBase.weight_kg || 0);
 
-  let energyText = '-';
-  let feelingText = '-';
+    let changeLabel = 'Veränderung';
+    if (currentRange === 'last') changeLabel = 'Zum letzten Bericht';
+    if (currentRange === 'month') changeLabel = 'In 4 Wochen';
+    if (currentRange === 'total') changeLabel = 'Gesamt';
 
-  if (currentRange === 'last') {
-    if (filteredData.length >= 2) {
-      const prev = filteredData[0];
-      const curr = filteredData[filteredData.length - 1];
-      const energyDiff = Number(curr.energy_level || 0) - Number(prev.energy_level || 0);
-      const feelingDiff = Number(curr.body_feeling || 0) - Number(prev.body_feeling || 0);
+    cardsEl.innerHTML = `
+      <div class="statistics-grid body-cards-grid">
+        <div class="statistics-mini-card fade-up-item fade-up-delay-1">
+          <div class="statistics-mini-label">Aktuelles Gewicht</div>
+          <div class="statistics-mini-value statistics-text-neutral">${currentWeight.toFixed(1)} kg</div>
+        </div>
 
-      energyText = `${energyDiff > 0 ? '+' : ''}${energyDiff}`;
-      feelingText = `${feelingDiff > 0 ? '+' : ''}${feelingDiff}`;
-    }
-  } else {
-    energyText = `Ø ${average(filteredData.map((d) => Number(d.energy_level || 0))).toFixed(1)}`;
-    feelingText = `Ø ${average(filteredData.map((d) => Number(d.body_feeling || 0))).toFixed(1)}`;
-  }
-
-  cardsEl.innerHTML = `
-    <div class="stat-card fade-up-item fade-up-delay-1">
-      Aktuelles Gewicht<br>
-      <b>${currentWeight.toFixed(1)} kg</b>
-    </div>
-
-    <div class="stat-card fade-up-item fade-up-delay-2">
-      Veränderung<br>
-      <b class="${weightDiff >= 0 ? 'statistics-trend-positive' : 'statistics-trend-negative'}">
-        ${weightDiff > 0 ? '+' : ''}${weightDiff.toFixed(1)} kg
-      </b>
-    </div>
-
-    <div class="stat-card fade-up-item fade-up-delay-3">
-      Energielevel<br>
-      <b class="${String(energyText).startsWith('-') ? 'statistics-trend-negative' : 'statistics-trend-positive'}">${energyText}</b>
-    </div>
-
-    <div class="stat-card fade-up-item fade-up-delay-4">
-      Körpergefühl<br>
-      <b class="${String(feelingText).startsWith('-') ? 'statistics-trend-negative' : 'statistics-trend-positive'}">${feelingText}</b>
-    </div>
-  `;
-}
-
-function renderMotivation(filteredData) {
-  if (!filteredData.length) {
-    motivationEl.innerHTML = '';
+        <div class="statistics-mini-card fade-up-item fade-up-delay-2">
+          <div class="statistics-mini-label">${changeLabel}</div>
+          <div class="statistics-mini-value statistics-text-neutral">
+            ${weightDiff > 0 ? '+' : ''}${weightDiff.toFixed(1)} kg
+          </div>
+        </div>
+      </div>
+    `;
     return;
   }
 
-  const first = filteredData[0];
-  const latest = filteredData[filteredData.length - 1];
+  const currentValue = getValue(latest);
+  const currentState = getCurrentState(currentValue);
 
-  const weightDiff = Number(latest.weight_kg || 0) - Number(first.weight_kg || 0);
-  const energyDiff = Number(latest.energy_level || 0) - Number(first.energy_level || 0);
-  const feelingDiff = Number(latest.body_feeling || 0) - Number(first.body_feeling || 0);
+  let secondLabel = '';
+  let secondValue = '';
+  let secondClass = 'statistics-trend-positive';
 
-  const weightText =
-    weightDiff < 0
-      ? 'Dein Gewicht entwickelt sich aktuell nach unten.'
-      : weightDiff > 0
-        ? 'Dein Gewicht entwickelt sich aktuell nach oben.'
-        : 'Dein Gewicht ist aktuell stabil.';
+  if (currentRange === 'last') {
+    secondLabel = 'Zum letzten Bericht';
 
-  const energyText =
-    energyDiff > 0
-      ? 'Dein Energielevel hat sich verbessert.'
-      : energyDiff < 0
-        ? 'Dein Energielevel ist zuletzt gesunken.'
-        : 'Dein Energielevel ist stabil geblieben.';
+    if (filteredData.length >= 2) {
+      const prev = filteredData[0];
+      const curr = filteredData[filteredData.length - 1];
+      const diff = getValue(curr) - getValue(prev);
 
-  const feelingText =
-    feelingDiff > 0
-      ? 'Dein Körpergefühl entwickelt sich positiv.'
-      : feelingDiff < 0
-        ? 'Dein Körpergefühl ist etwas gesunken.'
-        : 'Dein Körpergefühl ist stabil geblieben.';
+      secondValue = `${diff > 0 ? '+' : ''}${diff.toFixed(1)}`;
+      secondClass = getDeltaClass(diff);
+    } else {
+      secondValue = '0.0';
+      secondClass = 'statistics-trend-warning';
+    }
+  } else {
+    const avg = average(filteredData.map(getValue));
+    const avgState = getCurrentState(avg);
 
-  motivationEl.innerHTML = `
-    <p>${weightText}</p>
-    <p>${energyText}</p>
-    <p>${feelingText}</p>
-  `;
+    secondLabel = currentRange === 'month' ? 'Ø 4 Wochen' : 'Ø Gesamt';
+    secondValue = `${avg.toFixed(1)} - ${avgState.label}`;
+    secondClass = avgState.colorClass;
+  }
+
+  cardsEl.innerHTML = `
+    <div class="statistics-grid body-cards-grid">
+      <div class="statistics-mini-card fade-up-item fade-up-delay-1">
+        <div class="statistics-mini-label">${currentType === 'energy' ? 'Aktuelles Energielevel' : 'Aktuelles Körpergefühl'}</div>
+        <div class="statistics-mini-value ${currentState.colorClass}">
+          ${currentValue.toFixed(1)} - ${currentState.label}
+        </div>
+      </div>
+
+      <div class="statistics-mini-card fade-up-item fade-up-delay-2">
+        <div class="statistics-mini-label">${secondLabel}</div>
+        <div class="statistics-mini-value ${secondClass}">
+          ${secondValue}
+        </div>
+      </div>
+    </div>
+    `;
 }
 
 function updateActiveButtons(containerSelector, activeValue, dataAttr) {
@@ -312,12 +359,10 @@ function updateActiveButtons(containerSelector, activeValue, dataAttr) {
 
 async function init() {
   const allData = await loadData();
-
   const filteredData = filterData(allData);
 
   renderChart(filteredData);
   renderCards(allData, filteredData);
-  renderMotivation(filteredData);
 
   updateActiveButtons('#bodyRangeSwitch', currentRange, 'range');
   updateActiveButtons('#bodyTypeSwitch', currentType, 'type');

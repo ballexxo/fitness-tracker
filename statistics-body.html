@@ -5,47 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Körper Statistik</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#28c267">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
   <div class="page-shell">
-
     <header class="page-header">
       <a class="back-button" href="statistik.html">←</a>
     </header>
 
     <section class="page-card">
 
-      <!-- Zeitraum -->
       <div class="statistics-switch" id="bodyRangeSwitch">
-        <button class="active" data-range="last">Letzter Bericht</button>
-        <button data-range="month">4 Wochen</button>
-        <button data-range="total">Gesamt</button>
+        <button class="active" data-range="last" type="button">Letzter Bericht</button>
+        <button data-range="month" type="button">4 Wochen</button>
+        <button data-range="total" type="button">Gesamt</button>
       </div>
 
-      <!-- Datentyp -->
-      <div class="statistics-switch" id="bodyTypeSwitch" style="margin-top:10px;">
-        <button class="active" data-type="weight">Gewicht</button>
-        <button data-type="energy">Energie</button>
-        <button data-type="feeling">Gefühl</button>
+      <div class="statistics-switch" id="bodyTypeSwitch" style="margin-top: 10px;">
+        <button class="active" data-type="weight" type="button">Gewicht</button>
+        <button data-type="energy" type="button">Energie</button>
+        <button data-type="feeling" type="button">Gefühl</button>
       </div>
 
-      <!-- Diagramm -->
-      <div class="statistics-chart-wrap">
+      <div class="statistics-chart-wrap" style="margin-top: 18px;">
         <canvas id="bodyChart"></canvas>
       </div>
 
       <div id="bodyText" class="statistics-trend-text"></div>
 
-      <!-- Karten -->
-      <div class="statistics-grid" id="bodyCards"></div>
-
-      <!-- Motivation -->
-      <div class="statistics-motivation" id="bodyMotivation"></div>
+      <div id="bodyCards"></div>
 
     </section>
-
   </div>
 
   <script type="module" src="statistics-body.js"></script>

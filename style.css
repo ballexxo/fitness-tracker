@@ -1287,6 +1287,7 @@ button.logout:active {
 
 .statistics-trend-negative {
   color: #28c267;
+  /*color: #f87171;*/
 }
 
 @media (max-width: 700px) {
@@ -1307,23 +1308,31 @@ button.logout:active {
 }
 
 .statistics-mini-card {
-  padding: 18px;
-  border-radius: 22px;
+ padding: 16px 14px;
+  border-radius: 18px;
   background: rgba(12, 22, 38, 0.8);
   border: 1px solid rgba(255,255,255,0.06);
   text-align: center;
+  backdrop-filter: blur(6px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.statistics-mini-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
 }
 
 .statistics-mini-label {
   color: #cbd5e1;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   line-height: 1.5;
+  
 }
 
 .statistics-mini-value {
-  margin-top: 10px;
+  margin-top: 6px;
   color: #28c267;
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   font-weight: 900;
 }
 
@@ -1771,4 +1780,78 @@ button.logout:active {
   margin-top: 20px;
   text-align: center;
   line-height: 1.6;
+}
+.statistics-trend-warning {
+  color: #facc15;
+}
+
+.body-single-card {
+  grid-column: 1 / -1;
+}
+
+.body-card-label {
+  color: #cbd5e1;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.body-card-value {
+  margin-top: 8px;
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+
+.body-cards-grid {
+  width: 100%;
+  max-width: 760px;
+  margin: 20px auto 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 170px));
+  justify-content: center;
+  gap: 12px;
+}
+
+.statistics-trend-warning {
+  color: #facc15;
+}
+
+.statistics-text-neutral {
+  color: #28c267;
+}
+
+
+#bodyCards .statistics-mini-value.statistics-trend-positive {
+  color: #28c267 !important;
+}
+
+#bodyCards .statistics-mini-value.statistics-trend-negative {
+  color: #f87171 !important;
+}
+
+#bodyCards .statistics-mini-value.statistics-trend-warning {
+  color: #facc15 !important;
+}
+
+#bodyCards .statistics-mini-value.statistics-text-neutral {
+  color: #28c267 !important;
+}
+
+.page-card {
+  padding: 20px;
+}
+
+.statistics-chart-wrap {
+  margin-top: 18px;
+}
+
+.statistics-trend-text {
+  margin-top: 16px;
+  text-align: center;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.statistics-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }

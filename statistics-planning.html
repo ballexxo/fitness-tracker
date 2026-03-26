@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fitness Tracker - Planung Statistik</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#28c267">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="page-header">
+      <a class="back-button" href="statistik.html">←</a>
+    </header>
+
+    <section class="page-card">
+
+      <div class="statistics-switch" id="planningRangeSwitch">
+        <button class="active" data-range="last" type="button">Letzte Woche</button>
+        <button data-range="month" type="button">4 Wochen</button>
+        <button data-range="total" type="button">Gesamt</button>
+      </div>
+
+      <div class="statistics-chart-wrap" style="margin-top: 18px;">
+        <canvas id="planningChart"></canvas>
+      </div>
+
+      <div id="planningText" class="statistics-trend-text">
+        Lade Planung...
+      </div>
+
+      <div id="planningCards" class="statistics-cards-grid" style="margin-top: 22px;">
+        <div class="statistics-mini-card"><div class="statistics-mini-label">Lade...</div><div class="statistics-mini-value">-</div></div>
+      </div>
+
+      <div id="planningInsights" class="statistics-cards-grid" style="margin-top: 16px;">
+        <div class="statistics-mini-card"><div class="statistics-mini-label">Lade...</div><div class="statistics-mini-value">-</div></div>
+      </div>
+
+    </section>
+  </div>
+
+  <script type="module" src="statistics-planning.js"></script>
+</body>
+</html>
