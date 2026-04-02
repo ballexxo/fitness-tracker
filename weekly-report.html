@@ -8,63 +8,69 @@
 </head>
 <body>
 
-  <div class="page-shell">
+  <div class="page-shell page-shell-app">
 
-    <header class="page-header">
-        <button class="back-button" type="button" onclick="history.back()">←</button>
+    <header class="page-header app-page-header">
+      <button class="app-back-button" type="button" onclick="history.back()" aria-label="Zurück">
+        <svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 6L9 12L15 18"></path>
+        </svg>
+      </button>
     </header>
 
-    <div class="page-title">Wochenbericht</div>
+    <main class="app-form-page">
+      <section class="app-form-card">
+       
 
-    <section class="page-card">
-      <div class="module-badge">Wöchentlicher Check-in</div>
+        <div id="weeklyReportInfo" class="app-info-box weekly-info-box">
+          Lade aktuellen Stand...
+        </div>
 
-      <div id="weeklyReportInfo" class="info-box weekly-info-box">
-        Lade aktuellen Stand...
-      </div>
+        <form id="weeklyReportForm" class="auth-form app-form" style="margin-top: 24px;">
+          <label>
+            Gewicht in kg
+            <input id="weeklyWeight" type="number" min="30" max="300" step="0.1" placeholder="Zum Beispiel 82.4" required>
+          </label>
 
-      <form id="weeklyReportForm" class="auth-form" style="margin-top: 24px;">
-        <label>
-          Gewicht in kg
-          <input id="weeklyWeight" type="number" min="30" max="300" step="0.1" placeholder="Zum Beispiel 82.4" required>
-        </label>
+          <label>
+            Energielevel
+            <select id="weeklyEnergy" required>
+              <option value="">Bitte auswählen</option>
+              <option value="1">1 - Sehr niedrig</option>
+              <option value="2">2 - Niedrig</option>
+              <option value="3">3 - Mittel</option>
+              <option value="4">4 - Gut</option>
+              <option value="5">5 - Sehr gut</option>
+            </select>
+          </label>
 
-        <label>
-          Energielevel
-          <select id="weeklyEnergy" required>
-            <option value="">Bitte auswählen</option>
-            <option value="1">1 - Sehr niedrig</option>
-            <option value="2">2 - Niedrig</option>
-            <option value="3">3 - Mittel</option>
-            <option value="4">4 - Gut</option>
-            <option value="5">5 - Sehr gut</option>
-          </select>
-        </label>
+          <label>
+            Körpergefühl
+            <select id="weeklyFeeling" required>
+              <option value="">Bitte auswählen</option>
+              <option value="1">1 - Sehr schlecht</option>
+              <option value="2">2 - Eher schlecht</option>
+              <option value="3">3 - Neutral</option>
+              <option value="4">4 - Gut</option>
+              <option value="5">5 - Sehr gut</option>
+            </select>
+          </label>
 
-        <label>
-          Körpergefühl
-          <select id="weeklyFeeling" required>
-            <option value="">Bitte auswählen</option>
-            <option value="1">1 - Sehr schlecht</option>
-            <option value="2">2 - Eher schlecht</option>
-            <option value="3">3 - Neutral</option>
-            <option value="4">4 - Gut</option>
-            <option value="5">5 - Sehr gut</option>
-          </select>
-        </label>
+          <label>
+            Notiz (optional)
+            <textarea id="weeklyNote" rows="4" placeholder="Zum Beispiel: Training lief gut, wenig Schlaf, Ernährung war sauber ..."></textarea>
+          </label>
 
-        <label>
-          Notiz (optional)
-          <textarea id="weeklyNote" rows="4" placeholder="Zum Beispiel: Training lief gut, wenig Schlaf, Ernährung war sauber ..."></textarea>
-        </label>
+          <div id="weeklyReportStatus" class="status hidden"></div>
 
-        <div id="weeklyReportStatus" class="status hidden"></div>
+          <div class="app-form-actions">
+            <button id="saveWeeklyReportBtn" class="dashboard-summary-primary-btn" type="submit">Wochenbericht speichern</button>
+          </div>
+        </form>
 
-        <button id="saveWeeklyReportBtn" class="primary" type="submit">Wochenbericht speichern</button>
-      </form>
-
-      <div id="weeklyLastEntryBox" class="calculator-result-box hidden"></div>
-    </section>
+        <div id="weeklyLastEntryBox" class="calculator-result-box hidden"></div>
+      </section>
+    </main>
 
   </div>
 

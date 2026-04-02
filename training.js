@@ -23,7 +23,7 @@ async function loadLastTraining() {
 
   const { data, error } = await supabase
     .from('workout_sessions')
-    .select('plan_name, training_date, created_at')
+    .select('plan_name, training_date, created_at, finished_at')
     .eq('user_id', user.id)
     .not('finished_at', 'is', null)
     .order('finished_at', { ascending: false })
@@ -31,12 +31,12 @@ async function loadLastTraining() {
 
   if (error || !data || data.length === 0) {
     lastTrainingName.textContent = 'Noch kein Training';
-    lastTrainingDate.textContent = '-';
+    lastTrainingDate.textContent = 'Sobald du ein Training abschließt, erscheint es hier.';
     return;
   }
 
   const session = data[0];
-  lastTrainingName.textContent = session.plan_name;
+  lastTrainingName.textContent = session.plan_name || 'Training';
 
   const date = new Date(session.training_date);
   const weekday = date.toLocaleDateString('de-DE', { weekday: 'long' });

@@ -8,52 +8,58 @@
 </head>
 <body>
 
-  <div class="page-shell">
+  <div class="page-shell page-shell-app">
 
-    <header class="page-header">
-        <button class="back-button" type="button" onclick="history.back()">←</button>
+    <header class="page-header app-page-header">
+      <button class="app-back-button" type="button" onclick="history.back()" aria-label="Zurück">
+        <svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 6L9 12L15 18"></path>
+        </svg>
+      </button>
     </header>
 
-    <div class="page-title">Daten eintragen</div>
+    <main class="app-form-page">
+      <section class="app-form-card">
+        
 
-    <section class="page-card">
-      <div class="module-badge">Stammdaten</div>
+        <form id="profileForm" class="auth-form app-form">
+          <label>
+            Name
+            <input id="profileName" type="text" placeholder="Zum Beispiel Max" required>
+          </label>
 
-      <form id="profileForm" class="auth-form">
-        <label>
-          Name
-          <input id="profileName" type="text" placeholder="Zum Beispiel Max" required>
-        </label>
+          <label>
+            Geburtsdatum
+            <input id="profileBirthdate" type="date" required>
+          </label>
 
-        <label>
-          Geburtsdatum
-          <input id="profileBirthdate" type="date" required>
-        </label>
+          <label>
+            Geschlecht
+            <select id="profileSex" required>
+              <option value="">Bitte auswählen</option>
+              <option value="male">Männlich</option>
+              <option value="female">Weiblich</option>
+            </select>
+          </label>
 
-        <label>
-          Geschlecht
-          <select id="profileSex" required>
-            <option value="">Bitte auswählen</option>
-            <option value="male">Männlich</option>
-            <option value="female">Weiblich</option>
-          </select>
-        </label>
+          <label>
+            Größe in cm
+            <input id="profileHeight" type="number" min="100" max="250" placeholder="Zum Beispiel 180" required>
+          </label>
 
-        <label>
-          Größe in cm
-          <input id="profileHeight" type="number" min="100" max="250" placeholder="Zum Beispiel 180" required>
-        </label>
+          <label>
+            Aktuelles Gewicht in kg
+            <input id="profileWeight" type="number" min="30" max="300" step="0.1" placeholder="Zum Beispiel 82.5" required>
+          </label>
 
-        <label>
-          Aktuelles Gewicht in kg
-          <input id="profileWeight" type="number" min="30" max="300" step="0.1" placeholder="Zum Beispiel 82.5" required>
-        </label>
+          <div id="profileFormStatus" class="status hidden"></div>
 
-        <div id="profileFormStatus" class="status hidden"></div>
-
-        <button id="saveProfileBtn" class="primary" type="submit">Daten speichern</button>
-      </form>
-    </section>
+          <div class="app-form-actions">
+            <button id="saveProfileBtn" class="dashboard-summary-primary-btn" type="submit">Daten speichern</button>
+          </div>
+        </form>
+      </section>
+    </main>
 
   </div>
 

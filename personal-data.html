@@ -8,23 +8,50 @@
 </head>
 <body>
 
-  <div class="page-shell">
+  <div class="page-shell page-shell-app">
 
-    <header class="page-header">
-  <a class="back-button" href="dashboard.html">←</a>
-</header>
+    <header class="page-header app-page-header">
+      <a class="app-back-button" href="dashboard.html" aria-label="Zurück zum Dashboard">
+        <svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 6L9 12L15 18"></path>
+        </svg>
+      </a>
+    </header>
 
-    <div class="page-title">Persönliche Daten</div>
+    <main class="personal-page">
+      <section class="app-hero-card personal-hero-card">
+        <div id="profileOverview">Lade Daten...</div>
+      </section>
 
-    <section class="info-box personal-overview-box">
-      <div id="profileOverview">Lade Daten...</div>
-    </section>
+      <section class="dashboard-nav-list dashboard-nav-list-no-icons personal-nav-list">
+        <a href="personal-data-form.html" class="dashboard-nav-button dashboard-nav-button-no-icon">
+          <span class="nav-left nav-left-no-icon">
+            <span class="nav-text">
+              <span class="nav-title">Daten eintragen</span>
+            </span>
+          </span>
+          <img class="nav-chevron-img" src="icon-chevron.svg" alt="">
+        </a>
 
-    <div class="personal-actions">
-      <a href="personal-data-form.html" class="main-button">Daten eintragen</a>
-      <a href="calorie-calculator.html" class="main-button">Kalorienrechner</a>
-      <a href="weekly-report.html" class="main-button">Wochenbericht</a>
-    </div>
+        <a href="calorie-calculator.html" class="dashboard-nav-button dashboard-nav-button-no-icon">
+          <span class="nav-left nav-left-no-icon">
+            <span class="nav-text">
+              <span class="nav-title">Kalorienrechner</span>
+            </span>
+          </span>
+          <img class="nav-chevron-img" src="icon-chevron.svg" alt="">
+        </a>
+
+        <a href="weekly-report.html" class="dashboard-nav-button dashboard-nav-button-no-icon">
+          <span class="nav-left nav-left-no-icon">
+            <span class="nav-text">
+              <span class="nav-title">Wochenbericht</span>
+            </span>
+          </span>
+          <img class="nav-chevron-img" src="icon-chevron.svg" alt="">
+        </a>
+      </section>
+    </main>
 
   </div>
 

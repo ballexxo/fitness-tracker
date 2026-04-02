@@ -6,28 +6,57 @@
   <title>Fitness Tracker - Training</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#28c267">
+  <meta name="theme-color" content="#071225">
   <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
-  <div class="page-shell">
-    <header class="page-header">
-      <a class="back-button" href="dashboard.html">←</a>
+  <div class="page-shell page-shell-app">
+    <header class="page-header app-page-header">
+      <a class="app-back-button" href="dashboard.html" aria-label="Zurück zum Dashboard">
+        <svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 6L9 12L15 18"></path>
+        </svg>
+      </a>
     </header>
 
-    <section class="page-card">
-      <div class="info-box" style="max-width:100%; margin-bottom:24px;">
-        <div class="streak-label">Letztes Training</div>
-        <div class="streak-value" id="lastTrainingName">Noch kein Training</div>
-        <div class="streak-text" id="lastTrainingDate">-</div>
-      </div>
+    <main class="training-page">
+      <section class="app-hero-card training-hero-card">
+        <div class="training-hero-inner">
+          <div class="training-hero-label">Letztes Training</div>
+          <div class="training-hero-name" id="lastTrainingName">Noch kein Training</div>
+          <div class="training-hero-date" id="lastTrainingDate">-</div>
+        </div>
+      </section>
 
-      <div class="dashboard-buttons" style="max-width:100%;">
-        <a href="training-start-list.html" class="main-button">Training Starten</a>
-        <a href="training-history.html" class="main-button">Training Historie</a>
-        <a href="training-planner.html" class="main-button">Training Planen</a>
-      </div>
-    </section>
+      <section class="dashboard-nav-list dashboard-nav-list-no-icons training-nav-list">
+        <a href="training-start-list.html" class="dashboard-nav-button dashboard-nav-button-no-icon">
+          <span class="nav-left nav-left-no-icon">
+            <span class="nav-text">
+              <span class="nav-title">Training starten</span>
+            </span>
+          </span>
+          <img class="nav-chevron-img" src="icon-chevron.svg" alt="">
+        </a>
+
+        <a href="training-history.html" class="dashboard-nav-button dashboard-nav-button-no-icon">
+          <span class="nav-left nav-left-no-icon">
+            <span class="nav-text">
+              <span class="nav-title">Training Historie</span>
+            </span>
+          </span>
+          <img class="nav-chevron-img" src="icon-chevron.svg" alt="">
+        </a>
+
+        <a href="training-planner.html" class="dashboard-nav-button dashboard-nav-button-no-icon">
+          <span class="nav-left nav-left-no-icon">
+            <span class="nav-text">
+              <span class="nav-title">Training planen</span>
+            </span>
+          </span>
+          <img class="nav-chevron-img" src="icon-chevron.svg" alt="">
+        </a>
+      </section>
+    </main>
   </div>
 
   <script type="module" src="training.js"></script>

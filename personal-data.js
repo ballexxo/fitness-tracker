@@ -59,18 +59,49 @@ function hasGoalData(profile) {
   );
 }
 
+function createSectionTitle(title) {
+  return `
+    <div class="dashboard-summary-line personal-card-line">
+      <span>${title}</span>
+    </div>
+  `;
+}
+
+function createInfoRow(label, value) {
+  return `
+    <div class="personal-info-row">
+      <span class="personal-info-label">${label}</span>
+      <span class="personal-info-value">${value}</span>
+    </div>
+  `;
+}
+
+function createReminderCard(text, href, buttonLabel) {
+  return `
+    <div class="dashboard-summary-reminder dashboard-summary-reminder-warning personal-reminder-card">
+      <div class="dashboard-summary-reminder-text">
+        <span class="dashboard-summary-reminder-icon">⚠</span>
+        <span>${text}</span>
+      </div>
+      <a class="dashboard-summary-reminder-btn" href="${href}">
+        ${buttonLabel}
+      </a>
+    </div>
+  `;
+}
+
 async function loadProfile() {
   try {
-    renderMessage('Lade Daten...');
+    renderMessage('<div class="personal-loading">Lade Daten...</div>');
 
     const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
 
     if (sessionError) {
       console.error('Session-Fehler:', sessionError);
       renderMessage(`
-        <div class="empty-state-box">
-          <strong>Session konnte nicht geladen werden.</strong><br><br>
-          Bitte logge dich erneut ein.
+        <div class="personal-empty-state">
+          <div class="personal-empty-title">Session konnte nicht geladen werden.</div>
+          <div class="personal-empty-text">Bitte logge dich erneut ein.</div>
         </div>
       `);
       return;
@@ -92,9 +123,11 @@ async function loadProfile() {
     if (profileError) {
       console.error('Fehler beim Laden der Profildaten:', profileError);
       renderMessage(`
-        <div class="empty-state-box">
-          <strong>Die Profildaten konnten nicht geladen werden.</strong><br><br>
-          Bitte prüfe, ob die Tabelle <b>user_profile_data</b> existiert und die Daten gespeichert wurden.
+        <div class="personal-empty-state">
+          <div class="personal-empty-title">Die Profildaten konnten nicht geladen werden.</div>
+          <div class="personal-empty-text">
+            Bitte prüfe, ob die Tabelle <strong>user_profile_data</strong> existiert und Daten gespeichert wurden.
+          </div>
         </div>
       `);
       return;
@@ -102,9 +135,12 @@ async function loadProfile() {
 
     if (!profile) {
       renderMessage(`
-        <div class="empty-state-box">
-          <strong>Noch keine persönlichen Daten vorhanden.</strong><br><br>
-          Trage zuerst deine Daten ein.
+        <div class="personal-empty-state">
+          <div class="personal-empty-title">Noch keine persönlichen Daten vorhanden.</div>
+          <div class="personal-empty-text">Trage zuerst deine Daten ein.</div>
+          <div class="personal-empty-action">
+            <a class="dashboard-summary-primary-btn" href="personal-data-form.html">Daten eintragen</a>
+          </div>
         </div>
       `);
       return;
@@ -126,100 +162,79 @@ async function loadProfile() {
       const diffDays = (Date.now() - lastDate.getTime()) / (1000 * 60 * 60 * 24);
 
       if (diffDays > 7) {
-        warningHtml = `
-          <div class="profile-warning-box">
-            ⚠ Bitte aktualisiere deinen Wochenbericht
-          </div>
-        `;
+        warningHtml = createReminderCard(
+          'Bitte aktualisiere deinen Wochenbericht.',
+          'weekly-report.html',
+          'Aktualisieren'
+        );
       }
     }
 
     const goalSectionHtml = hasGoalData(profile)
       ? `
-        <div class="profile-text-block">
-          <span class="profile-label-normal">Ziel:</span>
-          <span class="profile-value-inline">${formatGoal(profile.goal)}</span><br>
+        <div class="personal-info-grid personal-info-grid-goal">
+          ${createInfoRow('Ziel', formatGoal(profile.goal))}
+          ${createInfoRow('Ernährungsform', formatDietType(profile.diet_type))}
+          ${createInfoRow('Kalorienziel', `${profile.calorie_target} kcal`)}
+        </div>
 
-          <span class="profile-label-normal">Ernährungsform:</span>
-          <span class="profile-value-inline">${formatDietType(profile.diet_type)}</span><br>
+        <div class="personal-macro-row">
+          <span class="personal-macro-label">Eiweiß</span>
+          <span class="personal-macro-value">${profile.protein_g} g</span>
 
-          <span class="profile-label-normal">Kalorienziel:</span>
-          <span class="profile-value-inline">${profile.calorie_target} kcal</span>
+          <span class="personal-macro-divider">|</span>
 
-          <div class="profile-macros">
-            <span class="profile-label-inline">Eiweiß:</span>
-            <span class="profile-value-inline">${profile.protein_g} g</span>
-            <span class="macro-separator">|</span>
+          <span class="personal-macro-label">Kohlenhydrate</span>
+          <span class="personal-macro-value">${profile.carbs_g} g</span>
 
-            <span class="profile-label-inline">Kohlenhydrate:</span>
-            <span class="profile-value-inline">${profile.carbs_g} g</span>
-            <span class="macro-separator">|</span>
+          <span class="personal-macro-divider">|</span>
 
-            <span class="profile-label-inline">Fett:</span>
-            <span class="profile-value-inline">${profile.fat_g} g</span>
-          </div>
+          <span class="personal-macro-label">Fett</span>
+          <span class="personal-macro-value">${profile.fat_g} g</span>
         </div>
       `
       : `
-        <div class="profile-text-block" style="text-align:center;">
-          <div class="dashboard-center-text" style="margin-top: 4px;">
-            Noch kein Ziel berechnet.
-          </div>
-          <div style="margin-top: 14px;">
-            <a class="pill-button" href="calorie-calculator.html">Kalorienrechner öffnen</a>
+        <div class="personal-empty-inline">
+          <div class="personal-empty-inline-text">Noch kein Ziel berechnet.</div>
+          <div class="personal-empty-inline-action">
+            <a class="dashboard-summary-primary-btn" href="calorie-calculator.html">Kalorienrechner öffnen</a>
           </div>
         </div>
       `;
 
     renderMessage(`
-      <div class="profile-section">
+      <div class="personal-card-content">
 
-        <div class="profile-section-title centered-title">
-          <div class="line"></div>
-          <span>Daten</span>
-          <div class="line"></div>
-        </div>
+        <div class="personal-card-section">
+          ${createSectionTitle('Daten')}
 
-        <div class="profile-text-block">
-          <div class="profile-name">${profile.display_name || '-'}</div>
+          <div class="personal-user-name">
+            ${profile.display_name || '-'}
+          </div>
 
-          <div class="profile-details">
-            <span class="profile-label-normal">Alter:</span>
-            <span class="profile-value-inline">${calculateAge(profile.birthdate)}</span><br>
-
-            <span class="profile-label-normal">Größe:</span>
-            <span class="profile-value-inline">${profile.height_cm ?? '-'} cm</span><br>
-
-            <span class="profile-label-normal">Gewicht:</span>
-            <span class="profile-value-inline">${profile.current_weight_kg ?? '-'} kg</span><br>
-
-            <span class="profile-label-normal">Letzter Stand:</span>
-            <span class="profile-value-inline">${formatUpdatedAt(profile.updated_at)}</span>
+          <div class="personal-info-grid">
+            ${createInfoRow('Alter', calculateAge(profile.birthdate))}
+            ${createInfoRow('Größe', `${profile.height_cm ?? '-'} cm`)}
+            ${createInfoRow('Gewicht', `${profile.current_weight_kg ?? '-'} kg`)}
+            ${createInfoRow('Letzter Stand', formatUpdatedAt(profile.updated_at))}
           </div>
         </div>
 
-      </div>
-
-      <div class="profile-section">
-
-        <div class="profile-section-title centered-title">
-          <div class="line"></div>
-          <span>Ziel</span>
-          <div class="line"></div>
+        <div class="personal-card-section">
+          ${createSectionTitle('Ziel')}
+          ${goalSectionHtml}
         </div>
 
-        ${goalSectionHtml}
+        ${warningHtml}
 
       </div>
-
-      ${warningHtml}
     `);
   } catch (error) {
     console.error('Unerwarteter Fehler in personal-data.js:', error);
     renderMessage(`
-      <div class="empty-state-box">
-        <strong>Beim Laden ist ein Fehler aufgetreten.</strong><br><br>
-        Öffne bitte einmal die Browser-Konsole.
+      <div class="personal-empty-state">
+        <div class="personal-empty-title">Beim Laden ist ein Fehler aufgetreten.</div>
+        <div class="personal-empty-text">Öffne bitte einmal die Browser-Konsole.</div>
       </div>
     `);
   }
