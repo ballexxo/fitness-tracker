@@ -3,7 +3,6 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const helloText = document.getElementById('helloText');
 const currentWeekday = document.getElementById('currentWeekday');
 const currentDate = document.getElementById('currentDate');
 const logoutBtn = document.getElementById('logoutBtn');
@@ -73,15 +72,16 @@ async function guardPage() {
 async function loadUser() {
   const user = await guardPage();
   if (!user) return null;
-
-  helloText.innerText = 'Hallo ' + (user.user_metadata.display_name || user.email);
   return user;
 }
 
 function loadDateBox() {
   const now = new Date();
 
-  currentWeekday.textContent = now.toLocaleDateString('de-DE', { weekday: 'long' });
+  currentWeekday.textContent = now.toLocaleDateString('de-DE', {
+    weekday: 'long',
+  });
+
   currentDate.textContent = now.toLocaleDateString('de-DE', {
     day: '2-digit',
     month: '2-digit',
@@ -131,16 +131,41 @@ function isDateInCurrentWeek(dateString) {
   return test >= monday && test <= sunday;
 }
 
+function createSummarySection(label, value, extraClass = '') {
+  return `
+    <div class="dashboard-summary-section ${extraClass}">
+      <div class="dashboard-summary-line">
+        <span>${label}</span>
+      </div>
+      <div class="dashboard-summary-value">${value}</div>
+    </div>
+  `;
+}
+
+function createSummaryTextSection(label, text) {
+  return `
+    <div class="dashboard-summary-section dashboard-summary-section-text">
+      <div class="dashboard-summary-line">
+        <span>${label}</span>
+      </div>
+      <div class="dashboard-summary-text">${text}</div>
+    </div>
+  `;
+}
+
 async function getDashboardReminderHtml(userId) {
   const profile = await getProfileState(userId);
 
   if (!profile || !profile.current_weight_kg) {
     return `
-      <div class="profile-warning-box" style="margin-top: 22px;">
-        ⚠ Bitte trage zuerst deine persönlichen Daten ein.
-        <div style="margin-top: 12px;">
-          <a class="pill-button" href="personal-data-form.html">Persönliche Daten eintragen</a>
+      <div class="dashboard-summary-reminder">
+        <div class="dashboard-summary-reminder-text">
+          <span class="dashboard-summary-reminder-icon">⚠</span>
+          <span>Bitte trage zuerst deine persönlichen Daten ein.</span>
         </div>
+        <a class="dashboard-summary-reminder-btn" href="personal-data-form.html">
+          Jetzt eintragen
+        </a>
       </div>
     `;
   }
@@ -172,12 +197,15 @@ async function getDashboardReminderHtml(userId) {
     return '';
   }
 
-  return `
-    <div class="profile-warning-box" style="margin-top: 22px;">
-      ⚠ Bitte aktualisiere deinen Wochenbericht.
-      <div style="margin-top: 12px;">
-        <a class="pill-button" href="weekly-report.html">Aktualisieren</a>
+    return `
+    <div class="dashboard-summary-reminder dashboard-summary-reminder-warning">
+      <div class="dashboard-summary-reminder-text">
+        <span class="dashboard-summary-reminder-icon">⚠</span>
+        <span>Bitte aktualisiere deinen Wochenbericht.</span>
       </div>
+      <a class="dashboard-summary-reminder-btn" href="weekly-report.html">
+        Aktualisieren
+      </a>
     </div>
   `;
 }
@@ -186,71 +214,68 @@ async function renderEmptyPlanningState(userId) {
   const reminderHtml = await getDashboardReminderHtml(userId);
 
   plannerDashboardContent.innerHTML = `
-    <div class="dashboard-section-title">
-      <div class="line"></div>
-      <span>Live Streak</span>
-      <div class="line"></div>
+    <div class="dashboard-summary-content">
+      ${createSummarySection('Live Streak', '0')}
+
+      <div class="dashboard-summary-section dashboard-summary-section-text">
+        <div class="dashboard-summary-line">
+          <span>Status</span>
+        </div>
+        <div class="dashboard-summary-text">
+          Plane dein Training, um deine Streak zu starten.
+        </div>
+      </div>
+
+      <div class="dashboard-summary-actions">
+        <a class="dashboard-summary-primary-btn" href="training-planner.html">
+          Training planen
+        </a>
+      </div>
+
+      ${reminderHtml}
     </div>
-
-    <div class="dashboard-center-value">0</div>
-
-    <div class="dashboard-center-text" style="margin-top: 14px;">
-      Plane dein Training, um Live Streak zu starten.
-    </div>
-
-    <div style="margin-top: 14px;">
-      <a class="pill-button" href="training-planner.html">Planen</a>
-    </div>
-
-    ${reminderHtml}
   `;
 }
 
-async function renderPlanningState(userId, { streak, completedThisWeek, totalThisWeek, nextWorkout, todayWorkout }) {
+async function renderPlanningState(
+  userId,
+  { streak, completedThisWeek, totalThisWeek, nextWorkout, todayWorkout }
+) {
   const reminderHtml = await getDashboardReminderHtml(userId);
 
+  const nextWorkoutText = nextWorkout
+    ? `
+  <span class="next-training-date">${getRelativeText(nextWorkout.planned_date)}</span>
+  <span class="next-training-separator">·</span>
+  <span class="next-training-name">${nextWorkout.plan_name}</span>
+`
+    : 'Kein weiteres Training geplant';
+
   plannerDashboardContent.innerHTML = `
-    <div class="dashboard-section-title">
-      <div class="line"></div>
-      <span>Live Streak</span>
-      <div class="line"></div>
-    </div>
+    <div class="dashboard-summary-content">
+      ${createSummarySection('Live Streak', `${streak}`)}
 
-    <div class="dashboard-center-value">${streak}</div>
+      ${createSummarySection(
+        'Diese Woche absolvierte Trainings',
+        `${completedThisWeek}/${totalThisWeek}`
+      )}
 
-    <div class="dashboard-section-title" style="margin-top: 22px;">
-      <div class="line"></div>
-      <span>Diese Woche absolvierte Trainings</span>
-      <div class="line"></div>
-    </div>
+      ${createSummaryTextSection('Nächstes Training', nextWorkoutText)}
 
-    <div class="dashboard-center-value">${completedThisWeek}/${totalThisWeek}</div>
-
-    <div class="dashboard-section-title" style="margin-top: 22px;">
-      <div class="line"></div>
-      <span>Nächstes Training</span>
-      <div class="line"></div>
-    </div>
-
-    <div class="dashboard-center-text" style="margin-top: 8px;">
       ${
-        nextWorkout
-          ? `${getRelativeText(nextWorkout.planned_date)} - ${nextWorkout.plan_name}`
-          : 'Kein weiteres Training geplant'
+        todayWorkout
+          ? `
+            <div class="dashboard-summary-actions">
+              <a class="dashboard-summary-primary-btn" href="training-session.html?planId=${todayWorkout.plan_id}">
+                Training starten
+              </a>
+            </div>
+          `
+          : ''
       }
+
+      ${reminderHtml}
     </div>
-
-    ${
-      todayWorkout
-        ? `
-          <div style="margin-top: 16px;">
-            <a class="pill-button" href="training-session.html?planId=${todayWorkout.plan_id}">Starten</a>
-          </div>
-        `
-        : ''
-    }
-
-    ${reminderHtml}
   `;
 }
 
@@ -271,7 +296,7 @@ async function loadPlanningDashboard(user) {
   if (error) {
     console.error('Fehler beim Laden der Planung:', error);
     plannerDashboardContent.innerHTML = `
-      <div class="dashboard-center-text">Planung konnte nicht geladen werden.</div>
+      <div class="dashboard-summary-text">Planung konnte nicht geladen werden.</div>
     `;
     return;
   }

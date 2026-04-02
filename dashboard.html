@@ -4,33 +4,85 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fitness Tracker - Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#28c267">
+  <meta name="theme-color" content="#07152d">
   <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
-  <div class="dashboard-shell">
+  <div class="dashboard-page">
     <div class="dashboard-topbar">
-      <button id="logoutBtn" class="logout" type="button">Logout</button>
+      <button id="logoutBtn" class="dashboard-logout" type="button">Logout</button>
     </div>
 
-    <main class="dashboard-main">
-      <h1 class="dashboard-title" id="helloText">Hallo</h1>
+    <main>
+      <section class="dashboard-summary-card">
+        <div class="summary-day" id="currentWeekday">-</div>
+        <div class="summary-date" id="currentDate">-</div>
 
-      <section class="info-box dashboard-planner-box">
-        <div id="currentWeekday">-</div>
-        <div id="currentDate">-</div>
-
-        <div id="plannerDashboardContent" style="margin-top: 18px;"></div>
+        <div id="plannerDashboardContent"></div>
       </section>
 
-      <section class="dashboard-buttons">
-        <a href="personal-data.html" class="main-button">Persönliche Daten</a>
-        <a href="trainingsplan.html" class="main-button">Trainingsplan Erstellen</a>
-        <a href="training.html" class="main-button">Training</a>
-        <a href="statistik.html" class="main-button">Statistik</a>
-      </section>
+      <section class="dashboard-nav-list">
+          <a href="personal-data.html" class="dashboard-nav-button">
+            <span class="nav-left">
+              <span class="nav-icon-wrap">
+                <img class="nav-icon-img" src="icon-user.svg" alt="">
+              </span>
+              <span class="nav-text">
+                <span class="nav-title">Persönliche Daten</span>
+              </span>
+            </span>
+            <span class="nav-chevron-wrap">
+              <img class="nav-chevron-img" src="icon-chevron.svg" alt="">
+            </span>
+          </a>
+
+          <a href="trainingsplan.html" class="dashboard-nav-button">
+            <span class="nav-left">
+              <span class="nav-icon-wrap">
+                <img class="nav-icon-img" src="icon-plan.svg" alt="">
+              </span>
+              <span class="nav-text">
+                <span class="nav-title">Trainingsplan Erstellen</span>
+              </span>
+            </span>
+            <span class="nav-chevron-wrap">
+              <img class="nav-chevron-img" src="icon-chevron.svg" alt="">
+            </span>
+          </a>
+
+          <a href="training.html" class="dashboard-nav-button">
+            <span class="nav-left">
+              <span class="nav-icon-wrap">
+                <img class="nav-icon-img" src="icon-training.svg" alt="">
+              </span>
+              <span class="nav-text">
+                <span class="nav-title">Training</span>
+              </span>
+            </span>
+            <span class="nav-chevron-wrap">
+              <img class="nav-chevron-img" src="icon-chevron.svg" alt="">
+            </span>
+          </a>
+
+          <a href="statistik.html" class="dashboard-nav-button">
+            <span class="nav-left">
+              <span class="nav-icon-wrap">
+                <img class="nav-icon-img" src="icon-stats.svg" alt="">
+              </span>
+              <span class="nav-text">
+                <span class="nav-title">Statistik</span>
+              </span>
+            </span>
+            <span class="nav-chevron-wrap">
+              <img class="nav-chevron-img" src="icon-chevron.svg" alt="">
+            </span>
+          </a>
+        </section>
     </main>
   </div>
 
