@@ -23,6 +23,15 @@ async function guardPage() {
   return data.session.user;
 }
 
+function escapeHtml(value = '') {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
 async function loadPlans() {
   const user = await guardPage();
   if (!user) return;
@@ -39,21 +48,42 @@ async function loadPlans() {
   }
 
   if (!data || data.length === 0) {
-    trainingPlanList.innerHTML = '<p class="muted">Noch keine Trainingspläne vorhanden.</p>';
+    trainingPlanList.innerHTML = `
+      <div class="training-start-empty">
+        <div class="training-start-empty-title">Noch keine Trainingspläne vorhanden.</div>
+        <div class="training-start-empty-text">
+          Erstelle zuerst einen Trainingsplan, damit du direkt ein Training starten kannst.
+        </div>
+        <div class="training-start-empty-action">
+          <a href="training-planner.html" class="dashboard-summary-primary-btn">Training planen</a>
+        </div>
+      </div>
+    `;
     return;
   }
 
   trainingPlanList.innerHTML = data.map((plan) => `
-    <div class="exercise-item">
-      <div>
-        <strong>${plan.name}</strong>
+    <article class="training-start-plan-card">
+      <div class="training-start-plan-top">
+        <div class="training-start-plan-name">${escapeHtml(plan.name)}</div>
       </div>
 
-      <div class="exercise-actions training-plan-actions">
-        <a class="main-button small-action-button" href="training-session.html?planId=${plan.id}">Start</a>
-        <a class="manual-entry-button small-action-button" href="training-manual-entry.html?planId=${plan.id}">Nachtragen</a>
+      <div class="training-start-plan-actions">
+        <a
+          class="training-start-action training-start-action-primary"
+          href="training-session.html?planId=${plan.id}"
+        >
+          Start
+        </a>
+
+        <a
+          class="training-start-action training-start-action-secondary"
+          href="training-manual-entry.html?planId=${plan.id}"
+        >
+          Nachtragen
+        </a>
       </div>
-    </div>
+    </article>
   `).join('');
 }
 

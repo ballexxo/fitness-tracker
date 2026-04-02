@@ -6,25 +6,32 @@
   <title>Fitness Tracker - Training Starten</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#28c267">
+  <meta name="theme-color" content="#071225">
   <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
-  <div class="page-shell">
-    <header class="page-header">
-        <button class="back-button" type="button" onclick="history.back()">←</button>
+  <div class="page-shell page-shell-app">
+    <header class="page-header app-page-header">
+      <button class="app-back-button" type="button" onclick="history.back()" aria-label="Zurück">
+        <svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 6L9 12L15 18"></path>
+        </svg>
+      </button>
     </header>
 
-    <div class="page-title">Training Starten</div>
+    <main class="app-form-page">
+      <section class="app-form-card training-start-page-card">
+        <div class="app-form-head training-start-head">
+          <h1 class="app-form-title">Plan auswählen</h1>
+          <p class="app-form-subtitle">
+            Wähle den Trainingsplan aus, den du jetzt starten möchtest.
+          </p>
+        </div>
 
-    <section class="page-card">
-      <div class="module-badge">Trainingspläne</div>
-      <h1>Plan auswählen</h1>
-      <p>Wähle den Trainingsplan aus, den du jetzt starten möchtest.</p>
-
-      <div id="trainingPlanListStatus" class="status hidden"></div>
-      <div id="trainingPlanList" style="margin-top: 24px;"></div>
-    </section>
+        <div id="trainingPlanListStatus" class="status hidden"></div>
+        <div id="trainingPlanList" class="training-start-list"></div>
+      </section>
+    </main>
   </div>
 
   <script type="module" src="training-start-list.js"></script>

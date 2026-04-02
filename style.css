@@ -6909,3 +6909,213 @@ select option[value=""] {
     height: 20px;
   }
 }
+/* ------------------------------------------------ */
+/* TRAINING START LIST */
+/* ------------------------------------------------ */
+
+.training-start-page-card {
+  padding-top: 24px;
+}
+
+.training-start-head {
+  margin-bottom: 18px;
+  gap: 10px;
+}
+
+.training-start-head .app-form-title {
+  text-align: left;
+  font-size: 2rem;
+}
+
+.training-start-head .app-form-subtitle {
+  text-align: left;
+  max-width: 560px;
+  font-size: 0.98rem;
+}
+
+.training-start-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.training-start-plan-card {
+  padding: 18px 18px 16px;
+  border-radius: 24px;
+  border: 1px solid rgba(109, 180, 255, 0.12);
+  background:
+    linear-gradient(180deg, rgba(10, 22, 43, 0.74), rgba(7, 16, 33, 0.88));
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.02);
+}
+
+.training-start-plan-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.training-start-plan-name {
+  color: #f7fbff;
+  font-size: 1.32rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+
+.training-start-plan-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.training-start-action {
+  min-height: 50px;
+  padding: 0 16px;
+  border-radius: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.training-start-action:hover {
+  transform: translateY(-1px);
+}
+
+.training-start-action:active {
+  transform: scale(0.985);
+}
+
+.training-start-action-primary {
+  border: 1.5px solid rgba(104, 225, 255, 0.72);
+  background: linear-gradient(180deg, rgba(16, 42, 82, 0.96), rgba(8, 24, 52, 0.98));
+  color: #eff8ff;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.04),
+    0 0 16px rgba(59, 194, 255, 0.12);
+}
+
+.training-start-action-primary:hover {
+  border-color: rgba(115, 231, 255, 0.92);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.05),
+    0 0 20px rgba(59, 194, 255, 0.18);
+}
+
+.training-start-action-secondary {
+  border: 1px solid rgba(127, 159, 201, 0.18);
+  background: linear-gradient(180deg, rgba(13, 24, 45, 0.92), rgba(8, 16, 31, 0.96));
+  color: #dbe6f4;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.02);
+}
+
+.training-start-action-secondary:hover {
+  border-color: rgba(150, 184, 225, 0.28);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.03),
+    0 0 14px rgba(70, 120, 190, 0.12);
+}
+
+.training-start-empty {
+  padding: 18px 16px;
+  border-radius: 22px;
+  border: 1px solid rgba(109, 180, 255, 0.12);
+  background: linear-gradient(180deg, rgba(10, 22, 43, 0.74), rgba(7, 16, 33, 0.88));
+  text-align: center;
+}
+
+.training-start-empty-title {
+  color: #f7fbff;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.training-start-empty-text {
+  margin-top: 10px;
+  color: #d6e1ef;
+  font-size: 0.96rem;
+  line-height: 1.55;
+}
+
+.training-start-empty-action {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  .training-start-page-card {
+    padding-top: 20px;
+  }
+
+  .training-start-head {
+    margin-bottom: 14px;
+    gap: 8px;
+  }
+
+  .training-start-head .app-form-title {
+    font-size: 1.65rem;
+    line-height: 1.05;
+  }
+
+  .training-start-head .app-form-subtitle {
+    font-size: 0.94rem;
+    line-height: 1.5;
+  }
+
+  .training-start-list {
+    gap: 12px;
+  }
+
+  .training-start-plan-card {
+    padding: 15px 14px 14px;
+    border-radius: 20px;
+  }
+
+  .training-start-plan-top {
+    margin-bottom: 12px;
+  }
+
+  .training-start-plan-name {
+    font-size: 1.18rem;
+  }
+
+  .training-start-plan-actions {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .training-start-action {
+    min-height: 44px;
+    padding: 0 12px;
+    border-radius: 16px;
+    font-size: 0.92rem;
+  }
+
+  .training-start-empty {
+    padding: 16px 14px;
+    border-radius: 18px;
+  }
+
+  .training-start-empty-title {
+    font-size: 1rem;
+  }
+
+  .training-start-empty-text {
+    font-size: 0.92rem;
+  }
+}
