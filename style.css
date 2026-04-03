@@ -8198,3 +8198,245 @@ body.modal-open {
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 }
+
+/* ------------------------------------------------ */
+/* TRAINING PLANNER */
+/* ------------------------------------------------ */
+
+.planner-page {
+  display: flex;
+  flex-direction: column;
+}
+
+.planner-page-card {
+  padding-top: 22px;
+}
+
+.planner-day-list {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.planner-day-card {
+  padding: 18px 18px 16px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(10, 22, 43, 0.76), rgba(7, 16, 33, 0.90));
+  border: 1px solid rgba(109, 180, 255, 0.10);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+}
+
+.planner-day-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.planner-day-title {
+  color: #f7fbff;
+  font-size: 1.08rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.planner-day-date {
+  margin-top: 4px;
+  color: #99adc3;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.planner-add-btn {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(104, 225, 255, 0.72);
+  background: linear-gradient(180deg, rgba(16, 42, 82, 0.96), rgba(8, 24, 52, 0.98));
+  color: #eff8ff;
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04), 0 0 16px rgba(59, 194, 255, 0.12);
+}
+
+.planner-delete-btn {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 87, 109, 0.72);
+  background: linear-gradient(180deg, rgba(129, 10, 29, 0.96), rgba(92, 6, 20, 0.98));
+  color: #fff;
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04), 0 0 16px rgba(255, 74, 103, 0.14);
+}
+
+.planner-empty-block {
+  margin-top: 14px;
+  min-height: 68px;
+  border-radius: 18px;
+  border: 1px dashed rgba(115, 171, 255, 0.14);
+  background: rgba(6, 14, 29, 0.44);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.planner-empty-text {
+  color: #7f95ac;
+  font-size: 0.94rem;
+  font-weight: 600;
+}
+
+.planner-entry-card {
+  margin-top: 14px;
+  padding: 16px 16px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(109, 180, 255, 0.12);
+  background: linear-gradient(180deg, rgba(8, 18, 37, 0.82), rgba(5, 13, 28, 0.92));
+}
+
+.planner-entry-name {
+  color: #7ee9cf;
+  font-size: 1.12rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.planner-entry-status {
+  margin-top: 6px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.planner-status-planned .planner-entry-status {
+  color: #b8c7d7;
+}
+
+.planner-status-completed {
+  border-color: rgba(61, 235, 163, 0.20);
+  box-shadow: 0 0 20px rgba(38, 214, 128, 0.08);
+}
+
+.planner-status-completed .planner-entry-status {
+  color: #8ff3cf;
+}
+
+.planner-status-missed {
+  border-color: rgba(255, 101, 124, 0.20);
+  box-shadow: 0 0 20px rgba(255, 82, 112, 0.07);
+}
+
+.planner-status-missed .planner-entry-status {
+  color: #ffb4bf;
+}
+
+.planner-modal-card {
+  width: min(760px, calc(100vw - 24px));
+  max-height: 88vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.planner-modal-text {
+  margin-top: 10px;
+  text-align: left;
+}
+
+.planner-plan-list {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.planner-plan-option {
+  width: 100%;
+  min-height: 62px;
+  padding: 0 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(109, 180, 255, 0.10);
+  background: linear-gradient(180deg, rgba(10, 22, 43, 0.76), rgba(7, 16, 33, 0.90));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.planner-plan-option-title {
+  color: #f4f8fd;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 700px) {
+  .planner-day-list {
+    gap: 12px;
+  }
+
+  .planner-day-card {
+    padding: 16px 14px 14px;
+    border-radius: 20px;
+  }
+
+  .planner-day-title {
+    font-size: 1rem;
+  }
+
+  .planner-day-date {
+    font-size: 0.9rem;
+  }
+
+  .planner-add-btn {
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
+    font-size: 1.3rem;
+  }
+
+  .planner-delete-btn {
+    min-height: 36px;
+    padding: 0 12px;
+    font-size: 0.82rem;
+  }
+
+  .planner-entry-card {
+    margin-top: 12px;
+    padding: 14px 14px 12px;
+    border-radius: 18px;
+  }
+
+  .planner-entry-name {
+    font-size: 1rem;
+  }
+
+  .planner-entry-status {
+    font-size: 0.84rem;
+  }
+
+  .planner-modal-card {
+    width: calc(100vw - 18px);
+    max-height: 90vh;
+  }
+
+  .planner-plan-option {
+    min-height: 56px;
+    padding: 0 14px;
+    border-radius: 18px;
+  }
+
+  .planner-plan-option-title {
+    font-size: 0.95rem;
+  }
+}

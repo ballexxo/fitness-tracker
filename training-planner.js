@@ -25,6 +25,18 @@ function setStatus(element, message, type = '') {
   element.classList.toggle('hidden', !message);
 }
 
+function openModal(modal) {
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  document.body.classList.add('modal-open');
+}
+
+function closeModal(modal) {
+  if (!modal) return;
+  modal.classList.add('hidden');
+  document.body.classList.remove('modal-open');
+}
+
 function getLocalDateString(date = new Date()) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -148,8 +160,6 @@ async function upsertPlannedWorkoutForDate(planId, planName, plannedDate) {
   let status = 'planned';
   let completedSessionId = null;
 
-  // Nur für heute automatisch auf completed setzen,
-  // wenn das passende Training heute bereits absolviert wurde.
   if (plannedDate === today) {
     const completedSession = await findCompletedSessionForToday(planId);
 
@@ -175,8 +185,7 @@ async function upsertPlannedWorkoutForDate(planId, planName, plannedDate) {
 
 function openPlannerModal(dateString) {
   selectedDateForModal = dateString;
-  plannerModal.classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
+  openModal(plannerModal);
 
   plannerModalText.textContent = `Plane dein Training für ${formatDate(dateString)}.`;
 
@@ -186,14 +195,10 @@ function openPlannerModal(dateString) {
   }
 
   plannerPlanList.innerHTML = allPlans.map((plan) => `
-    <div class="exercise-item">
-      <div>
-        <strong>${plan.name}</strong>
-      </div>
-      <div class="exercise-actions" style="min-width: 140px;">
-        <button class="primary choose-plan-btn" data-id="${plan.id}" data-name="${plan.name}" type="button">Auswählen</button>
-      </div>
-    </div>
+    <button class="planner-plan-option choose-plan-btn" data-id="${plan.id}" data-name="${plan.name}" type="button">
+      <span class="planner-plan-option-title">${plan.name}</span>
+      <img class="nav-chevron-img" src="icon-chevron.svg" alt="">
+    </button>
   `).join('');
 
   document.querySelectorAll('.choose-plan-btn').forEach((button) => {
@@ -218,10 +223,30 @@ function openPlannerModal(dateString) {
 }
 
 function closePlannerModal() {
-  plannerModal.classList.add('hidden');
-  document.body.style.overflow = '';
+  closeModal(plannerModal);
   selectedDateForModal = null;
   plannerPlanList.innerHTML = '';
+}
+
+function getPlannerStatusMeta(status) {
+  if (status === 'completed') {
+    return {
+      className: 'planner-status-completed',
+      label: 'Abgeschlossen',
+    };
+  }
+
+  if (status === 'missed') {
+    return {
+      className: 'planner-status-missed',
+      label: 'Nicht abgeschlossen',
+    };
+  }
+
+  return {
+    className: 'planner-status-planned',
+    label: 'Geplant',
+  };
 }
 
 async function loadPlanner() {
@@ -267,66 +292,58 @@ async function loadPlanner() {
     const planned = plannedMap.get(dateString);
     const past = isPastDate(dateString);
 
-    let contentHtml = '';
     if (!planned) {
-      contentHtml = `
-        <div class="planner-empty-row">
-          <span class="muted">Kein Training geplant</span>
-          ${
-            !past
-              ? `<button class="mini-square-button open-plan-modal-btn" data-date="${dateString}" type="button">+</button>`
-              : ''
-          }
-        </div>
+      return `
+        <article class="planner-day-card">
+          <div class="planner-day-top">
+            <div>
+              <div class="planner-day-title">${getDayName(date)}</div>
+              <div class="planner-day-date">${date.toLocaleDateString('de-DE')}</div>
+            </div>
+
+            ${
+              !past
+                ? `<button class="planner-add-btn open-plan-modal-btn" data-date="${dateString}" type="button" aria-label="Training hinzufügen">+</button>`
+                : ''
+            }
+          </div>
+
+          <div class="planner-empty-block">
+            <span class="planner-empty-text">Kein Training geplant</span>
+          </div>
+        </article>
       `;
-    } else {
-      const canDelete = !past && planned.status === 'planned';
-      let statusClass = 'planner-status-planned';
-      let statusText = 'Geplant';
+    }
 
-      if (planned.status === 'completed') {
-        statusClass = 'planner-status-completed';
-        statusText = 'Abgeschlossen';
-      } else if (planned.status === 'missed') {
-        statusClass = 'planner-status-missed';
-        statusText = 'Nicht abgeschlossen';
-      }
+    const statusMeta = getPlannerStatusMeta(planned.status);
+    const canDelete = !past && planned.status === 'planned';
 
-      contentHtml = `
-        <div class="planner-planned-card ${statusClass}">
+    return `
+      <article class="planner-day-card">
+        <div class="planner-day-top">
           <div>
-            <strong>${planned.plan_name}</strong><br>
-            <span class="planner-status-text">${statusText}</span>
+            <div class="planner-day-title">${getDayName(date)}</div>
+            <div class="planner-day-date">${date.toLocaleDateString('de-DE')}</div>
           </div>
 
           ${
             canDelete
-              ? `<button class="logout mini-action-button delete-planned-btn" data-id="${planned.id}" type="button">Löschen</button>`
+              ? `<button class="planner-delete-btn delete-planned-btn" data-id="${planned.id}" type="button">Löschen</button>`
               : ''
           }
         </div>
-      `;
-    }
 
-    return `
-      <div class="planner-day-card">
-        <div class="planner-day-head">
-          <div>
-            <strong>${getDayName(date)}</strong><br>
-            <span class="muted">${date.toLocaleDateString('de-DE')}</span>
-          </div>
+        <div class="planner-entry-card ${statusMeta.className}">
+          <div class="planner-entry-name">${planned.plan_name}</div>
+          <div class="planner-entry-status">${statusMeta.label}</div>
         </div>
-        <div style="margin-top: 12px;">
-          ${contentHtml}
-        </div>
-      </div>
+      </article>
     `;
   }).join('');
 
   document.querySelectorAll('.open-plan-modal-btn').forEach((button) => {
     button.addEventListener('click', () => {
-      const dateString = button.dataset.date;
-      openPlannerModal(dateString);
+      openPlannerModal(button.dataset.date);
     });
   });
 
@@ -361,5 +378,11 @@ nextWeekBtn.addEventListener('click', async () => {
 });
 
 closePlannerModalBtn.addEventListener('click', closePlannerModal);
+
+plannerModal.addEventListener('click', (event) => {
+  if (event.target === plannerModal) {
+    closePlannerModal();
+  }
+});
 
 loadPlanner();

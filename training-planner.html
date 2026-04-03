@@ -6,40 +6,52 @@
   <title>Fitness Tracker - Training planen</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#28c267">
+  <meta name="theme-color" content="#071225">
   <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
-  <div class="page-shell">
-    <header class="page-header">
-      <button class="back-button" type="button" onclick="history.back()">←</button>
+  <div class="page-shell page-shell-app">
+    <header class="page-header app-page-header">
+      <button class="app-back-button" type="button" onclick="history.back()" aria-label="Zurück">
+        <svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 6L9 12L15 18"></path>
+        </svg>
+      </button>
     </header>
 
-    <section class="page-card">
-      <div class="history-toolbar">
-        <button id="prevWeekBtn" class="week-nav-button" type="button" aria-label="Vorherige Woche">←</button>
+    <main class="planner-page">
+      <section class="app-form-card planner-page-card">
+        <div class="planner-toolbar app-history-toolbar">
+          <button id="prevWeekBtn" class="app-back-button history-week-nav" type="button" aria-label="Vorherige Woche">
+            <svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15 6L9 12L15 18"></path>
+            </svg>
+          </button>
 
-        <div class="history-range-box">
-          <div class="muted">Trainingswoche</div>
-          <div id="plannerRangeText" class="history-range-text">-</div>
+          <div class="history-range-box app-history-range-box">
+            <div class="app-history-range-label">Trainingswoche</div>
+            <div id="plannerRangeText" class="history-range-text app-history-range-text">-</div>
+          </div>
+
+          <button id="nextWeekBtn" class="app-back-button history-week-nav history-week-nav-next" type="button" aria-label="Nächste Woche">
+            <svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15 6L9 12L15 18"></path>
+            </svg>
+          </button>
         </div>
 
-        <button id="nextWeekBtn" class="week-nav-button" type="button" aria-label="Nächste Woche">→</button>
-      </div>
-
-      <div id="plannerStatus" class="status hidden"></div>
-      <div id="plannerList" style="margin-top: 24px;"></div>
-    </section>
+        <div id="plannerStatus" class="status hidden"></div>
+        <div id="plannerList" class="planner-day-list"></div>
+      </section>
+    </main>
   </div>
 
   <div id="plannerModal" class="modal-overlay hidden">
-    <div class="modal-card">
-      <h2>Trainingsplan auswählen</h2>
-      <div id="plannerModalText" class="muted" style="margin-top:8px;"></div>
-      <div id="plannerPlanList" style="margin-top:16px;"></div>
-      <div class="modal-actions">
-        <button id="closePlannerModalBtn" class="logout" type="button">Abbrechen</button>
-      </div>
+    <div class="modal-card app-modal-card planner-modal-card">
+      <button id="closePlannerModalBtn" class="modal-close-x" type="button" aria-label="Schließen">×</button>
+      <h2 class="app-modal-title">Trainingsplan auswählen</h2>
+      <div id="plannerModalText" class="app-modal-text planner-modal-text"></div>
+      <div id="plannerPlanList" class="planner-plan-list"></div>
     </div>
   </div>
 
