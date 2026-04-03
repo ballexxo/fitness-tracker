@@ -83,8 +83,7 @@ async function checkPlannedTrainingConflict(planId) {
   plannedTrainingWarningText.textContent =
     `Heute ist ${data.plan_name} geplant. Plane dein Training um, da sonst deine Live Streak kaputt geht.`;
 
-  plannedTrainingWarningModal.classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
+  openModal(plannedTrainingWarningModal);
 
   return false;
 }
@@ -312,6 +311,18 @@ function getImprovementSummaryBadge(improvement) {
   }
 
   return '<span class="training-badge training-badge-neutral">Keine Vergleichsdaten</span>';
+}
+
+function openModal(modal) {
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  document.body.classList.add('modal-open');
+}
+
+function closeModal(modal) {
+  if (!modal) return;
+  modal.classList.add('hidden');
+  document.body.classList.remove('modal-open');
 }
 
 function getImprovementSummaryLine(improvement) {
@@ -747,8 +758,7 @@ saveManualTrainingBtn.addEventListener('click', async () => {
       `);
     }
 
-    manualSummaryContent.innerHTML = summaryParts.join('');
-    manualSummaryModal.classList.remove('hidden');
+    openModal(manualSummaryModal);
   } catch (error) {
     console.error(error);
     setStatus(manualSessionStatus, 'Beim Speichern ist ein Fehler aufgetreten.', 'error');
@@ -758,14 +768,27 @@ saveManualTrainingBtn.addEventListener('click', async () => {
   }
 });
 
+
+manualSummaryModal.addEventListener('click', (event) => {
+  if (event.target === manualSummaryModal) {
+    closeModal(manualSummaryModal);
+  }
+});
+
+plannedTrainingWarningModal.addEventListener('click', (event) => {
+  if (event.target === plannedTrainingWarningModal) {
+    closeModal(plannedTrainingWarningModal);
+  }
+});
+
+
 manualSummaryOkBtn.addEventListener('click', () => {
-  manualSummaryModal.classList.add('hidden');
+  closeModal(manualSummaryModal);
   window.location.replace('./training.html');
 });
 
 continuePlannedTrainingBtn.addEventListener('click', async () => {
-  plannedTrainingWarningModal.classList.add('hidden');
-  document.body.style.overflow = '';
+  closeModal(plannedTrainingWarningModal);
   await loadPlan();
 });
 

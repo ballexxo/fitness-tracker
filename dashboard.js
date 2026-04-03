@@ -142,13 +142,30 @@ function createSummarySection(label, value, extraClass = '') {
   `;
 }
 
-function createSummaryTextSection(label, text) {
+function createSummaryTextSection(label, text, options = {}) {
+  const {
+    showPlanButton = false,
+    planButtonHref = 'training-planner.html',
+    planButtonLabel = 'Planen',
+  } = options;
+
   return `
     <div class="dashboard-summary-section dashboard-summary-section-text">
       <div class="dashboard-summary-line">
         <span>${label}</span>
       </div>
       <div class="dashboard-summary-text">${text}</div>
+      ${
+        showPlanButton
+          ? `
+            <div class="dashboard-summary-inline-action">
+              <a class="dashboard-summary-primary-btn dashboard-summary-primary-btn-small" href="${planButtonHref}">
+                ${planButtonLabel}
+              </a>
+            </div>
+          `
+          : ''
+      }
     </div>
   `;
 }
@@ -197,7 +214,7 @@ async function getDashboardReminderHtml(userId) {
     return '';
   }
 
-    return `
+  return `
     <div class="dashboard-summary-reminder dashboard-summary-reminder-warning">
       <div class="dashboard-summary-reminder-text">
         <span class="dashboard-summary-reminder-icon">⚠</span>
@@ -243,12 +260,14 @@ async function renderPlanningState(
 ) {
   const reminderHtml = await getDashboardReminderHtml(userId);
 
-  const nextWorkoutText = nextWorkout
+  const hasNextWorkout = Boolean(nextWorkout);
+
+  const nextWorkoutText = hasNextWorkout
     ? `
-  <span class="next-training-date">${getRelativeText(nextWorkout.planned_date)}</span>
-  <span class="next-training-separator">·</span>
-  <span class="next-training-name">${nextWorkout.plan_name}</span>
-`
+      <span class="next-training-date">${getRelativeText(nextWorkout.planned_date)}</span>
+      <span class="next-training-separator">·</span>
+      <span class="next-training-name">${nextWorkout.plan_name}</span>
+    `
     : 'Kein weiteres Training geplant';
 
   plannerDashboardContent.innerHTML = `
@@ -260,7 +279,11 @@ async function renderPlanningState(
         `${completedThisWeek}/${totalThisWeek}`
       )}
 
-      ${createSummaryTextSection('Nächstes Training', nextWorkoutText)}
+      ${createSummaryTextSection('Nächstes Training', nextWorkoutText, {
+        showPlanButton: !hasNextWorkout,
+        planButtonHref: 'training-planner.html',
+        planButtonLabel: 'Planen',
+      })}
 
       ${
         todayWorkout

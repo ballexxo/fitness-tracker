@@ -7,7 +7,7 @@ const openExerciseModalBtn = document.getElementById('openExerciseModalBtn');
 const savePlanBtn = document.getElementById('savePlanBtn');
 const exerciseModal = document.getElementById('exerciseModal');
 const successModal = document.getElementById('successModal');
-const cancelExerciseBtn = document.getElementById('cancelExerciseBtn');
+const closeExerciseModalBtn = document.getElementById('closeExerciseModalBtn');
 const confirmExerciseBtn = document.getElementById('confirmExerciseBtn');
 const successOkBtn = document.getElementById('successOkBtn');
 
@@ -21,17 +21,30 @@ const exerciseSets = document.getElementById('exerciseSets');
 const exerciseRepsMin = document.getElementById('exerciseRepsMin');
 const exerciseRepsMax = document.getElementById('exerciseRepsMax');
 const exerciseRest = document.getElementById('exerciseRest');
+const modalTitle = document.getElementById('modalTitle');
 
 let exercises = [];
 let editIndex = null;
 
-// ------------------------------------------------------------
-// Hilfsfunktionen
-// ------------------------------------------------------------
+/* ------------------------------------------------------------ */
+/* Helpers */
+/* ------------------------------------------------------------ */
 function setStatus(element, message, type = '') {
   element.textContent = message;
   element.className = `status ${type}`.trim();
   element.classList.toggle('hidden', !message);
+}
+
+function openModal(modal) {
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  document.body.classList.add('modal-open');
+}
+
+function closeModal(modal) {
+  if (!modal) return;
+  modal.classList.add('hidden');
+  document.body.classList.remove('modal-open');
 }
 
 async function guardPage() {
@@ -47,60 +60,82 @@ async function guardPage() {
 
 function resetExerciseForm() {
   exerciseName.value = '';
-  exerciseSets.value = '5';
+  exerciseSets.value = '3';
   exerciseRepsMin.value = '';
   exerciseRepsMax.value = '';
   exerciseRest.value = '';
   setStatus(exerciseStatus, '');
 }
 
-function openModal(isEdit = false) {
-  exerciseModal.classList.remove('hidden');
+function openExerciseModal(isEdit = false) {
+  modalTitle.textContent = isEdit ? 'Übung bearbeiten' : 'Übung hinzufügen';
   confirmExerciseBtn.textContent = isEdit ? 'Speichern' : 'Hinzufügen';
-  document.getElementById('modalTitle').textContent = isEdit ? 'Übung bearbeiten' : 'Übung hinzufügen';
+  openModal(exerciseModal);
 }
 
-function closeModal() {
-  exerciseModal.classList.add('hidden');
+function closeExerciseModal() {
+  closeModal(exerciseModal);
   resetExerciseForm();
   editIndex = null;
 }
 
-// ------------------------------------------------------------
-// Übungen rendern
-// ------------------------------------------------------------
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+/* ------------------------------------------------------------ */
+/* Übungen rendern */
+/* ------------------------------------------------------------ */
 function renderExercises() {
   if (exercises.length === 0) {
-    exerciseList.innerHTML = '<p class="muted">Noch keine Übungen hinzugefügt.</p>';
+    exerciseList.innerHTML = `
+      <div class="plan-add-empty-state">
+        Noch keine Übungen hinzugefügt.
+      </div>
+    `;
     return;
   }
 
   exerciseList.innerHTML = exercises.map((exercise, index) => `
-    <div class="exercise-item">
-      <div>
-        <strong>${index + 1}. ${exercise.name}</strong><br>
-        <span class="muted">
+    <article class="plan-add-exercise-card">
+      <div class="plan-add-exercise-main">
+        <div class="plan-add-exercise-title">${index + 1}. ${escapeHtml(exercise.name)}</div>
+        <div class="plan-add-exercise-meta">
           ${exercise.sets} Sätze · ${exercise.repsMin}-${exercise.repsMax} Wdh. · ${exercise.restSeconds}s Pause
-        </span>
-      </div>
-
-      <div class="exercise-actions">
-        <div class="exercise-move-row">
-          <button class="mini-square-button move-up-btn" data-index="${index}" type="button">↑</button>
-          <button class="mini-square-button move-down-btn" data-index="${index}" type="button">↓</button>
-        </div>
-
-        <div class="exercise-main-row">
-          <button class="pill-button mini-action-button edit-exercise-btn" data-index="${index}" type="button">
-            Bearbeiten
-          </button>
-
-          <button class="logout mini-action-button delete-exercise-btn" data-index="${index}" type="button">
-            Löschen
-          </button>
         </div>
       </div>
-    </div>
+
+      <div class="plan-add-exercise-side plan-add-exercise-side-row">
+        <button class="history-action-btn history-action-btn-primary edit-exercise-btn" data-index="${index}" type="button">
+          Bearbeiten
+        </button>
+
+        <button class="history-action-btn history-action-btn-danger delete-exercise-btn" data-index="${index}" type="button">
+          Löschen
+        </button>
+
+        <div class="plan-add-mini-move-group">
+          <button class="plan-add-mini-move-btn move-up-btn" data-index="${index}" type="button" aria-label="Nach oben">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 6L12 18"></path>
+              <path d="M7 11L12 6L17 11"></path>
+            </svg>
+          </button>
+
+          <button class="plan-add-mini-move-btn move-down-btn" data-index="${index}" type="button" aria-label="Nach unten">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 6L12 18"></path>
+              <path d="M7 13L12 18L17 13"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </article>
   `).join('');
 
   document.querySelectorAll('.edit-exercise-btn').forEach((button) => {
@@ -110,12 +145,12 @@ function renderExercises() {
 
       editIndex = index;
       exerciseName.value = exercise.name;
-      exerciseSets.value = exercise.sets;
-      exerciseRepsMin.value = exercise.repsMin;
-      exerciseRepsMax.value = exercise.repsMax;
-      exerciseRest.value = exercise.restSeconds;
+      exerciseSets.value = String(exercise.sets);
+      exerciseRepsMin.value = String(exercise.repsMin);
+      exerciseRepsMax.value = String(exercise.repsMax);
+      exerciseRest.value = String(exercise.restSeconds);
 
-      openModal(true);
+      openExerciseModal(true);
     });
   });
 
@@ -147,16 +182,23 @@ function renderExercises() {
     });
   });
 }
-// ------------------------------------------------------------
-// Modal Events
-// ------------------------------------------------------------
+
+/* ------------------------------------------------------------ */
+/* Modal Events */
+/* ------------------------------------------------------------ */
 openExerciseModalBtn.addEventListener('click', () => {
   editIndex = null;
   resetExerciseForm();
-  openModal(false);
+  openExerciseModal(false);
 });
 
-cancelExerciseBtn.addEventListener('click', closeModal);
+closeExerciseModalBtn.addEventListener('click', closeExerciseModal);
+
+exerciseModal.addEventListener('click', (event) => {
+  if (event.target === exerciseModal) {
+    closeExerciseModal();
+  }
+});
 
 confirmExerciseBtn.addEventListener('click', () => {
   const newExercise = {
@@ -182,7 +224,7 @@ confirmExerciseBtn.addEventListener('click', () => {
     return;
   }
 
-  if (newExercise.restSeconds < 0) {
+  if (Number.isNaN(newExercise.restSeconds) || newExercise.restSeconds < 0) {
     setStatus(exerciseStatus, 'Pause darf nicht negativ sein.', 'error');
     return;
   }
@@ -194,12 +236,12 @@ confirmExerciseBtn.addEventListener('click', () => {
   }
 
   renderExercises();
-  closeModal();
+  closeExerciseModal();
 });
 
-// ------------------------------------------------------------
-// Trainingsplan speichern
-// ------------------------------------------------------------
+/* ------------------------------------------------------------ */
+/* Trainingsplan speichern */
+/* ------------------------------------------------------------ */
 savePlanBtn.addEventListener('click', async () => {
   setStatus(planStatus, '');
 
@@ -222,7 +264,6 @@ savePlanBtn.addEventListener('click', async () => {
   savePlanBtn.textContent = 'Wird gespeichert...';
 
   try {
-    // 1. Trainingsplan speichern
     const { data: planData, error: planError } = await supabase
       .from('training_plans')
       .insert({
@@ -238,7 +279,6 @@ savePlanBtn.addEventListener('click', async () => {
       return;
     }
 
-    // 2. Übungen speichern
     const exerciseRows = exercises.map((exercise, index) => ({
       plan_id: planData.id,
       exercise_order: index,
@@ -259,7 +299,7 @@ savePlanBtn.addEventListener('click', async () => {
       return;
     }
 
-    successModal.classList.remove('hidden');
+    openModal(successModal);
   } catch (error) {
     console.error('Unerwarteter Fehler:', error);
     setStatus(planStatus, 'Beim Speichern ist ein Fehler aufgetreten.', 'error');
@@ -269,16 +309,22 @@ savePlanBtn.addEventListener('click', async () => {
   }
 });
 
-// ------------------------------------------------------------
-// Erfolgs-Modal
-// ------------------------------------------------------------
+/* ------------------------------------------------------------ */
+/* Erfolgs-Modal */
+/* ------------------------------------------------------------ */
 successOkBtn.addEventListener('click', () => {
-  successModal.classList.add('hidden');
+  closeModal(successModal);
   window.location.href = './trainingsplan.html';
 });
 
-// ------------------------------------------------------------
-// Start
-// ------------------------------------------------------------
+successModal.addEventListener('click', (event) => {
+  if (event.target === successModal) {
+    closeModal(successModal);
+  }
+});
+
+/* ------------------------------------------------------------ */
+/* Start */
+/* ------------------------------------------------------------ */
 guardPage();
 renderExercises();

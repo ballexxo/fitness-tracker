@@ -6,96 +6,107 @@
   <title>Fitness Tracker - Trainingsplan hinzufügen</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#28c267">
+  <meta name="theme-color" content="#071225">
   <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
-  <div class="page-shell">
-    <header class="page-header">
-        <button class="back-button" type="button" onclick="history.back()">←</button>
+  <div class="page-shell page-shell-app">
+    <header class="page-header app-page-header">
+      <button class="app-back-button" type="button" onclick="history.back()" aria-label="Zurück">
+        <svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 6L9 12L15 18"></path>
+        </svg>
+      </button>
     </header>
 
-    <div class="page-title">Trainingsplan hinzufügen</div>
+    <main class="plan-add-page">
+      <section class="app-form-card plan-add-card">
+        <div class="plan-add-field">
+          <label for="planName" class="plan-add-label">Trainingsplan benennen</label>
+          <input id="planName" class="plan-add-input" type="text" placeholder="Zum Beispiel Push" required>
+        </div>
 
-    <section class="page-card">
-      <div class="module-badge">Neuer Plan</div>
+        <div id="exerciseList" class="plan-add-exercise-list"></div>
 
-      <form id="planForm" class="auth-form">
-        <label>
-          Trainingsplan benennen
-          <input id="planName" type="text" placeholder="Zum Beispiel Push" required>
-        </label>
-      </form>
-
-     <div id="exerciseList" style="margin-top: 24px;"></div>
-
-        <div style="margin-top: 20px;">
-          <button id="openExerciseModalBtn" class="primary" type="button">+ Übung hinzufügen</button>
+        <div class="plan-add-plus-wrap">
+          <button id="openExerciseModalBtn" class="plan-add-plus-btn" type="button" aria-label="Übung hinzufügen">+</button>
         </div>
 
         <div id="planStatus" class="status hidden"></div>
 
-        <div style="margin-top: 24px;">
-          <button id="savePlanBtn" class="primary" type="button">Trainingsplan speichern</button>
+        <div class="plan-add-save-wrap">
+          <button id="savePlanBtn" class="dashboard-summary-primary-btn plan-add-save-btn" type="button">
+            Speichern
+          </button>
         </div>
+      </section>
+    </main>
+  </div>
 
   <div id="exerciseModal" class="modal-overlay hidden">
-    <div class="modal-card">
-      <h2 id="modalTitle">Übung hinzufügen</h2>
+    <div class="modal-card app-modal-card plan-exercise-modal-card">
+      <button id="closeExerciseModalBtn" class="modal-close-x" type="button" aria-label="Schließen">×</button>
+      <h2 id="modalTitle" class="app-modal-title">Übung hinzufügen</h2>
 
-      <form id="exerciseForm" class="auth-form">
-        <label>
-          Übung
-          <input id="exerciseName" type="text" placeholder="Zum Beispiel Bankdrücken" required>
-        </label>
+      <div class="app-modal-content">
+  <form id="exerciseForm" class="app-form plan-exercise-form">
+    <div class="plan-exercise-row">
+      <label class="plan-add-label" for="exerciseName">Übung</label>
+      <input id="exerciseName" class="plan-add-input" type="text" placeholder="Zum Beispiel Bankdrücken" required>
+    </div>
 
-        <label>
-          Sätze
-          <select id="exerciseSets" required>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5" selected>5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-          </select>
-        </label>
-
-        <div class="two-col-grid">
-          <label>
-            Wiederholungen min
-            <input id="exerciseRepsMin" type="number" min="1" required>
-          </label>
-
-          <label>
-            Wiederholungen max
-            <input id="exerciseRepsMax" type="number" min="1" required>
-          </label>
-        </div>
-
-        <label>
-          Pause in Sekunden
-          <input id="exerciseRest" type="number" min="0" placeholder="120" required>
-        </label>
-      </form>
-
-      <div class="modal-actions">
-        <button id="cancelExerciseBtn" class="logout" type="button">Abbrechen</button>
-        <button id="confirmExerciseBtn" class="primary" type="button">Hinzufügen</button>
+    <div class="plan-exercise-compact-grid">
+      <div class="plan-exercise-compact-field plan-exercise-compact-field-sets">
+        <label class="plan-add-label" for="exerciseSets">Sätze</label>
+        <select id="exerciseSets" class="plan-add-input" required>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3" selected>3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+        </select>
       </div>
 
-      <div id="exerciseStatus" class="status hidden"></div>
+      <div class="plan-exercise-compact-field">
+        <label class="plan-add-label" for="exerciseRepsMin">Wdh. min</label>
+        <input id="exerciseRepsMin" class="plan-add-input" type="number" min="1" required>
+      </div>
+
+      <div class="plan-exercise-compact-field">
+        <label class="plan-add-label" for="exerciseRepsMax">Wdh. max</label>
+        <input id="exerciseRepsMax" class="plan-add-input" type="number" min="1" required>
+      </div>
+
+      <div class="plan-exercise-compact-field plan-exercise-compact-field-rest">
+        <label class="plan-add-label" for="exerciseRest">Pause</label>
+        <input id="exerciseRest" class="plan-add-input" type="number" min="0" placeholder="120" required>
+      </div>
+    </div>
+  </form>
+
+  <div id="exerciseStatus" class="status hidden"></div>
+</div>
+
+      <div class="modal-actions app-modal-actions">
+        <button id="confirmExerciseBtn" class="dashboard-summary-primary-btn" type="button">
+          Hinzufügen
+        </button>
+      </div>
     </div>
   </div>
 
   <div id="successModal" class="modal-overlay hidden">
-    <div class="modal-card">
-      <h2>Trainingsplan angelegt</h2>
-      <p class="muted" style="margin-top: 10px;">Dein Trainingsplan wurde erfolgreich gespeichert.</p>
-      <div class="modal-actions" style="margin-top: 20px;">
-        <button id="successOkBtn" class="primary" type="button">OK</button>
+    <div class="modal-card app-modal-card plan-exercise-success-card">
+      <h2 class="app-modal-title">Trainingsplan angelegt</h2>
+      <div class="app-modal-text">
+        Dein Trainingsplan wurde erfolgreich gespeichert.
+      </div>
+
+      <div class="modal-actions app-modal-actions">
+        <button id="successOkBtn" class="dashboard-summary-primary-btn" type="button">OK</button>
       </div>
     </div>
   </div>

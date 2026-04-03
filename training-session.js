@@ -103,16 +103,28 @@ function startTimer(startTimestamp) {
   timerInterval = setInterval(update, 1000);
 }
 
+function openModal(modal) {
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  document.body.classList.add('modal-open');
+}
+
+function closeModal(modal) {
+  if (!modal) return;
+  modal.classList.add('hidden');
+  document.body.classList.remove('modal-open');
+}
+
 function closeLeaveModal() {
   if (!leaveTrainingModal) return;
   leaveTrainingModal.classList.add('hidden');
-  document.body.style.overflow = '';
+  document.body.classList.remove('modal-open');
 }
 
 function openLeaveModal() {
   if (!leaveTrainingModal) return;
   leaveTrainingModal.classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
+  document.body.classList.add('modal-open');
 }
 
 async function guardPage() {
@@ -152,8 +164,7 @@ async function checkPlannedTrainingConflict(planId) {
   plannedTrainingWarningText.textContent =
     `Heute ist ${data.plan_name} geplant. Plane dein Training um, da sonst deine Live Streak kaputt geht.`;
 
-  plannedTrainingWarningModal.classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
+openModal(plannedTrainingWarningModal);
 
   return false;
 }
@@ -805,7 +816,7 @@ async function finishTraining() {
 
     sessionSummaryContent.innerHTML = summaryParts.join('');
     closeLeaveModal();
-    sessionSummaryModal.classList.remove('hidden');
+    openModal(sessionSummaryModal);
 
     clearDraftLocally();
     if (timerInterval) clearInterval(timerInterval);
@@ -823,16 +834,33 @@ async function finishTraining() {
   }
 }
 
+sessionSummaryModal.addEventListener('click', (event) => {
+  if (event.target === sessionSummaryModal) {
+    closeModal(sessionSummaryModal);
+  }
+});
+
+plannedTrainingWarningModal.addEventListener('click', (event) => {
+  if (event.target === plannedTrainingWarningModal) {
+    closeModal(plannedTrainingWarningModal);
+  }
+});
+
+leaveTrainingModal.addEventListener('click', (event) => {
+  if (event.target === leaveTrainingModal) {
+    closeLeaveModal();
+  }
+});
+
 finishTrainingBtn.addEventListener('click', finishTraining);
 
 sessionSummaryOkBtn.addEventListener('click', () => {
-  sessionSummaryModal.classList.add('hidden');
+  openModal(sessionSummaryModal);
   window.location.replace('./training.html');
 });
 
 continuePlannedTrainingBtn.addEventListener('click', async () => {
-  plannedTrainingWarningModal.classList.add('hidden');
-  document.body.style.overflow = '';
+  closeModal(plannedTrainingWarningModal);
   await loadPlanAndCreateDraft();
 });
 

@@ -6,27 +6,47 @@
   <title>Fitness Tracker - Trainingsplan erstellen</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#28c267">
+  <meta name="theme-color" content="#071225">
   <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
-  <div class="page-shell">
-    <header class="page-header">
-  <a class="back-button" href="dashboard.html">←</a>
-</header>
+  <div class="page-shell page-shell-app">
+    <header class="page-header app-page-header">
+      <button class="app-back-button" type="button" onclick="history.back()" aria-label="Zurück">
+        <svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 6L9 12L15 18"></path>
+        </svg>
+      </button>
+    </header>
 
-    <div class="page-title">Trainingsplan erstellen</div>
+    <main class="training-plan-page">
+      <section class="app-hero-card training-plan-hero-card">
+        <div class="training-plan-hero-inner">
+          <div class="training-plan-hero-label">Anzahl deiner Trainingspläne</div>
+          <div id="trainingPlanCount" class="training-plan-hero-value">0</div>
+        </div>
+      </section>
 
-    <section class="page-card">
-      <div class="module-badge">Modul 1</div>
-      <h1>Trainingspläne verwalten</h1>
-      <p>Wähle aus, ob du einen neuen Trainingsplan anlegen oder bestehende Trainingspläne bearbeiten möchtest.</p>
+      <section class="dashboard-nav-list dashboard-nav-list-no-icons training-plan-nav-list">
+        <a href="trainingsplan-add.html" class="dashboard-nav-button dashboard-nav-button-no-icon">
+          <span class="nav-left nav-left-no-icon">
+            <span class="nav-text">
+              <span class="nav-title">Trainingsplan hinzufügen</span>
+            </span>
+          </span>
+          <img class="nav-chevron-img" src="icon-chevron.svg" alt="">
+        </a>
 
-      <div class="dashboard-buttons" style="margin-top: 24px;">
-        <a href="trainingsplan-add.html" class="main-button">Trainingsplan hinzufügen</a>
-        <a href="trainingsplan-edit-list.html" class="main-button">Trainingsplan bearbeiten</a>
-      </div>
-    </section>
+        <a href="trainingsplan-edit-list.html" class="dashboard-nav-button dashboard-nav-button-no-icon">
+          <span class="nav-left nav-left-no-icon">
+            <span class="nav-text">
+              <span class="nav-title">Trainingsplan bearbeiten</span>
+            </span>
+          </span>
+          <img class="nav-chevron-img" src="icon-chevron.svg" alt="">
+        </a>
+      </section>
+    </main>
   </div>
 
   <script type="module" src="trainingsplan.js"></script>
