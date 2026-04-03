@@ -55,35 +55,34 @@
       <input id="exerciseName" class="plan-add-input" type="text" placeholder="Zum Beispiel Bankdrücken" required>
     </div>
 
-    <div class="plan-exercise-compact-grid">
-      <div class="plan-exercise-compact-field plan-exercise-compact-field-sets">
-        <label class="plan-add-label" for="exerciseSets">Sätze</label>
-        <select id="exerciseSets" class="plan-add-input" required>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3" selected>3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-          <option value="7">7</option>
-          <option value="8">8</option>
-        </select>
-      </div>
+    <div class="plan-exercise-row">
+      <label class="plan-add-label" for="exerciseSets">Sätze</label>
+      <select id="exerciseSets" class="plan-add-input" required>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3" selected>3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+      </select>
+    </div>
 
-      <div class="plan-exercise-compact-field">
-        <label class="plan-add-label" for="exerciseRepsMin">Wdh. min</label>
-        <input id="exerciseRepsMin" class="plan-add-input" type="number" min="1" required>
-      </div>
+    <div class="plan-exercise-row">
+  <label class="plan-add-label">Wdh.</label>
 
-      <div class="plan-exercise-compact-field">
-        <label class="plan-add-label" for="exerciseRepsMax">Wdh. max</label>
-        <input id="exerciseRepsMax" class="plan-add-input" type="number" min="1" required>
-      </div>
+  <div class="plan-reps-group">
+    <input id="exerciseRepsMin" class="plan-add-input" type="number" min="1" placeholder="min" required>
 
-      <div class="plan-exercise-compact-field plan-exercise-compact-field-rest">
-        <label class="plan-add-label" for="exerciseRest">Pause</label>
-        <input id="exerciseRest" class="plan-add-input" type="number" min="0" placeholder="120" required>
-      </div>
+    <span class="plan-reps-separator">–</span>
+
+    <input id="exerciseRepsMax" class="plan-add-input" type="number" min="1" placeholder="max" required>
+  </div>
+</div>
+    <div class="plan-exercise-row">
+      <label class="plan-add-label" for="exerciseRest">Pause in Sekunden</label>
+      <input id="exerciseRest" class="plan-add-input" type="number" min="0" placeholder="120" required>
     </div>
   </form>
 

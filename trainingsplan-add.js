@@ -110,16 +110,18 @@ function renderExercises() {
         </div>
       </div>
 
-      <div class="plan-add-exercise-side plan-add-exercise-side-row">
-        <button class="history-action-btn history-action-btn-primary edit-exercise-btn" data-index="${index}" type="button">
-          Bearbeiten
-        </button>
+      <div class="plan-add-exercise-bottom">
+        <div class="plan-add-action-buttons plan-add-action-buttons-mobile">
+          <button class="history-action-btn history-action-btn-primary edit-exercise-btn" data-index="${index}" type="button">
+            Bearbeiten
+          </button>
 
-        <button class="history-action-btn history-action-btn-danger delete-exercise-btn" data-index="${index}" type="button">
-          Löschen
-        </button>
+          <button class="history-action-btn history-action-btn-danger delete-exercise-btn" data-index="${index}" type="button">
+            Löschen
+          </button>
+        </div>
 
-        <div class="plan-add-mini-move-group">
+        <div class="plan-add-mini-move-group plan-add-mini-move-group-mobile">
           <button class="plan-add-mini-move-btn move-up-btn" data-index="${index}" type="button" aria-label="Nach oben">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M12 6L12 18"></path>

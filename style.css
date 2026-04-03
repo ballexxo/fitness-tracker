@@ -9299,3 +9299,189 @@ body.modal-open {
     min-width: 160px;
   }
 }
+
+/* ------------------------------------------ */
+/* TRAININGSPLAN ADD – MOBILE FIX */
+/* ------------------------------------------ */
+
+.plan-add-exercise-card {
+  padding: 16px 16px 14px;
+  min-height: auto;
+}
+
+.plan-add-exercise-main {
+  min-width: 0;
+}
+
+.plan-add-exercise-title {
+  font-size: 1rem;
+  line-height: 1.15;
+}
+
+.plan-add-exercise-meta {
+  margin-top: 4px;
+  font-size: 0.88rem;
+  line-height: 1.3;
+}
+
+.plan-add-exercise-bottom {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.plan-add-action-buttons-mobile {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+}
+
+.plan-add-action-buttons-mobile .history-action-btn {
+  flex: 1;
+  min-width: 0;
+  min-height: 42px;
+  padding: 0 12px;
+  font-size: 0.84rem;
+}
+
+.plan-add-mini-move-group-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.plan-add-mini-move-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(104, 225, 255, 0.14);
+  background: linear-gradient(180deg, rgba(13, 29, 55, 0.94), rgba(8, 18, 37, 0.98));
+  color: #aeefff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.02),
+    0 0 8px rgba(59, 194, 255, 0.05);
+}
+
+.plan-add-mini-move-btn svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Modal kompakter */
+.plan-exercise-modal-card {
+  width: calc(100vw - 14px);
+  max-height: 90vh;
+  padding: 14px 12px 12px;
+}
+
+.plan-exercise-modal-card .app-modal-title {
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+.plan-exercise-form {
+  gap: 10px;
+}
+
+.plan-exercise-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.plan-exercise-row .plan-add-label {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+
+.plan-exercise-row .plan-add-input {
+  min-height: 46px;
+  height: 46px;
+  padding: 0 12px;
+  border-radius: 14px;
+  font-size: 16px;
+}
+
+.plan-exercise-modal-card .modal-actions {
+  margin-top: 12px;
+}
+
+.plan-add-save-wrap {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+}
+
+.plan-add-save-btn {
+  min-width: 170px;
+}
+
+/* Desktop darf etwas breiter bleiben */
+@media (min-width: 701px) {
+  .plan-add-exercise-card {
+    padding: 16px 18px;
+  }
+
+  .plan-add-exercise-bottom {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .plan-add-action-buttons-mobile {
+    display: flex;
+    gap: 10px;
+    flex: 1;
+  }
+
+  .plan-add-mini-move-group-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .plan-add-mini-move-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .plan-add-mini-move-btn svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .plan-exercise-modal-card {
+    width: min(520px, calc(100vw - 18px));
+    padding: 16px 16px 14px;
+  }
+}
+/* Wiederholungen nebeneinander (mobile optimiert) */
+.plan-reps-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.plan-reps-group .plan-add-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.plan-reps-separator {
+  font-size: 1rem;
+  color: rgba(200,220,255,0.6);
+  flex: 0 0 auto;
+}
