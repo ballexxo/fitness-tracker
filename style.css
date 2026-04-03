@@ -8062,3 +8062,139 @@ select option[value=""] {
     font-size: 0.92rem;
   }
 }
+/* ------------------------------------------ */
+/* HISTORY MODALS – COMPACT HEADER */
+/* ------------------------------------------ */
+
+.history-modal-card .app-modal-title {
+  margin-bottom: 14px;
+}
+
+.history-modal-card .app-modal-content {
+  margin-top: 8px;
+}
+
+.history-modal-card .training-summary-top {
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.history-modal-card .history-view-plan-name {
+  margin-bottom: 2px;
+  font-size: 1.22rem;
+}
+
+.history-modal-card .history-view-meta {
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+.history-modal-card .training-summary-exercise-card {
+  margin-top: 12px;
+}
+
+.history-edit-modal-card .app-modal-content {
+  margin-top: 8px;
+}
+
+.history-edit-modal-card .training-summary-top {
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+/* ------------------------------------------ */
+/* MODAL CLOSE X */
+/* ------------------------------------------ */
+
+.history-modal-card {
+  position: relative;
+}
+
+.modal-close-x {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 87, 109, 0.36);
+  background: linear-gradient(180deg, rgba(108, 17, 32, 0.94), rgba(78, 10, 22, 0.98));
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.03),
+    0 0 16px rgba(255, 74, 103, 0.14);
+}
+
+.modal-close-x:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 700px) {
+  .modal-close-x {
+    top: 10px;
+    right: 10px;
+    width: 38px;
+    height: 38px;
+    font-size: 1.35rem;
+  }
+}
+/* ------------------------------------------ */
+/* MOBILE INPUT ZOOM FIX */
+/* ------------------------------------------ */
+
+input,
+select,
+textarea {
+  font-size: 16px;
+}
+
+.training-set-input,
+.app-form input,
+.app-form select,
+.app-form textarea,
+.auth-form input,
+.auth-form select,
+.auth-form textarea {
+  font-size: 16px !important;
+}
+
+@media (max-width: 700px) {
+  .training-set-input,
+  .app-form input,
+  .app-form select,
+  .app-form textarea,
+  .auth-form input,
+  .auth-form select,
+  .auth-form textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* ------------------------------------------ */
+/* MODAL SCROLL FIX */
+/* ------------------------------------------ */
+
+body.modal-open {
+  overflow: hidden;
+  touch-action: none;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+.history-modal-card,
+.history-edit-modal-card,
+.app-modal-card {
+  max-height: 88vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}

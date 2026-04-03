@@ -48,24 +48,23 @@
 
   <div id="viewHistoryModal" class="modal-overlay hidden">
     <div class="modal-card app-modal-card history-modal-card">
-      <h2 class="app-modal-title">Training anzeigen</h2>
-      <div id="viewHistoryContent" class="app-modal-content"></div>
-      <div class="modal-actions app-modal-actions">
-        <button id="closeViewHistoryBtn" class="dashboard-summary-primary-btn" type="button">Schließen</button>
-      </div>
+        <button id="closeViewHistoryIconBtn" class="modal-close-x" type="button" aria-label="Schließen">×</button>
+        <h2 class="app-modal-title">Training anzeigen</h2>
+        <div id="viewHistoryContent" class="app-modal-content"></div>
     </div>
+    
   </div>
 
   <div id="editHistoryModal" class="modal-overlay hidden">
     <div class="modal-card app-modal-card history-modal-card history-edit-modal-card">
-      <h2 class="app-modal-title">Training bearbeiten</h2>
-      <div id="editHistoryContent" class="app-modal-content"></div>
-      <div id="editHistoryStatus" class="status hidden"></div>
-      <div class="modal-actions app-modal-actions app-modal-actions-split">
-        <button id="cancelEditHistoryBtn" class="app-btn app-btn-danger" type="button">Abbrechen</button>
-        <button id="saveEditHistoryBtn" class="dashboard-summary-primary-btn" type="button">Speichern</button>
-      </div>
-    </div>
+  <button id="closeEditHistoryIconBtn" class="modal-close-x" type="button" aria-label="Abbrechen">×</button>
+  <h2 class="app-modal-title">Training bearbeiten</h2>
+  <div id="editHistoryContent" class="app-modal-content"></div>
+  <div id="editHistoryStatus" class="status hidden"></div>
+  <div class="modal-actions app-modal-actions">
+    <button id="saveEditHistoryBtn" class="dashboard-summary-primary-btn" type="button">Speichern</button>
+  </div>
+</div>
   </div>
 
   <script type="module" src="training-history.js"></script>

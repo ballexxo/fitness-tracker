@@ -11,12 +11,13 @@ const historyList = document.getElementById('historyList');
 
 const viewHistoryModal = document.getElementById('viewHistoryModal');
 const viewHistoryContent = document.getElementById('viewHistoryContent');
-const closeViewHistoryBtn = document.getElementById('closeViewHistoryBtn');
+const closeViewHistoryIconBtn = document.getElementById('closeViewHistoryIconBtn');
+const closeEditHistoryIconBtn = document.getElementById('closeEditHistoryIconBtn');
 
 const editHistoryModal = document.getElementById('editHistoryModal');
 const editHistoryContent = document.getElementById('editHistoryContent');
 const editHistoryStatus = document.getElementById('editHistoryStatus');
-const cancelEditHistoryBtn = document.getElementById('cancelEditHistoryBtn');
+
 const saveEditHistoryBtn = document.getElementById('saveEditHistoryBtn');
 
 let currentUser = null;
@@ -35,7 +36,7 @@ function setStatus(element, message, type = '') {
 
 function setModalState(modal, isOpen) {
   modal.classList.toggle('hidden', !isOpen);
-  document.body.style.overflow = isOpen ? 'hidden' : '';
+  document.body.classList.toggle('modal-open', isOpen);
 }
 
 async function guardPage() {
@@ -585,11 +586,11 @@ async function loadHistory() {
 /* ------------------------------------------------------------ */
 /* Modal Events */
 /* ------------------------------------------------------------ */
-closeViewHistoryBtn.addEventListener('click', () => {
+closeViewHistoryIconBtn.addEventListener('click', () => {
   setModalState(viewHistoryModal, false);
 });
 
-cancelEditHistoryBtn.addEventListener('click', () => {
+closeEditHistoryIconBtn.addEventListener('click', () => {
   setModalState(editHistoryModal, false);
   currentEditSession = null;
   setStatus(editHistoryStatus, '');
