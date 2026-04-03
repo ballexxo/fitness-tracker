@@ -6,50 +6,64 @@
   <title>Fitness Tracker - Training Historie</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#28c267">
+  <meta name="theme-color" content="#071225">
   <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
-  <div class="page-shell">
-    <header class="page-header">
-      <button class="back-button" type="button" onclick="history.back()">←</button>
+  <div class="page-shell page-shell-app">
+    <header class="page-header app-page-header">
+      <button class="app-back-button" type="button" onclick="history.back()" aria-label="Zurück">
+        <svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 6L9 12L15 18"></path>
+        </svg>
+      </button>
     </header>
 
-    <section class="page-card">
-      <div class="history-toolbar">
-        <button id="prevWeekBtn" class="week-nav-button" type="button" aria-label="Vorherige Woche">←</button>
+    <main class="history-page">
+      <section class="app-form-card history-page-card">
+        <div class="history-toolbar app-history-toolbar">
+          <button id="prevWeekBtn" class="app-back-button history-week-nav" type="button" aria-label="Vorherige Woche">
+            <svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15 6L9 12L15 18"></path>
+            </svg>
+          </button>
 
-        <div class="history-range-box">
-          <div class="muted">Angezeigte Woche</div>
-          <div id="historyRangeText" class="history-range-text">-</div>
+          <div class="history-range-box app-history-range-box">
+            <div class="app-history-range-label">Angezeigte Woche</div>
+            <div id="historyRangeText" class="history-range-text app-history-range-text">-</div>
+          </div>
+
+          <button id="nextWeekBtn" class="app-back-button history-week-nav history-week-nav-next" type="button" aria-label="Nächste Woche">
+            <svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15 6L9 12L15 18"></path>
+            </svg>
+          </button>
         </div>
 
-        <button id="nextWeekBtn" class="week-nav-button" type="button" aria-label="Nächste Woche">→</button>
-      </div>
-
-      <div id="historyStatus" class="status hidden"></div>
-      <div id="historyList" style="margin-top: 24px;"></div>
-    </section>
+        <div id="historyStatus" class="status hidden"></div>
+        <div id="historyList" class="history-session-list"></div>
+      </section>
+    </main>
   </div>
 
   <div id="viewHistoryModal" class="modal-overlay hidden">
-    <div class="modal-card">
-      <h2>Training anzeigen</h2>
-      <div id="viewHistoryContent" style="margin-top:16px;"></div>
-      <div class="modal-actions" style="margin-top:20px;">
-        <button id="closeViewHistoryBtn" class="primary" type="button">Schließen</button>
+    <div class="modal-card app-modal-card history-modal-card">
+      <h2 class="app-modal-title">Training anzeigen</h2>
+      <div id="viewHistoryContent" class="app-modal-content"></div>
+      <div class="modal-actions app-modal-actions">
+        <button id="closeViewHistoryBtn" class="dashboard-summary-primary-btn" type="button">Schließen</button>
       </div>
     </div>
   </div>
 
   <div id="editHistoryModal" class="modal-overlay hidden">
-    <div class="modal-card">
-      <h2>Training bearbeiten</h2>
-      <div id="editHistoryContent" style="margin-top:16px;"></div>
+    <div class="modal-card app-modal-card history-modal-card history-edit-modal-card">
+      <h2 class="app-modal-title">Training bearbeiten</h2>
+      <div id="editHistoryContent" class="app-modal-content"></div>
       <div id="editHistoryStatus" class="status hidden"></div>
-      <div class="modal-actions" style="margin-top:20px;">
-        <button id="cancelEditHistoryBtn" class="logout" type="button">Abbrechen</button>
-        <button id="saveEditHistoryBtn" class="primary" type="button">Speichern</button>
+      <div class="modal-actions app-modal-actions app-modal-actions-split">
+        <button id="cancelEditHistoryBtn" class="app-btn app-btn-danger" type="button">Abbrechen</button>
+        <button id="saveEditHistoryBtn" class="dashboard-summary-primary-btn" type="button">Speichern</button>
       </div>
     </div>
   </div>
