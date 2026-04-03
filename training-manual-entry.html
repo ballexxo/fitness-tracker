@@ -6,69 +6,73 @@
   <title>Fitness Tracker - Training nachtragen</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#28c267">
+  <meta name="theme-color" content="#071225">
   <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
-  <div class="page-shell">
-    <header class="page-header">
-        <button class="back-button" type="button" onclick="history.back()">←</button>
+  <div class="page-shell page-shell-app">
+    <header class="page-header app-page-header">
+      <button class="app-back-button" type="button" onclick="history.back()" aria-label="Zurück">
+        <svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 6L9 12L15 18"></path>
+        </svg>
+      </button>
     </header>
 
-    <div class="page-title">Training nachtragen</div>
+    <main class="training-session-page">
+      <section class="app-hero-card training-session-hero">
+        <div class="training-session-hero-label">Trainingsplan</div>
+        <div class="training-session-hero-name" id="manualPlanName">-</div>
+      </section>
 
-    <section class="page-card">
-      <div class="module-badge">Nachtragen</div>
+      <section class="app-form-card training-manual-meta-card">
+        <form class="auth-form app-form training-manual-meta-form">
+          <label>
+            Datum des Trainings
+            <input id="manualTrainingDate" type="date" required>
+          </label>
 
-      <div class="info-box" style="max-width:100%; margin-bottom: 24px;">
-        <div class="streak-label">Trainingsplan</div>
-        <div class="streak-value" id="manualPlanName">-</div>
-      </div>
-
-      <form class="auth-form">
-        <label>
-          Datum des Trainings
-          <input id="manualTrainingDate" type="date" required>
-        </label>
-
-        <label>
-          Dauer in Minuten
-          <input id="manualDurationMinutes" type="number" min="1" placeholder="Zum Beispiel 75" required>
-        </label>
-      </form>
+          <label>
+            Dauer in Minuten
+            <input id="manualDurationMinutes" type="number" min="1" placeholder="Zum Beispiel 75" required>
+          </label>
+        </form>
+      </section>
 
       <div id="manualSessionStatus" class="status hidden"></div>
-      <div id="manualExerciseList" style="margin-top: 24px;"></div>
+      <section id="manualExerciseList" class="training-exercise-list"></section>
 
-      <div style="margin-top:24px;">
-        <button id="saveManualTrainingBtn" class="primary" type="button">Training speichern</button>
+      <div class="training-session-footer">
+        <button id="saveManualTrainingBtn" class="dashboard-summary-primary-btn" type="button">
+          Training speichern
+        </button>
       </div>
-    </section>
+    </main>
   </div>
 
   <div id="manualSummaryModal" class="modal-overlay hidden">
-    <div class="modal-card">
-      <h2>Training nachgetragen</h2>
-      <div id="manualSummaryContent" style="margin-top:16px;"></div>
-      <div class="modal-actions" style="margin-top:20px;">
-        <button id="manualSummaryOkBtn" class="primary" type="button">OK</button>
+    <div class="modal-card app-modal-card">
+      <h2 class="app-modal-title">Training nachgetragen</h2>
+      <div id="manualSummaryContent" class="app-modal-content"></div>
+      <div class="modal-actions app-modal-actions">
+        <button id="manualSummaryOkBtn" class="dashboard-summary-primary-btn" type="button">OK</button>
       </div>
     </div>
   </div>
 
   <div id="plannedTrainingWarningModal" class="modal-overlay hidden">
-  <div class="modal-card">
-    <h2>Hinweis</h2>
-    <div id="plannedTrainingWarningText" style="margin-top: 12px; line-height: 1.6;">
-      Heute ist ein anderes Training geplant. Plane dein Training um, da sonst deine Live Streak kaputt geht.
-    </div>
+    <div class="modal-card app-modal-card">
+      <h2 class="app-modal-title">Hinweis</h2>
+      <div id="plannedTrainingWarningText" class="app-modal-text">
+        Heute ist ein anderes Training geplant. Plane dein Training um, da sonst deine Live Streak kaputt geht.
+      </div>
 
-    <div class="modal-actions" style="margin-top: 20px;">
-      <button id="cancelPlannedTrainingBtn" class="logout" type="button">Abbrechen</button>
-      <button id="continuePlannedTrainingBtn" class="primary" type="button">Fortfahren</button>
+      <div class="modal-actions app-modal-actions app-modal-actions-split">
+        <button id="cancelPlannedTrainingBtn" class="app-btn app-btn-secondary" type="button">Abbrechen</button>
+        <button id="continuePlannedTrainingBtn" class="dashboard-summary-primary-btn" type="button">Fortfahren</button>
+      </div>
     </div>
   </div>
-</div>
 
   <script type="module" src="training-manual-entry.js"></script>
 </body>

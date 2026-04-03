@@ -77,13 +77,8 @@ async function checkPlannedTrainingConflict(planId) {
     return true;
   }
 
-  if (!data) {
-    return true;
-  }
-
-  if (data.plan_id === planId) {
-    return true;
-  }
+  if (!data) return true;
+  if (data.plan_id === planId) return true;
 
   plannedTrainingWarningText.textContent =
     `Heute ist ${data.plan_name} geplant. Plane dein Training um, da sonst deine Live Streak kaputt geht.`;
@@ -114,9 +109,7 @@ async function fetchLastExerciseData(exerciseName) {
       .eq('exercise_name', exerciseName)
       .limit(1);
 
-    if (exerciseError || !exerciseRows || exerciseRows.length === 0) {
-      continue;
-    }
+    if (exerciseError || !exerciseRows || exerciseRows.length === 0) continue;
 
     const exerciseRow = exerciseRows[0];
 
@@ -137,24 +130,217 @@ async function fetchLastExerciseData(exerciseName) {
   return null;
 }
 
-function getPerformanceBadge(lastData, repsMax) {
+function getPerformanceBadgeMeta(lastData, repsMax) {
   if (!lastData || !lastData.sets || lastData.sets.length === 0) {
-    return '<span class="performance-badge performance-neutral">Keine Historie</span>';
+    return { label: 'Keine Historie', className: 'training-badge-neutral' };
   }
 
   const allReachedMax = lastData.sets.every((setItem) => Number(setItem.reps_done) >= Number(repsMax));
 
   if (allReachedMax) {
-    return '<span class="performance-badge performance-good">Gewicht erhöhen möglich</span>';
+    return { label: 'Gewicht erhöhen möglich', className: 'training-badge-up' };
   }
 
-  return '<span class="performance-badge performance-neutral">Gewicht beibehalten</span>';
+  return { label: 'Gewicht beibehalten', className: 'training-badge-keep' };
 }
 
-function getCompactLastTrainingLine(lastData) {
-  return lastData.sets
-    .map((setItem) => `${setItem.reps_done ?? '-'} Wdh · ${setItem.weight_used ?? '-'} kg`)
-    .join(' | ');
+function applySuggestedWeightsFromHistory(exercise, lastData, badgeMeta) {
+  if (!exercise || !lastData || !lastData.sets || !badgeMeta) return;
+
+  const shouldPrefillWeights = badgeMeta.className === 'training-badge-keep';
+
+  if (!shouldPrefillWeights) return;
+
+  for (let index = 0; index < exercise.sets.length; index++) {
+    const currentSet = exercise.sets[index];
+    const lastSet = lastData.sets[index];
+
+    if (!currentSet || !lastSet) continue;
+
+    const isWeightEmpty =
+      currentSet.weight_used === null ||
+      currentSet.weight_used === undefined ||
+      currentSet.weight_used === '';
+
+    if (isWeightEmpty && lastSet.weight_used !== null && lastSet.weight_used !== undefined) {
+      currentSet.weight_used = Number(lastSet.weight_used);
+    }
+  }
+}
+
+function renderLastTrainingMatrix(lastData, plannedSets) {
+  const setCount = Math.max(plannedSets, lastData?.sets?.length || 0);
+
+  if (!lastData || !lastData.sets || lastData.sets.length === 0) {
+    return `
+      <div class="training-last-empty">
+        Noch keine Daten aus dem letzten Training vorhanden.
+      </div>
+    `;
+  }
+
+  const headers = Array.from({ length: setCount }, (_, index) => `
+    <div class="training-last-col-head">${index + 1}. Satz</div>
+  `).join('');
+
+  const repsRow = Array.from({ length: setCount }, (_, index) => {
+    const setItem = lastData.sets[index];
+    return `<div class="training-last-value">${setItem?.reps_done ?? '-'}</div>`;
+  }).join('');
+
+  const weightRow = Array.from({ length: setCount }, (_, index) => {
+    const setItem = lastData.sets[index];
+    return `<div class="training-last-value">${setItem?.weight_used ?? '-'}</div>`;
+  }).join('');
+
+  return `
+    <div class="training-last-grid training-last-grid-head" style="--training-set-count:${setCount};">
+      <div></div>
+      ${headers}
+    </div>
+
+    <div class="training-last-grid" style="--training-set-count:${setCount};">
+      <div class="training-last-row-label">Wdh.</div>
+      ${repsRow}
+    </div>
+
+    <div class="training-last-grid" style="--training-set-count:${setCount};">
+      <div class="training-last-row-label">Gewicht</div>
+      ${weightRow}
+    </div>
+  `;
+}
+
+function renderSetInputMatrix(exercise, exerciseIndex) {
+  const headers = Array.from({ length: exercise.sets_planned }, (_, setIndex) => `
+    <div class="training-set-col-head">${setIndex + 1}. Satz</div>
+  `).join('');
+
+  const repsInputs = exercise.sets.map((setData, setIndex) => `
+    <input
+      class="training-set-input"
+      type="number"
+      min="0"
+      inputmode="numeric"
+      data-exercise-index="${exerciseIndex}"
+      data-set-index="${setIndex}"
+      data-field="reps"
+      value="${setData.reps_done ?? ''}"
+      placeholder="-"
+    >
+  `).join('');
+
+  const weightInputs = exercise.sets.map((setData, setIndex) => `
+    <input
+      class="training-set-input"
+      type="number"
+      min="0"
+      step="0.5"
+      inputmode="decimal"
+      data-exercise-index="${exerciseIndex}"
+      data-set-index="${setIndex}"
+      data-field="weight"
+      value="${setData.weight_used ?? ''}"
+      placeholder="-"
+    >
+  `).join('');
+
+  return `
+    <div class="training-set-grid training-set-grid-head" style="--training-set-count:${exercise.sets_planned};">
+      <div></div>
+      ${headers}
+    </div>
+
+    <div class="training-set-grid" style="--training-set-count:${exercise.sets_planned};">
+      <div class="training-set-row-label">Wdh.</div>
+      ${repsInputs}
+    </div>
+
+    <div class="training-set-grid" style="--training-set-count:${exercise.sets_planned};">
+      <div class="training-set-row-label">Gewicht</div>
+      ${weightInputs}
+    </div>
+  `;
+}
+
+function renderSummarySetMatrix(sets) {
+  const setCount = Math.max(sets.length, 1);
+
+  const headers = Array.from({ length: setCount }, (_, index) => `
+    <div class="training-last-col-head">${index + 1}. Satz</div>
+  `).join('');
+
+  const repsRow = Array.from({ length: setCount }, (_, index) => {
+    const setItem = sets[index];
+    return `<div class="training-last-value">${setItem?.reps_done ?? '-'}</div>`;
+  }).join('');
+
+  const weightRow = Array.from({ length: setCount }, (_, index) => {
+    const setItem = sets[index];
+    return `<div class="training-last-value">${setItem?.weight_used ?? '-'}</div>`;
+  }).join('');
+
+  return `
+    <div class="training-last-grid training-last-grid-head" style="--training-set-count:${setCount};">
+      <div></div>
+      ${headers}
+    </div>
+
+    <div class="training-last-grid" style="--training-set-count:${setCount};">
+      <div class="training-last-row-label">Wdh.</div>
+      ${repsRow}
+    </div>
+
+    <div class="training-last-grid" style="--training-set-count:${setCount};">
+      <div class="training-last-row-label">Gewicht</div>
+      ${weightRow}
+    </div>
+  `;
+}
+
+function getImprovementSummaryBadge(improvement) {
+  if (!improvement || !improvement.text) {
+    return '<span class="training-badge training-badge-neutral">Keine Vergleichsdaten</span>';
+  }
+
+  if (improvement.className === 'improvement-positive') {
+    return '<span class="training-badge training-badge-up">Steigerung</span>';
+  }
+
+  if (improvement.className === 'improvement-negative') {
+    return '<span class="training-badge training-badge-reduced">Reduziert</span>';
+  }
+
+  return '<span class="training-badge training-badge-neutral">Keine Vergleichsdaten</span>';
+}
+
+function getImprovementSummaryLine(improvement) {
+  if (!improvement || !improvement.text) {
+    return `
+      <span class="training-summary-improvement-prefix">Vergleich zum letzten Training</span>
+      <span class="training-summary-arrow">→</span>
+      <span class="training-summary-improvement-neutral">Keine Vergleichsdaten</span>
+    `;
+  }
+
+  let emphasizedText = 'Keine Vergleichsdaten';
+  let emphasizedClass = 'training-summary-improvement-neutral';
+
+  if (improvement.className === 'improvement-positive') {
+    const clean = improvement.text.replace('Steigerung zum letzten Training: ', '');
+    emphasizedText = clean;
+    emphasizedClass = 'training-summary-improvement-positive';
+  } else if (improvement.className === 'improvement-negative') {
+    const clean = improvement.text.replace('Steigerung zum letzten Training: ', '');
+    emphasizedText = clean;
+    emphasizedClass = 'training-summary-improvement-negative';
+  }
+
+  return `
+    <span class="training-summary-improvement-prefix">Vergleich zum letzten Training</span>
+    <span class="training-summary-arrow">→</span>
+    <span class="${emphasizedClass}">${emphasizedText}</span>
+  `;
 }
 
 function calculateExerciseVolume(exercise) {
@@ -288,9 +474,7 @@ function estimateCalories(durationSeconds, bodyWeightKg) {
 async function markPlannedWorkoutAsCompleted(sessionRow, selectedDate) {
   const today = getLocalDateString();
 
-  if (selectedDate !== today) {
-    return;
-  }
+  if (selectedDate !== today) return;
 
   const { data: plannedWorkout, error: plannedError } = await supabase
     .from('planned_workouts')
@@ -306,9 +490,7 @@ async function markPlannedWorkoutAsCompleted(sessionRow, selectedDate) {
     return;
   }
 
-  if (!plannedWorkout) {
-    return;
-  }
+  if (!plannedWorkout) return;
 
   const { error: updateError } = await supabase
     .from('planned_workouts')
@@ -329,69 +511,32 @@ async function renderManualExercises() {
   for (let exerciseIndex = 0; exerciseIndex < manualSession.exercises.length; exerciseIndex++) {
     const exercise = manualSession.exercises[exerciseIndex];
     const lastData = await fetchLastExerciseData(exercise.exercise_name);
+    const badge = getPerformanceBadgeMeta(lastData, exercise.reps_max);
 
-    let lastTrainingHtml = '';
-    if (!lastData) {
-      lastTrainingHtml = `<div class="muted" style="margin-top:10px;">Noch keine Datensätze aus dem letzten Training vorhanden.</div>`;
-    } else {
-      lastTrainingHtml = `
-        <div class="last-training-box">
-          <div class="muted">Letztes Training</div>
-          <div style="margin-top:8px;">${getCompactLastTrainingLine(lastData)}</div>
-          <div style="margin-top:10px;">
-            ${getPerformanceBadge(lastData, exercise.reps_max)}
-          </div>
-        </div>
-      `;
-    }
-
-    let setsHtml = '';
-    for (let setIndex = 0; setIndex < exercise.sets_planned; setIndex++) {
-      const setData = exercise.sets[setIndex];
-
-      setsHtml += `
-        <div class="set-row">
-          <div class="set-row-title">Satz ${setIndex + 1}</div>
-          <div class="two-col-grid">
-            <label>
-              Wiederholungen
-              <input
-                type="number"
-                min="0"
-                data-exercise-index="${exerciseIndex}"
-                data-set-index="${setIndex}"
-                data-field="reps"
-                value="${setData.reps_done ?? ''}"
-              >
-            </label>
-            <label>
-              Gewicht (kg)
-              <input
-                type="number"
-                min="0"
-                step="0.5"
-                data-exercise-index="${exerciseIndex}"
-                data-set-index="${setIndex}"
-                data-field="weight"
-                value="${setData.weight_used ?? ''}"
-              >
-            </label>
-          </div>
-        </div>
-      `;
-    }
+    applySuggestedWeightsFromHistory(exercise, lastData, badge);
 
     htmlParts.push(`
-      <div class="exercise-item training-live-card">
-        <div style="width:100%;">
-          <strong>${exerciseIndex + 1}. ${exercise.exercise_name}</strong><br>
-          <span class="muted">${exercise.sets_planned} Sätze · ${exercise.reps_min}-${exercise.reps_max} Wdh.</span>
-          ${lastTrainingHtml}
-          <div style="margin-top:14px;">
-            ${setsHtml}
+      <article class="training-exercise-card" style="--training-set-count:${exercise.sets_planned};">
+        <div class="training-exercise-head">
+          <div>
+            <div class="training-exercise-title">${exerciseIndex + 1}. ${exercise.exercise_name}</div>
+            <div class="training-exercise-meta">${exercise.sets_planned} Sätze · ${exercise.reps_min}-${exercise.reps_max} Wdh.</div>
           </div>
         </div>
-      </div>
+
+        <div class="training-last-card">
+          <div class="training-last-head">
+            <div class="training-section-title">Letztes Training</div>
+            <span class="training-badge ${badge.className}">${badge.label}</span>
+          </div>
+
+          ${renderLastTrainingMatrix(lastData, exercise.sets_planned)}
+        </div>
+
+        <div class="training-input-card">
+          ${renderSetInputMatrix(exercise, exerciseIndex)}
+        </div>
+      </article>
     `);
   }
 
@@ -416,9 +561,7 @@ async function renderManualExercises() {
 }
 
 async function loadPlan() {
-  if (!currentUser) {
-    await guardPage();
-  }
+  if (!currentUser) await guardPage();
 
   currentPlanId = getPlanIdFromUrl();
   if (!currentPlanId) {
@@ -566,36 +709,39 @@ saveManualTrainingBtn.addEventListener('click', async () => {
     }
 
     const summaryParts = [];
-    summaryParts.push(`
-      <div class="summary-block">
-        <strong>Trainingsdauer:</strong> ${formatSeconds(durationSeconds)}
-      </div>
-    `);
 
     summaryParts.push(`
-      <div class="summary-block" style="margin-top:10px;">
-        ${
-          estimatedCalories !== null
-            ? `<strong>Ca. verbrannte kcal:</strong> ${estimatedCalories} kcal`
-            : `Es fehlt dein Gewicht bei Persönliche Daten, um den Kalorienverbrauch zu berechnen.`
-        }
+      <div class="training-summary-top">
+        <div class="training-summary-top-row training-summary-top-row-left">
+          <span class="training-summary-top-label">Trainingsdauer:</span>
+          <span class="training-summary-top-value">${formatSeconds(durationSeconds)}</span>
+        </div>
+
+        <div class="training-summary-top-row training-summary-top-row-left">
+          <span class="training-summary-top-label">Ca. verbrannte kcal:</span>
+          <span class="training-summary-top-value">
+            ${estimatedCalories !== null ? `${estimatedCalories} kcal` : '-'}
+          </span>
+        </div>
       </div>
     `);
 
     for (const exercise of manualSession.exercises) {
       const improvement = await calculateExerciseImprovement(exercise, sessionRow.id);
 
-      let improvementHtml = improvement.text;
-      if (improvement.className) {
-        improvementHtml = `Steigerung zum letzten Training: <span class="${improvement.className}">${improvement.text.replace('Steigerung zum letzten Training: ', '')}</span>`;
-      }
-
       summaryParts.push(`
-        <div class="summary-exercise-box">
-          <strong>${exercise.exercise_name}</strong><br>
-          <div style="margin-top:6px;">${improvementHtml}</div>
-          <div class="muted" style="margin-top:8px;">
-            ${exercise.sets.map((setItem) => `${setItem.reps_done ?? '-'} Wdh · ${setItem.weight_used ?? '-'} kg`).join(' | ')}
+        <div class="training-summary-exercise-card">
+          <div class="training-summary-exercise-head">
+            <div class="training-summary-exercise-title">${exercise.exercise_name}</div>
+            ${getImprovementSummaryBadge(improvement)}
+          </div>
+
+          <div class="training-summary-improvement-text">
+            ${getImprovementSummaryLine(improvement)}
+          </div>
+
+          <div class="training-summary-matrix">
+            ${renderSummarySetMatrix(exercise.sets)}
           </div>
         </div>
       `);

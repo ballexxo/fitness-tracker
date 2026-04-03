@@ -6,61 +6,78 @@
   <title>Fitness Tracker - Trainingseinheit</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#28c267">
+  <meta name="theme-color" content="#071225">
   <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
-  <div class="page-shell">
-    <header class="page-header">
-        <button class="back-button" type="button" onclick="history.back()">←</button>
+  <div class="page-shell page-shell-app">
+    <header class="page-header app-page-header">
+      <button class="app-back-button" type="button" aria-label="Zurück">
+        <svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 6L9 12L15 18"></path>
+        </svg>
+      </button>
     </header>
 
-    <div class="page-title">Trainingseinheit</div>
-
-    <section class="page-card">
-      <div class="module-badge">Aktives Training</div>
-
-      <div class="info-box" style="max-width:100%; margin-bottom: 24px;">
-        <div class="streak-label">Aktueller Trainingsplan</div>
-        <div class="streak-value" id="sessionPlanName">-</div>
-        <div class="streak-text">Trainingszeit: <span id="sessionTimer">00:00:00</span></div>
-      </div>
+    <main class="training-session-page">
+      <section class="app-hero-card training-session-hero">
+        <div class="training-session-hero-label">Aktueller Trainingsplan</div>
+        <div class="training-session-hero-name" id="sessionPlanName">-</div>
+        <div class="training-session-hero-timer-row">
+          
+          <span class="training-session-hero-timer-value" id="sessionTimer">00:00:00</span>
+        </div>
+      </section>
 
       <div id="sessionStatus" class="status hidden"></div>
-      <div id="sessionExerciseList"></div>
+      <section id="sessionExerciseList" class="training-exercise-list"></section>
 
-      <div style="margin-top:24px;">
-        <button id="finishTrainingBtn" class="primary" type="button">Training Beenden</button>
+      <div class="training-session-footer">
+        <button id="finishTrainingBtn" class="dashboard-summary-primary-btn" type="button">
+          Training beenden
+        </button>
       </div>
-    </section>
+    </main>
   </div>
 
   <div id="sessionSummaryModal" class="modal-overlay hidden">
-    <div class="modal-card">
-      <h2>Training abgeschlossen</h2>
-
-      <div id="sessionSummaryContent" style="margin-top:16px;"></div>
-
-      <div class="modal-actions" style="margin-top:20px;">
-        <button id="sessionSummaryOkBtn" class="primary" type="button">OK</button>
+    <div class="modal-card app-modal-card">
+      <h2 class="app-modal-title">Training abgeschlossen</h2>
+      <div id="sessionSummaryContent" class="app-modal-content"></div>
+      <div class="modal-actions app-modal-actions">
+        <button id="sessionSummaryOkBtn" class="dashboard-summary-primary-btn" type="button">OK</button>
       </div>
     </div>
   </div>
 
-
   <div id="plannedTrainingWarningModal" class="modal-overlay hidden">
-  <div class="modal-card">
-    <h2>Hinweis</h2>
-    <div id="plannedTrainingWarningText" style="margin-top: 12px; line-height: 1.6;">
-      Heute ist ein anderes Training geplant. Plane dein Training um, da sonst deine Live Streak kaputt geht.
-    </div>
+    <div class="modal-card app-modal-card">
+      <h2 class="app-modal-title">Hinweis</h2>
+      <div id="plannedTrainingWarningText" class="app-modal-text">
+        Heute ist ein anderes Training geplant. Plane dein Training um, da sonst deine Live Streak kaputt geht.
+      </div>
 
-    <div class="modal-actions" style="margin-top: 20px;">
-      <button id="cancelPlannedTrainingBtn" class="logout" type="button">Abbrechen</button>
-      <button id="continuePlannedTrainingBtn" class="primary" type="button">Fortfahren</button>
+      <div class="modal-actions app-modal-actions app-modal-actions-split">
+        <button id="cancelPlannedTrainingBtn" class="app-btn app-btn-secondary" type="button">Abbrechen</button>
+        <button id="continuePlannedTrainingBtn" class="dashboard-summary-primary-btn" type="button">Fortfahren</button>
+      </div>
     </div>
   </div>
-</div>
+
+  <div id="leaveTrainingModal" class="modal-overlay hidden">
+    <div class="modal-card app-modal-card">
+      <h2 class="app-modal-title">Training verlassen?</h2>
+      <div class="app-modal-text">
+        Dein Training läuft weiter im Hintergrund und bleibt gespeichert. Du kannst später jederzeit fortsetzen oder es jetzt direkt beenden.
+      </div>
+
+      <div class="modal-actions app-modal-actions app-modal-actions-split">
+        <button id="resumeTrainingBtn" class="app-btn app-btn-secondary" type="button">Fortsetzen</button>
+        <button id="backgroundTrainingBtn" class="app-btn app-btn-secondary" type="button">Im Hintergrund weiter</button>
+        <button id="leaveAndFinishTrainingBtn" class="dashboard-summary-primary-btn" type="button">Beenden & speichern</button>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="training-session.js"></script>
 </body>

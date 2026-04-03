@@ -22,9 +22,17 @@
     <main class="training-page">
       <section class="app-hero-card training-hero-card">
         <div class="training-hero-inner">
-          <div class="training-hero-label">Letztes Training</div>
-          <div class="training-hero-name" id="lastTrainingName">Noch kein Training</div>
-          <div class="training-hero-date" id="lastTrainingDate">-</div>
+          <div id="trainingHeroLabel" class="training-hero-label">Letztes Training</div>
+          <div id="lastTrainingName" class="training-hero-name">Noch kein Training</div>
+          <div id="lastTrainingDate" class="training-hero-date">-</div>
+
+          <div id="activeTrainingInline" class="training-active-inline hidden">
+            
+            <div id="activeTrainingTime" class="training-active-inline-time">00:00:00</div>
+            <button id="resumeActiveTraining" class="dashboard-summary-primary-btn" type="button">
+              Fortsetzen
+            </button>
+          </div>
         </div>
       </section>
 

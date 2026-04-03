@@ -18,6 +18,15 @@ const plannedTrainingWarningText = document.getElementById('plannedTrainingWarni
 const cancelPlannedTrainingBtn = document.getElementById('cancelPlannedTrainingBtn');
 const continuePlannedTrainingBtn = document.getElementById('continuePlannedTrainingBtn');
 
+/* neues Leave-Modal */
+const leaveTrainingModal = document.getElementById('leaveTrainingModal');
+const resumeTrainingBtn = document.getElementById('resumeTrainingBtn');
+const backgroundTrainingBtn = document.getElementById('backgroundTrainingBtn');
+const leaveAndFinishTrainingBtn = document.getElementById('leaveAndFinishTrainingBtn');
+
+/* Back-Button aus dem Header */
+const backButton = document.querySelector('.app-back-button');
+
 let currentUser = null;
 let currentPlanId = null;
 let currentPlanName = '';
@@ -26,9 +35,9 @@ let draftStorageKey = null;
 let timerInterval = null;
 let startedAt = null;
 
-// ------------------------------------------------------------
-// Helpers
-// ------------------------------------------------------------
+/* ------------------------------------------------------------ */
+/* Helpers */
+/* ------------------------------------------------------------ */
 function setStatus(element, message, type = '') {
   element.textContent = message;
   element.className = `status ${type}`.trim();
@@ -94,6 +103,18 @@ function startTimer(startTimestamp) {
   timerInterval = setInterval(update, 1000);
 }
 
+function closeLeaveModal() {
+  if (!leaveTrainingModal) return;
+  leaveTrainingModal.classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+function openLeaveModal() {
+  if (!leaveTrainingModal) return;
+  leaveTrainingModal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
 async function guardPage() {
   const { data, error } = await supabase.auth.getSession();
 
@@ -106,9 +127,9 @@ async function guardPage() {
   return currentUser;
 }
 
-// ------------------------------------------------------------
-// Planung / Konflikt prüfen
-// ------------------------------------------------------------
+/* ------------------------------------------------------------ */
+/* Planung / Konflikt prüfen */
+/* ------------------------------------------------------------ */
 async function checkPlannedTrainingConflict(planId) {
   const today = getLocalDateString();
 
@@ -125,13 +146,8 @@ async function checkPlannedTrainingConflict(planId) {
     return true;
   }
 
-  if (!data) {
-    return true;
-  }
-
-  if (data.plan_id === planId) {
-    return true;
-  }
+  if (!data) return true;
+  if (data.plan_id === planId) return true;
 
   plannedTrainingWarningText.textContent =
     `Heute ist ${data.plan_name} geplant. Plane dein Training um, da sonst deine Live Streak kaputt geht.`;
@@ -159,9 +175,7 @@ async function markPlannedWorkoutAsCompleted(sessionRow) {
     return;
   }
 
-  if (!plannedWorkout) {
-    return;
-  }
+  if (!plannedWorkout) return;
 
   const { error: updateError } = await supabase
     .from('planned_workouts')
@@ -176,9 +190,9 @@ async function markPlannedWorkoutAsCompleted(sessionRow) {
   }
 }
 
-// ------------------------------------------------------------
-// Letzte Übungsdaten holen
-// ------------------------------------------------------------
+/* ------------------------------------------------------------ */
+/* Letzte Übungsdaten holen */
+/* ------------------------------------------------------------ */
 async function fetchLastExerciseData(exerciseName, excludeSessionId = null) {
   const { data: sessions, error: sessionsError } = await supabase
     .from('workout_sessions')
@@ -192,9 +206,7 @@ async function fetchLastExerciseData(exerciseName, excludeSessionId = null) {
   }
 
   for (const session of sessions) {
-    if (excludeSessionId && session.id === excludeSessionId) {
-      continue;
-    }
+    if (excludeSessionId && session.id === excludeSessionId) continue;
 
     const { data: exerciseRows, error: exerciseError } = await supabase
       .from('workout_session_exercises')
@@ -203,9 +215,7 @@ async function fetchLastExerciseData(exerciseName, excludeSessionId = null) {
       .eq('exercise_name', exerciseName)
       .limit(1);
 
-    if (exerciseError || !exerciseRows || exerciseRows.length === 0) {
-      continue;
-    }
+    if (exerciseError || !exerciseRows || exerciseRows.length === 0) continue;
 
     const exerciseRow = exerciseRows[0];
 
@@ -215,9 +225,7 @@ async function fetchLastExerciseData(exerciseName, excludeSessionId = null) {
       .eq('session_exercise_id', exerciseRow.id)
       .order('set_number', { ascending: true });
 
-    if (setError) {
-      return null;
-    }
+    if (setError) return null;
 
     return {
       date: session.training_date,
@@ -229,32 +237,216 @@ async function fetchLastExerciseData(exerciseName, excludeSessionId = null) {
   return null;
 }
 
-function getPerformanceBadge(lastData, repsMax) {
+function getPerformanceBadgeMeta(lastData, repsMax) {
   if (!lastData || !lastData.sets || lastData.sets.length === 0) {
-    return '<span class="performance-badge performance-neutral">Keine Historie</span>';
+    return { label: 'Keine Historie', className: 'training-badge-neutral' };
   }
 
   const allReachedMax = lastData.sets.every((setItem) => Number(setItem.reps_done) >= Number(repsMax));
 
   if (allReachedMax) {
-    return '<span class="performance-badge performance-good">Gewicht erhöhen möglich</span>';
+    return { label: 'Gewicht erhöhen möglich', className: 'training-badge-up' };
   }
 
-  return '<span class="performance-badge performance-neutral">Gewicht beibehalten</span>';
+  return { label: 'Gewicht beibehalten', className: 'training-badge-keep' };
 }
 
-function getCompactLastTrainingLine(lastData) {
-  return lastData.sets
-    .map((setItem) => `${setItem.reps_done ?? '-'} Wdh · ${setItem.weight_used ?? '-'} kg`)
-    .join(' | ');
+function applySuggestedWeightsFromHistory(exercise, lastData, badgeMeta) {
+  if (!exercise || !lastData || !lastData.sets || !badgeMeta) return;
+
+  const shouldPrefillWeights = badgeMeta.className === 'training-badge-keep';
+  if (!shouldPrefillWeights) return;
+
+  for (let index = 0; index < exercise.sets.length; index++) {
+    const currentSet = exercise.sets[index];
+    const lastSet = lastData.sets[index];
+
+    if (!currentSet || !lastSet) continue;
+
+    const isWeightEmpty =
+      currentSet.weight_used === null ||
+      currentSet.weight_used === undefined ||
+      currentSet.weight_used === '';
+
+    if (isWeightEmpty && lastSet.weight_used !== null && lastSet.weight_used !== undefined) {
+      currentSet.weight_used = Number(lastSet.weight_used);
+    }
+  }
 }
 
-function calculateExerciseVolume(exercise) {
-  return exercise.sets.reduce((sum, setItem) => {
-    const reps = Number(setItem.reps_done || 0);
-    const weight = Number(setItem.weight_used || 0);
-    return sum + reps * weight;
-  }, 0);
+function renderLastTrainingMatrix(lastData, plannedSets) {
+  const setCount = Math.max(plannedSets, lastData?.sets?.length || 0);
+
+  if (!lastData || !lastData.sets || lastData.sets.length === 0) {
+    return `
+      <div class="training-last-empty">
+        Noch keine Daten aus dem letzten Training vorhanden.
+      </div>
+    `;
+  }
+
+  const headers = Array.from({ length: setCount }, (_, index) => `
+    <div class="training-last-col-head">${index + 1}. Satz</div>
+  `).join('');
+
+  const repsRow = Array.from({ length: setCount }, (_, index) => {
+    const setItem = lastData.sets[index];
+    return `<div class="training-last-value">${setItem?.reps_done ?? '-'}</div>`;
+  }).join('');
+
+  const weightRow = Array.from({ length: setCount }, (_, index) => {
+    const setItem = lastData.sets[index];
+    return `<div class="training-last-value">${setItem?.weight_used ?? '-'}</div>`;
+  }).join('');
+
+  return `
+    <div class="training-last-grid training-last-grid-head" style="--training-set-count:${setCount};">
+      <div></div>
+      ${headers}
+    </div>
+
+    <div class="training-last-grid" style="--training-set-count:${setCount};">
+      <div class="training-last-row-label">Wdh.</div>
+      ${repsRow}
+    </div>
+
+    <div class="training-last-grid" style="--training-set-count:${setCount};">
+      <div class="training-last-row-label">Gewicht</div>
+      ${weightRow}
+    </div>
+  `;
+}
+
+function renderSetInputMatrix(exercise, exerciseIndex) {
+  const headers = Array.from({ length: exercise.sets_planned }, (_, setIndex) => `
+    <div class="training-set-col-head">${setIndex + 1}. Satz</div>
+  `).join('');
+
+  const repsInputs = exercise.sets.map((setData, setIndex) => `
+    <input
+      class="training-set-input"
+      type="number"
+      min="0"
+      inputmode="numeric"
+      data-exercise-index="${exerciseIndex}"
+      data-set-index="${setIndex}"
+      data-field="reps"
+      value="${setData.reps_done ?? ''}"
+      placeholder="-"
+    >
+  `).join('');
+
+  const weightInputs = exercise.sets.map((setData, setIndex) => `
+    <input
+      class="training-set-input"
+      type="number"
+      min="0"
+      step="0.5"
+      inputmode="decimal"
+      data-exercise-index="${exerciseIndex}"
+      data-set-index="${setIndex}"
+      data-field="weight"
+      value="${setData.weight_used ?? ''}"
+      placeholder="-"
+    >
+  `).join('');
+
+  return `
+    <div class="training-set-grid training-set-grid-head" style="--training-set-count:${exercise.sets_planned};">
+      <div></div>
+      ${headers}
+    </div>
+
+    <div class="training-set-grid" style="--training-set-count:${exercise.sets_planned};">
+      <div class="training-set-row-label">Wdh.</div>
+      ${repsInputs}
+    </div>
+
+    <div class="training-set-grid" style="--training-set-count:${exercise.sets_planned};">
+      <div class="training-set-row-label">Gewicht</div>
+      ${weightInputs}
+    </div>
+  `;
+}
+
+function renderSummarySetMatrix(sets) {
+  const setCount = Math.max(sets.length, 1);
+
+  const headers = Array.from({ length: setCount }, (_, index) => `
+    <div class="training-last-col-head">${index + 1}. Satz</div>
+  `).join('');
+
+  const repsRow = Array.from({ length: setCount }, (_, index) => {
+    const setItem = sets[index];
+    return `<div class="training-last-value">${setItem?.reps_done ?? '-'}</div>`;
+  }).join('');
+
+  const weightRow = Array.from({ length: setCount }, (_, index) => {
+    const setItem = sets[index];
+    return `<div class="training-last-value">${setItem?.weight_used ?? '-'}</div>`;
+  }).join('');
+
+  return `
+    <div class="training-last-grid training-last-grid-head" style="--training-set-count:${setCount};">
+      <div></div>
+      ${headers}
+    </div>
+
+    <div class="training-last-grid" style="--training-set-count:${setCount};">
+      <div class="training-last-row-label">Wdh.</div>
+      ${repsRow}
+    </div>
+
+    <div class="training-last-grid" style="--training-set-count:${setCount};">
+      <div class="training-last-row-label">Gewicht</div>
+      ${weightRow}
+    </div>
+  `;
+}
+
+function getImprovementSummaryBadge(improvement) {
+  if (!improvement || !improvement.text) {
+    return '<span class="training-badge training-badge-neutral">Keine Vergleichsdaten</span>';
+  }
+
+  if (improvement.className === 'improvement-positive') {
+    return '<span class="training-badge training-badge-up">Steigerung</span>';
+  }
+
+  if (improvement.className === 'improvement-negative') {
+    return '<span class="training-badge training-badge-reduced">Reduziert</span>';
+  }
+
+  return '<span class="training-badge training-badge-neutral">Keine Vergleichsdaten</span>';
+}
+
+function getImprovementSummaryLine(improvement) {
+  if (!improvement || !improvement.text) {
+    return `
+      <span class="training-summary-improvement-prefix">Vergleich zum letzten Training</span>
+      <span class="training-summary-arrow">→</span>
+      <span class="training-summary-improvement-neutral">Keine Vergleichsdaten</span>
+    `;
+  }
+
+  let emphasizedText = 'Keine Vergleichsdaten';
+  let emphasizedClass = 'training-summary-improvement-neutral';
+
+  if (improvement.className === 'improvement-positive') {
+    const clean = improvement.text.replace('Steigerung zum letzten Training: ', '');
+    emphasizedText = clean;
+    emphasizedClass = 'training-summary-improvement-positive';
+  } else if (improvement.className === 'improvement-negative') {
+    const clean = improvement.text.replace('Steigerung zum letzten Training: ', '');
+    emphasizedText = clean;
+    emphasizedClass = 'training-summary-improvement-negative';
+  }
+
+  return `
+    <span class="training-summary-improvement-prefix">Vergleich zum letzten Training</span>
+    <span class="training-summary-arrow">→</span>
+    <span class="${emphasizedClass}">${emphasizedText}</span>
+  `;
 }
 
 async function calculateExerciseImprovement(exercise, excludeSessionId = null) {
@@ -268,7 +460,11 @@ async function calculateExerciseImprovement(exercise, excludeSessionId = null) {
     };
   }
 
-  const currentVolume = calculateExerciseVolume(exercise);
+  const currentVolume = exercise.sets.reduce((sum, setItem) => {
+    const reps = Number(setItem.reps_done || 0);
+    const weight = Number(setItem.weight_used || 0);
+    return sum + reps * weight;
+  }, 0);
 
   const lastVolume = lastData.sets.reduce((sum, setItem) => {
     const reps = Number(setItem.reps_done || 0);
@@ -319,78 +515,41 @@ async function calculateExerciseImprovement(exercise, excludeSessionId = null) {
   };
 }
 
-// ------------------------------------------------------------
-// Übungen rendern
-// ------------------------------------------------------------
+/* ------------------------------------------------------------ */
+/* Übungen rendern */
+/* ------------------------------------------------------------ */
 async function renderSessionExercises() {
   const htmlParts = [];
 
   for (let exerciseIndex = 0; exerciseIndex < draftSession.exercises.length; exerciseIndex++) {
     const exercise = draftSession.exercises[exerciseIndex];
     const lastData = await fetchLastExerciseData(exercise.exercise_name);
+    const badge = getPerformanceBadgeMeta(lastData, exercise.reps_max);
 
-    let lastTrainingHtml = '';
-    if (!lastData) {
-      lastTrainingHtml = `<div class="muted" style="margin-top:10px;">Noch keine Datensätze aus dem letzten Training vorhanden.</div>`;
-    } else {
-      lastTrainingHtml = `
-        <div class="last-training-box">
-          <div class="muted">Letztes Training</div>
-          <div style="margin-top:8px;">${getCompactLastTrainingLine(lastData)}</div>
-          <div style="margin-top:10px;">
-            ${getPerformanceBadge(lastData, exercise.reps_max)}
-          </div>
-        </div>
-      `;
-    }
-
-    let setsHtml = '';
-    for (let setIndex = 0; setIndex < exercise.sets_planned; setIndex++) {
-      const setData = exercise.sets[setIndex];
-
-      setsHtml += `
-        <div class="set-row">
-          <div class="set-row-title">Satz ${setIndex + 1}</div>
-          <div class="two-col-grid">
-            <label>
-              Wiederholungen
-              <input
-                type="number"
-                min="0"
-                data-exercise-index="${exerciseIndex}"
-                data-set-index="${setIndex}"
-                data-field="reps"
-                value="${setData.reps_done ?? ''}"
-              >
-            </label>
-            <label>
-              Gewicht (kg)
-              <input
-                type="number"
-                min="0"
-                step="0.5"
-                data-exercise-index="${exerciseIndex}"
-                data-set-index="${setIndex}"
-                data-field="weight"
-                value="${setData.weight_used ?? ''}"
-              >
-            </label>
-          </div>
-        </div>
-      `;
-    }
+    applySuggestedWeightsFromHistory(exercise, lastData, badge);
 
     htmlParts.push(`
-      <div class="exercise-item training-live-card">
-        <div style="width:100%;">
-          <strong>${exerciseIndex + 1}. ${exercise.exercise_name}</strong><br>
-          <span class="muted">${exercise.sets_planned} Sätze · ${exercise.reps_min}-${exercise.reps_max} Wdh.</span>
-          ${lastTrainingHtml}
-          <div style="margin-top:14px;">
-            ${setsHtml}
+      <article class="training-exercise-card" style="--training-set-count:${exercise.sets_planned};">
+        <div class="training-exercise-head">
+          <div>
+            <div class="training-exercise-title">${exerciseIndex + 1}. ${exercise.exercise_name}</div>
+            <div class="training-exercise-meta">${exercise.sets_planned} Sätze · ${exercise.reps_min}-${exercise.reps_max} Wdh.</div>
           </div>
         </div>
-      </div>
+
+        <div class="training-last-card">
+          <div class="training-last-head">
+            <div class="training-section-title">Letztes Training</div>
+            <span class="training-badge ${badge.className}">${badge.label}</span>
+          </div>
+
+          ${renderLastTrainingMatrix(lastData, exercise.sets_planned)}
+        </div>
+
+        <div class="training-input-card">
+          ${renderSetInputMatrix(exercise, exerciseIndex)}
+        </div>
+      </article>
     `);
   }
 
@@ -414,11 +573,13 @@ async function renderSessionExercises() {
       saveDraftLocally();
     });
   });
+
+  saveDraftLocally();
 }
 
-// ------------------------------------------------------------
-// Gewicht / kcal
-// ------------------------------------------------------------
+/* ------------------------------------------------------------ */
+/* Gewicht / kcal */
+/* ------------------------------------------------------------ */
 async function fetchProfileWeight() {
   const { data, error } = await supabase
     .from('user_profile_data')
@@ -439,17 +600,12 @@ function estimateCalories(durationSeconds, bodyWeightKg) {
   return Math.round(met * bodyWeightKg * durationHours);
 }
 
-// ------------------------------------------------------------
-// Plan laden + Draft
-// ------------------------------------------------------------
+/* ------------------------------------------------------------ */
+/* Plan laden + Draft */
+/* ------------------------------------------------------------ */
 async function loadPlanAndCreateDraft() {
-  if (!currentUser) {
-    await guardPage();
-  }
-
-  if (!currentPlanId) {
-    currentPlanId = getPlanIdFromUrl();
-  }
+  if (!currentUser) await guardPage();
+  if (!currentPlanId) currentPlanId = getPlanIdFromUrl();
 
   if (!currentPlanId) {
     window.location.replace('./training-start-list.html');
@@ -517,9 +673,9 @@ async function loadPlanAndCreateDraft() {
   await renderSessionExercises();
 }
 
-// ------------------------------------------------------------
-// Training beenden
-// ------------------------------------------------------------
+/* ------------------------------------------------------------ */
+/* Training beenden */
+/* ------------------------------------------------------------ */
 async function finishTraining() {
   setStatus(sessionStatus, '');
 
@@ -530,6 +686,11 @@ async function finishTraining() {
 
   finishTrainingBtn.disabled = true;
   finishTrainingBtn.textContent = 'Wird gespeichert...';
+
+  if (leaveAndFinishTrainingBtn) {
+    leaveAndFinishTrainingBtn.disabled = true;
+    leaveAndFinishTrainingBtn.textContent = 'Wird gespeichert...';
+  }
 
   try {
     const finishedAt = new Date();
@@ -606,41 +767,44 @@ async function finishTraining() {
     const summaryParts = [];
 
     summaryParts.push(`
-      <div class="summary-block">
-        <strong>Trainingsdauer:</strong> ${formatSeconds(durationSeconds)}
-      </div>
-    `);
+      <div class="training-summary-top">
+        <div class="training-summary-top-row training-summary-top-row-left">
+          <span class="training-summary-top-label">Trainingsdauer:</span>
+          <span class="training-summary-top-value">${formatSeconds(durationSeconds)}</span>
+        </div>
 
-    summaryParts.push(`
-      <div class="summary-block" style="margin-top:10px;">
-        ${
-          estimatedCalories !== null
-            ? `<strong>Ca. verbrannte kcal:</strong> ${estimatedCalories} kcal`
-            : `Es fehlt dein Gewicht bei Persönliche Daten, um den Kalorienverbrauch zu berechnen.`
-        }
+        <div class="training-summary-top-row training-summary-top-row-left">
+          <span class="training-summary-top-label">Ca. verbrannte kcal:</span>
+          <span class="training-summary-top-value">
+            ${estimatedCalories !== null ? `${estimatedCalories} kcal` : '-'}
+          </span>
+        </div>
       </div>
     `);
 
     for (const exercise of draftSession.exercises) {
       const improvement = await calculateExerciseImprovement(exercise, sessionRow.id);
 
-      let improvementHtml = improvement.text;
-      if (improvement.className) {
-        improvementHtml = `Steigerung zum letzten Training: <span class="${improvement.className}">${improvement.text.replace('Steigerung zum letzten Training: ', '')}</span>`;
-      }
-
       summaryParts.push(`
-        <div class="summary-exercise-box">
-          <strong>${exercise.exercise_name}</strong><br>
-          <div style="margin-top:6px;">${improvementHtml}</div>
-          <div class="muted" style="margin-top:8px;">
-            ${exercise.sets.map((setItem) => `${setItem.reps_done ?? '-'} Wdh · ${setItem.weight_used ?? '-'} kg`).join(' | ')}
+        <div class="training-summary-exercise-card">
+          <div class="training-summary-exercise-head">
+            <div class="training-summary-exercise-title">${exercise.exercise_name}</div>
+            ${getImprovementSummaryBadge(improvement)}
+          </div>
+
+          <div class="training-summary-improvement-text">
+            ${getImprovementSummaryLine(improvement)}
+          </div>
+
+          <div class="training-summary-matrix">
+            ${renderSummarySetMatrix(exercise.sets)}
           </div>
         </div>
       `);
     }
 
     sessionSummaryContent.innerHTML = summaryParts.join('');
+    closeLeaveModal();
     sessionSummaryModal.classList.remove('hidden');
 
     clearDraftLocally();
@@ -650,7 +814,12 @@ async function finishTraining() {
     setStatus(sessionStatus, 'Beim Beenden des Trainings ist ein Fehler aufgetreten.', 'error');
   } finally {
     finishTrainingBtn.disabled = false;
-    finishTrainingBtn.textContent = 'Training Beenden';
+    finishTrainingBtn.textContent = 'Training beenden';
+
+    if (leaveAndFinishTrainingBtn) {
+      leaveAndFinishTrainingBtn.disabled = false;
+      leaveAndFinishTrainingBtn.textContent = 'Beenden & speichern';
+    }
   }
 }
 
@@ -673,6 +842,38 @@ cancelPlannedTrainingBtn.addEventListener('click', () => {
   window.location.replace('./training-start-list.html');
 });
 
+/* ------------------------------------------------------------ */
+/* Neues Leave-Modal */
+/* ------------------------------------------------------------ */
+if (backButton) {
+  backButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    openLeaveModal();
+  });
+}
+
+if (resumeTrainingBtn) {
+  resumeTrainingBtn.addEventListener('click', () => {
+    closeLeaveModal();
+  });
+}
+
+if (backgroundTrainingBtn) {
+  backgroundTrainingBtn.addEventListener('click', () => {
+    closeLeaveModal();
+    window.location.href = './training.html';
+  });
+}
+
+if (leaveAndFinishTrainingBtn) {
+  leaveAndFinishTrainingBtn.addEventListener('click', async () => {
+    await finishTraining();
+  });
+}
+
+/* ------------------------------------------------------------ */
+/* Init */
+/* ------------------------------------------------------------ */
 async function initTrainingSession() {
   await guardPage();
 
