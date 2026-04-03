@@ -3,9 +3,6 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ------------------------------------------------------------
-// Elemente
-// ------------------------------------------------------------
 const editPlanName = document.getElementById('editPlanName');
 const addExerciseBtn = document.getElementById('addExerciseBtn');
 const editExerciseList = document.getElementById('editExerciseList');
@@ -14,7 +11,7 @@ const saveEditedPlanBtn = document.getElementById('saveEditedPlanBtn');
 
 const editExerciseModal = document.getElementById('editExerciseModal');
 const editModalTitle = document.getElementById('editModalTitle');
-const cancelEditExerciseBtn = document.getElementById('cancelEditExerciseBtn');
+const closeEditExerciseModalBtn = document.getElementById('closeEditExerciseModalBtn');
 const confirmEditExerciseBtn = document.getElementById('confirmEditExerciseBtn');
 const editExerciseStatus = document.getElementById('editExerciseStatus');
 
@@ -24,17 +21,11 @@ const editExerciseRepsMin = document.getElementById('editExerciseRepsMin');
 const editExerciseRepsMax = document.getElementById('editExerciseRepsMax');
 const editExerciseRest = document.getElementById('editExerciseRest');
 
-// ------------------------------------------------------------
-// State
-// ------------------------------------------------------------
 let currentUser = null;
 let currentPlanId = null;
 let exercises = [];
 let editIndex = null;
 
-// ------------------------------------------------------------
-// Hilfsfunktionen
-// ------------------------------------------------------------
 function setStatus(element, message, type = '') {
   element.textContent = message;
   element.className = `status ${type}`.trim();
@@ -44,6 +35,16 @@ function setStatus(element, message, type = '') {
 function getPlanIdFromUrl() {
   const params = new URLSearchParams(window.location.search);
   return params.get('id');
+}
+
+function openModal(modal) {
+  modal.classList.remove('hidden');
+  document.body.classList.add('modal-open');
+}
+
+function closeModal(modal) {
+  modal.classList.add('hidden');
+  document.body.classList.remove('modal-open');
 }
 
 async function guardPage() {
@@ -60,55 +61,81 @@ async function guardPage() {
 
 function resetExerciseForm() {
   editExerciseName.value = '';
-  editExerciseSets.value = '5';
+  editExerciseSets.value = '3';
   editExerciseRepsMin.value = '';
   editExerciseRepsMax.value = '';
   editExerciseRest.value = '';
   setStatus(editExerciseStatus, '');
 }
 
-function openModal(isEdit = false) {
-  editExerciseModal.classList.remove('hidden');
+function openExerciseModal(isEdit = false) {
   editModalTitle.textContent = isEdit ? 'Übung bearbeiten' : 'Übung hinzufügen';
   confirmEditExerciseBtn.textContent = isEdit ? 'Speichern' : 'Hinzufügen';
+  openModal(editExerciseModal);
 }
 
-function closeModal() {
-  editExerciseModal.classList.add('hidden');
+function closeExerciseModal() {
+  closeModal(editExerciseModal);
   resetExerciseForm();
   editIndex = null;
 }
 
-// ------------------------------------------------------------
-// Übungen rendern
-// ------------------------------------------------------------
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
 function renderExercises() {
   if (exercises.length === 0) {
-    editExerciseList.innerHTML = '<p class="muted">Noch keine Übungen vorhanden.</p>';
+    editExerciseList.innerHTML = `
+      <div class="plan-add-empty-state">
+        Noch keine Übungen vorhanden.
+      </div>
+    `;
     return;
   }
 
   editExerciseList.innerHTML = exercises.map((exercise, index) => `
-    <div class="exercise-item">
-      <div>
-        <strong>${index + 1}. ${exercise.name}</strong><br>
-        <span class="muted">
+    <article class="plan-add-exercise-card">
+      <div class="plan-add-exercise-main">
+        <div class="plan-add-exercise-title">${index + 1}. ${escapeHtml(exercise.name)}</div>
+        <div class="plan-add-exercise-meta">
           ${exercise.sets} Sätze · ${exercise.repsMin}-${exercise.repsMax} Wdh. · ${exercise.restSeconds}s Pause
-        </span>
-      </div>
-
-      <div class="exercise-actions">
-        <div class="exercise-move-row">
-          <button class="mini-square-button move-up-btn" data-index="${index}" type="button">↑</button>
-          <button class="mini-square-button move-down-btn" data-index="${index}" type="button">↓</button>
-        </div>
-
-        <div class="exercise-main-row">
-          <button class="pill-button mini-action-button edit-exercise-btn" data-index="${index}" type="button">Bearbeiten</button>
-          <button class="logout mini-action-button delete-exercise-btn" data-index="${index}" type="button">Löschen</button>
         </div>
       </div>
-    </div>
+
+      <div class="plan-add-exercise-bottom">
+        <div class="plan-add-action-buttons-mobile">
+          <button class="history-action-btn history-action-btn-primary edit-exercise-btn" data-index="${index}" type="button">
+            Bearbeiten
+          </button>
+
+          <button class="history-action-btn history-action-btn-danger delete-exercise-btn" data-index="${index}" type="button">
+            Löschen
+          </button>
+        </div>
+
+        <div class="plan-add-mini-move-group-mobile">
+          <button class="plan-add-mini-move-btn move-up-btn" data-index="${index}" type="button" aria-label="Nach oben">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 6L12 18"></path>
+              <path d="M7 11L12 6L17 11"></path>
+            </svg>
+          </button>
+
+          <button class="plan-add-mini-move-btn move-down-btn" data-index="${index}" type="button" aria-label="Nach unten">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 6L12 18"></path>
+              <path d="M7 13L12 18L17 13"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </article>
   `).join('');
 
   document.querySelectorAll('.edit-exercise-btn').forEach((button) => {
@@ -123,7 +150,7 @@ function renderExercises() {
       editExerciseRepsMax.value = exercise.repsMax;
       editExerciseRest.value = exercise.restSeconds;
 
-      openModal(true);
+      openExerciseModal(true);
     });
   });
 
@@ -156,9 +183,6 @@ function renderExercises() {
   });
 }
 
-// ------------------------------------------------------------
-// Plan laden
-// ------------------------------------------------------------
 async function loadPlan() {
   await guardPage();
   currentPlanId = getPlanIdFromUrl();
@@ -168,7 +192,6 @@ async function loadPlan() {
     return;
   }
 
-  // Plan laden
   const { data: planData, error: planError } = await supabase
     .from('training_plans')
     .select('id, name, user_id')
@@ -183,7 +206,6 @@ async function loadPlan() {
 
   editPlanName.value = planData.name;
 
-  // Übungen laden
   const { data: exerciseData, error: exerciseError } = await supabase
     .from('training_plan_exercises')
     .select('id, exercise_order, name, sets, reps_min, reps_max, rest_seconds')
@@ -208,16 +230,19 @@ async function loadPlan() {
   renderExercises();
 }
 
-// ------------------------------------------------------------
-// Modal Aktionen
-// ------------------------------------------------------------
 addExerciseBtn.addEventListener('click', () => {
   editIndex = null;
   resetExerciseForm();
-  openModal(false);
+  openExerciseModal(false);
 });
 
-cancelEditExerciseBtn.addEventListener('click', closeModal);
+closeEditExerciseModalBtn.addEventListener('click', closeExerciseModal);
+
+editExerciseModal.addEventListener('click', (event) => {
+  if (event.target === editExerciseModal) {
+    closeExerciseModal();
+  }
+});
 
 confirmEditExerciseBtn.addEventListener('click', () => {
   const updatedExercise = {
@@ -256,12 +281,9 @@ confirmEditExerciseBtn.addEventListener('click', () => {
   }
 
   renderExercises();
-  closeModal();
+  closeExerciseModal();
 });
 
-// ------------------------------------------------------------
-// Änderungen speichern
-// ------------------------------------------------------------
 saveEditedPlanBtn.addEventListener('click', async () => {
   setStatus(editPlanStatus, '');
 
@@ -281,7 +303,6 @@ saveEditedPlanBtn.addEventListener('click', async () => {
   saveEditedPlanBtn.textContent = 'Wird gespeichert...';
 
   try {
-    // 1. Planname aktualisieren
     const { error: updatePlanError } = await supabase
       .from('training_plans')
       .update({ name: cleanPlanName })
@@ -293,7 +314,6 @@ saveEditedPlanBtn.addEventListener('click', async () => {
       return;
     }
 
-    // 2. Alte Übungen löschen
     const { error: deleteExercisesError } = await supabase
       .from('training_plan_exercises')
       .delete()
@@ -305,7 +325,6 @@ saveEditedPlanBtn.addEventListener('click', async () => {
       return;
     }
 
-    // 3. Übungen neu speichern
     const newExerciseRows = exercises.map((exercise, index) => ({
       plan_id: currentPlanId,
       exercise_order: index,
@@ -332,11 +351,8 @@ saveEditedPlanBtn.addEventListener('click', async () => {
     setStatus(editPlanStatus, 'Beim Speichern ist ein Fehler aufgetreten.', 'error');
   } finally {
     saveEditedPlanBtn.disabled = false;
-    saveEditedPlanBtn.textContent = 'Änderungen speichern';
+    saveEditedPlanBtn.textContent = 'Speichern';
   }
 });
 
-// ------------------------------------------------------------
-// Start
-// ------------------------------------------------------------
 loadPlan();

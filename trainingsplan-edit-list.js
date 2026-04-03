@@ -5,6 +5,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const planList = document.getElementById('planList');
 const planListStatus = document.getElementById('planListStatus');
+const trainingPlanListCount = document.getElementById('trainingPlanListCount');
 
 function setStatus(element, message, type = '') {
   element.textContent = message;
@@ -35,32 +36,42 @@ async function loadPlans() {
 
   if (error) {
     setStatus(planListStatus, 'Trainingspläne konnten nicht geladen werden.', 'error');
+    if (trainingPlanListCount) trainingPlanListCount.textContent = '-';
     return;
   }
 
-  if (!data || data.length === 0) {
-    planList.innerHTML = '<p class="muted">Noch keine Trainingspläne vorhanden.</p>';
-    return;
+  const plans = data || [];
+
+  if (trainingPlanListCount) {
+    trainingPlanListCount.textContent = String(plans.length);
   }
 
-  planList.innerHTML = '';
-
-  data.forEach((plan) => {
-    const item = document.createElement('div');
-    item.className = 'exercise-item';
-
-    item.innerHTML = `
-      <div>
-        <strong>${plan.name}</strong>
-      </div>
-      <div class="exercise-actions">
-        <a class="pill-button" href="trainingsplan-edit.html?id=${plan.id}">Bearbeiten</a>
-        <button class="logout delete-plan-btn" data-id="${plan.id}" type="button">Löschen</button>
+  if (plans.length === 0) {
+    planList.innerHTML = `
+      <div class="plan-add-empty-state">
+        Noch keine Trainingspläne vorhanden.
       </div>
     `;
+    return;
+  }
 
-    planList.appendChild(item);
-  });
+  planList.innerHTML = plans.map((plan) => `
+    <article class="training-plan-list-item">
+      <div class="training-plan-list-main">
+        <div class="training-plan-list-title">${plan.name}</div>
+      </div>
+
+      <div class="training-plan-list-actions">
+        <a class="history-action-btn history-action-btn-primary training-plan-edit-link" href="trainingsplan-edit.html?id=${plan.id}">
+          Bearbeiten
+        </a>
+
+        <button class="history-action-btn history-action-btn-danger delete-plan-btn" data-id="${plan.id}" type="button">
+          Löschen
+        </button>
+      </div>
+    </article>
+  `).join('');
 
   document.querySelectorAll('.delete-plan-btn').forEach((button) => {
     button.addEventListener('click', async () => {

@@ -6,25 +6,32 @@
   <title>Fitness Tracker - Trainingspläne bearbeiten</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#28c267">
+  <meta name="theme-color" content="#071225">
   <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
-  <div class="page-shell">
-    <header class="page-header">
-        <button class="back-button" type="button" onclick="history.back()">←</button>
+  <div class="page-shell page-shell-app">
+    <header class="page-header app-page-header">
+      <button class="app-back-button" type="button" onclick="history.back()" aria-label="Zurück">
+        <svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 6L9 12L15 18"></path>
+        </svg>
+      </button>
     </header>
 
-    <div class="page-title">Trainingspläne bearbeiten</div>
+    <main class="training-plan-edit-list-page">
+      <section class="app-hero-card training-plan-list-hero-card">
+        <div class="training-plan-list-hero-inner">
+          <div class="training-plan-list-hero-label">Gespeicherte Trainingspläne</div>
+          <div id="trainingPlanListCount" class="training-plan-list-hero-value">0</div>
+        </div>
+      </section>
 
-    <section class="page-card">
-      <div class="module-badge">Bearbeiten</div>
-      <h1>Gespeicherte Trainingspläne</h1>
-      <p>Hier kannst du vorhandene Trainingspläne bearbeiten oder löschen.</p>
-
-      <div id="planListStatus" class="status hidden"></div>
-      <div id="planList" style="margin-top: 24px;"></div>
-    </section>
+      <section class="app-form-card training-plan-edit-list-card">
+        <div id="planListStatus" class="status hidden"></div>
+        <div id="planList" class="training-plan-edit-list"></div>
+      </section>
+    </main>
   </div>
 
   <script type="module" src="trainingsplan-edit-list.js"></script>
