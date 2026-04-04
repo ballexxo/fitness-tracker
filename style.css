@@ -10239,3 +10239,54 @@ body.modal-open {
     font-size: 0.8rem;
   }
 }
+/* ------------------------------------------------ */
+/* STATISTIK – FINAL COMPACT FIX */
+/* ------------------------------------------------ */
+
+/* Switch kleiner & kompakter */
+.statistics-switch-modern {
+  gap: 6px;
+  max-width: 240px;
+}
+
+/* Buttons deutlich flacher */
+.statistics-switch-modern button {
+  min-height: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Aktiver Zustand (clean, ohne Verlauf) */
+.statistics-switch-modern button.active {
+  background: #6fd2c3;
+  color: #ffffff;
+}
+
+/* Abstand Switch → Label reduzieren */
+.statistics-mini-card-modern .statistics-mini-label {
+  margin-top: 8px; /* vorher viel größer */
+  font-size: 0.82rem;
+}
+
+/* Zahl näher ran */
+.statistics-mini-card-modern .statistics-mini-value {
+  margin-top: 6px;
+  font-size: 1.35rem;
+}
+
+/* Gesamte Card kompakter */
+.statistics-mini-card-modern {
+  padding: 12px 10px 12px;
+}
+
+
+
+.statistics-switch-modern {
+  background: none;
+}
