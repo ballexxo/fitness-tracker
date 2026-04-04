@@ -10969,3 +10969,109 @@ body.modal-open {
     inset 0 0 0 1px rgba(126, 233, 207, 0.12),
     0 0 12px rgba(111, 210, 195, 0.08);
 }
+
+/* ------------------------------------------------ */
+/* PERSONAL DATA – PUSH TOGGLE */
+/* ------------------------------------------------ */
+
+.personal-push-row {
+  justify-content: space-between;
+  gap: 14px;
+  cursor: default;
+}
+
+.personal-push-subtext {
+  color: #b9cadb;
+  font-size: 0.84rem;
+  font-weight: 500;
+  line-height: 1.25;
+  margin-top: 4px;
+}
+
+.push-toggle {
+  flex-shrink: 0;
+  width: 56px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.push-toggle-track {
+  position: relative;
+  display: block;
+  width: 56px;
+  height: 32px;
+  border-radius: 999px;
+  background: rgba(21, 35, 61, 0.95);
+  border: 1px solid rgba(109, 180, 255, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.015);
+  transition: all 0.2s ease;
+}
+
+.push-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(235, 244, 252, 0.98), rgba(212, 226, 238, 0.96));
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  transition: transform 0.2s ease;
+}
+
+.push-toggle.is-on .push-toggle-track {
+  background: rgba(111, 210, 195, 0.22);
+  border-color: rgba(111, 210, 195, 0.24);
+  box-shadow:
+    inset 0 0 0 1px rgba(126, 233, 207, 0.14),
+    0 0 14px rgba(111, 210, 195, 0.10);
+}
+
+.push-toggle.is-on .push-toggle-thumb {
+  transform: translateX(24px);
+  background: linear-gradient(180deg, rgba(242, 255, 252, 0.98), rgba(220, 247, 241, 0.98));
+}
+
+.push-toggle.is-busy {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.push-toggle:focus-visible .push-toggle-track {
+  outline: none;
+  box-shadow:
+    inset 0 0 0 1px rgba(126, 233, 207, 0.14),
+    0 0 0 3px rgba(111, 210, 195, 0.10);
+}
+
+@media (max-width: 700px) {
+  .personal-push-row {
+    min-height: 74px;
+  }
+
+  .personal-push-subtext {
+    font-size: 0.8rem;
+  }
+
+  .push-toggle {
+    width: 52px;
+    height: 30px;
+  }
+
+  .push-toggle-track {
+    width: 52px;
+    height: 30px;
+  }
+
+  .push-toggle-thumb {
+    width: 22px;
+    height: 22px;
+  }
+
+  .push-toggle.is-on .push-toggle-thumb {
+    transform: translateX(22px);
+  }
+}

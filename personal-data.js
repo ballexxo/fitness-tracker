@@ -2,7 +2,22 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 const profileOverview = document.getElementById('profileOverview');
+const pushToggle = document.getElementById('pushToggle');
+const pushStatusText = document.getElementById('pushStatusText');
+
+const PUBLIC_VAPID_KEY = 'BHXmlB9isuBjWIwG9mQpexbzN5KwrZkmfQu5faLC2MMFzPpsB9g5SXfnt4DuAu1ZL_RejC54uTAV0ebyjHtPLaQ';
+
+let currentPushEnabled = false;
+let currentUserId = null;
+let isPushBusy = false;
+
+const testPushBtn = document.getElementById('testPushBtn');
+
+if (testPushBtn) {
+  testPushBtn.addEventListener('click', sendTestPush);
+}
 
 function renderMessage(html) {
   profileOverview.innerHTML = html;
@@ -90,29 +105,217 @@ function createReminderCard(text, href, buttonLabel) {
   `;
 }
 
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding)
+    .replace(/-/g, '+')
+    .replace(/_/g, '/');
+
+  const rawData = window.atob(base64);
+  return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
+}
+
+function setPushUiState(enabled, text = '') {
+  currentPushEnabled = enabled;
+  pushToggle.classList.toggle('is-on', enabled);
+  pushToggle.setAttribute('aria-checked', enabled ? 'true' : 'false');
+
+  if (text) {
+    pushStatusText.textContent = text;
+    return;
+  }
+
+  pushStatusText.textContent = enabled
+    ? 'Aktiviert'
+    : 'Deaktiviert';
+}
+
+function setPushBusyState(busy) {
+  isPushBusy = busy;
+  pushToggle.disabled = busy;
+  pushToggle.classList.toggle('is-busy', busy);
+}
+
+async function getCurrentUser() {
+  const { data, error } = await supabase.auth.getSession();
+
+  if (error || !data.session?.user) {
+    window.location.href = './index.html';
+    return null;
+  }
+
+  return data.session.user;
+}
+
+async function sendTestPush() {
+  const user = await getCurrentUser();
+  if (!user) return;
+
+  const { data, error } = await supabase.functions.invoke('send-test-push', {
+    body: {
+      user_id: user.id,
+    },
+  });
+
+  if (error) {
+    console.error('Fehler beim Test Push:', error);
+    return;
+  }
+
+  console.log('Test Push Ergebnis:', data);
+}
+
+async function getExistingSubscriptionFromBrowser() {
+  if (!('serviceWorker' in navigator)) return null;
+  if (!('PushManager' in window)) return null;
+
+  const registration = await navigator.serviceWorker.ready;
+  return registration.pushManager.getSubscription();
+}
+
+async function removeSubscriptionFromDatabase(endpoint) {
+  if (!endpoint || !currentUserId) return;
+
+  const { error } = await supabase
+    .from('push_subscriptions')
+    .delete()
+    .eq('user_id', currentUserId)
+    .eq('endpoint', endpoint);
+
+  if (error) {
+    console.error('Fehler beim Löschen der Push-Subscription:', error);
+  }
+}
+
+async function syncPushStatus() {
+  try {
+    const browserSubscription = await getExistingSubscriptionFromBrowser();
+
+    if (!browserSubscription) {
+      setPushUiState(false, 'Deaktiviert');
+      return;
+    }
+
+    if (!currentUserId) {
+      setPushUiState(false, 'Deaktiviert');
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('push_subscriptions')
+      .select('id')
+      .eq('user_id', currentUserId)
+      .eq('endpoint', browserSubscription.endpoint)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Fehler beim Prüfen der Push-Subscription:', error);
+      setPushUiState(false, 'Status konnte nicht geladen werden');
+      return;
+    }
+
+    setPushUiState(Boolean(data), data ? 'Aktiviert' : 'Deaktiviert');
+  } catch (error) {
+    console.error('Fehler beim Synchronisieren des Push-Status:', error);
+    setPushUiState(false, 'Status konnte nicht geladen werden');
+  }
+}
+
+async function subscribeToPush() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    setPushUiState(false, 'Push wird auf diesem Gerät nicht unterstützt');
+    return;
+  }
+
+  const permission = await Notification.requestPermission();
+
+  if (permission !== 'granted') {
+    setPushUiState(false, 'Nicht erlaubt');
+    return;
+  }
+
+  const registration = await navigator.serviceWorker.ready;
+
+  let subscription = await registration.pushManager.getSubscription();
+
+  if (!subscription) {
+    subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY),
+    });
+  }
+
+  const subscriptionJson = subscription.toJSON();
+
+  const payload = {
+    user_id: currentUserId,
+    endpoint: subscription.endpoint,
+    p256dh: subscriptionJson.keys.p256dh,
+    auth: subscriptionJson.keys.auth,
+  };
+
+  const { error } = await supabase
+    .from('push_subscriptions')
+    .upsert(payload, {
+      onConflict: 'endpoint',
+    });
+
+  if (error) {
+    console.error('Fehler beim Speichern der Push-Subscription:', error);
+    setPushUiState(false, 'Fehler beim Aktivieren');
+    return;
+  }
+
+  setPushUiState(true, 'Aktiviert');
+}
+
+async function unsubscribeFromPush() {
+  const subscription = await getExistingSubscriptionFromBrowser();
+
+  if (!subscription) {
+    setPushUiState(false, 'Deaktiviert');
+    return;
+  }
+
+  await removeSubscriptionFromDatabase(subscription.endpoint);
+
+  const unsubscribed = await subscription.unsubscribe();
+
+  if (!unsubscribed) {
+    setPushUiState(true, 'Konnte nicht deaktiviert werden');
+    return;
+  }
+
+  setPushUiState(false, 'Deaktiviert');
+}
+
+async function handlePushToggle() {
+  if (isPushBusy || !currentUserId) return;
+
+  setPushBusyState(true);
+
+  try {
+    if (currentPushEnabled) {
+      await unsubscribeFromPush();
+    } else {
+      await subscribeToPush();
+    }
+  } catch (error) {
+    console.error('Fehler beim Umschalten von Push:', error);
+    setPushUiState(currentPushEnabled, 'Fehler beim Umschalten');
+  } finally {
+    setPushBusyState(false);
+  }
+}
+
 async function loadProfile() {
   try {
     renderMessage('<div class="personal-loading">Lade Daten...</div>');
 
-    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    const user = await getCurrentUser();
+    if (!user) return;
 
-    if (sessionError) {
-      console.error('Session-Fehler:', sessionError);
-      renderMessage(`
-        <div class="personal-empty-state">
-          <div class="personal-empty-title">Session konnte nicht geladen werden.</div>
-          <div class="personal-empty-text">Bitte logge dich erneut ein.</div>
-        </div>
-      `);
-      return;
-    }
-
-    if (!sessionData?.session?.user) {
-      window.location.href = './index.html';
-      return;
-    }
-
-    const user = sessionData.session.user;
+    currentUserId = user.id;
 
     const { data: profile, error: profileError } = await supabase
       .from('user_profile_data')
@@ -143,6 +346,7 @@ async function loadProfile() {
           </div>
         </div>
       `);
+      await syncPushStatus();
       return;
     }
 
@@ -229,6 +433,8 @@ async function loadProfile() {
 
       </div>
     `);
+
+    await syncPushStatus();
   } catch (error) {
     console.error('Unerwarteter Fehler in personal-data.js:', error);
     renderMessage(`
@@ -239,5 +445,7 @@ async function loadProfile() {
     `);
   }
 }
+
+pushToggle.addEventListener('click', handlePushToggle);
 
 loadProfile();

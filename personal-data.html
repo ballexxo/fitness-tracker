@@ -50,6 +50,31 @@
           </span>
           <img class="nav-chevron-img" src="icon-chevron.svg" alt="">
         </a>
+
+        <div class="dashboard-nav-button dashboard-nav-button-no-icon personal-push-row" id="pushNotificationRow">
+          <span class="nav-left nav-left-no-icon">
+            <span class="nav-text">
+              <span class="nav-title">Push-Benachrichtigungen</span>
+              <span class="personal-push-subtext" id="pushStatusText">Wird geladen...</span>
+            </span>
+          </span>
+
+          <button
+            id="pushToggle"
+            class="push-toggle"
+            type="button"
+            role="switch"
+            aria-checked="false"
+            aria-label="Push-Benachrichtigungen umschalten">
+            <span class="push-toggle-track">
+              <span class="push-toggle-thumb"></span>
+            </span>
+          </button>
+        </div>
+
+      <button id="testPushBtn" class="dashboard-summary-primary-btn" type="button">
+  Test Push senden
+</button>  
       </section>
     </main>
 
