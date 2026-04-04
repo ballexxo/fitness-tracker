@@ -325,22 +325,22 @@ function renderCards(allPlans, filteredPlans) {
   const completionRate = plannedCount > 0 ? Math.round((completedCount / plannedCount) * 100) : 0;
 
   planningCards.innerHTML = `
-    <div class="statistics-mini-card fade-up-item fade-up-delay-1">
+    <div class="statistics-mini-card statistics-mini-card-modern fade-up-item fade-up-delay-1">
       <div class="statistics-mini-label">Aktuelle Live Streak</div>
       <div class="statistics-mini-value statistics-trend-positive">${currentStreak}</div>
     </div>
 
-    <div class="statistics-mini-card fade-up-item fade-up-delay-2">
+    <div class="statistics-mini-card statistics-mini-card-modern fade-up-item fade-up-delay-2">
       <div class="statistics-mini-label">Beste Live Streak</div>
       <div class="statistics-mini-value statistics-trend-positive">${bestStreak}</div>
     </div>
 
-    <div class="statistics-mini-card fade-up-item fade-up-delay-3">
+    <div class="statistics-mini-card statistics-mini-card-modern fade-up-item fade-up-delay-3">
       <div class="statistics-mini-label">Planerfüllung</div>
       <div class="statistics-mini-value ${completionRate >= 70 ? 'statistics-trend-positive' : completionRate >= 40 ? 'statistics-trend-warning' : 'statistics-trend-negative'}">${completionRate}%</div>
     </div>
 
-    <div class="statistics-mini-card fade-up-item fade-up-delay-4">
+    <div class="statistics-mini-card statistics-mini-card-modern fade-up-item fade-up-delay-4">
       <div class="statistics-mini-label">Verpasste Trainings</div>
       <div class="statistics-mini-value ${missedCount > 0 ? 'statistics-trend-negative' : 'statistics-trend-warning'}">${missedCount}</div>
     </div>
@@ -351,12 +351,12 @@ function renderInsights(filteredPlans) {
   const { bestDay, worstDay } = getBestAndWorstDays(filteredPlans);
 
   planningInsights.innerHTML = `
-    <div class="statistics-mini-card fade-up-item fade-up-delay-1">
+    <div class="statistics-mini-card statistics-mini-card-modern fade-up-item fade-up-delay-1">
       <div class="statistics-mini-label">Bester Trainingstag</div>
       <div class="statistics-mini-value statistics-trend-positive">${bestDay}</div>
     </div>
 
-    <div class="statistics-mini-card fade-up-item fade-up-delay-2">
+    <div class="statistics-mini-card statistics-mini-card-modern fade-up-item fade-up-delay-2">
       <div class="statistics-mini-label">Häufigster Ausfalltag</div>
       <div class="statistics-mini-value ${worstDay === '-' ? 'statistics-trend-warning' : 'statistics-trend-negative'}">${worstDay}</div>
     </div>

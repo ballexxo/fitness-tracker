@@ -55,7 +55,7 @@ async function loadPlans() {
           Erstelle zuerst einen Trainingsplan, damit du direkt ein Training starten kannst.
         </div>
         <div class="training-start-empty-action">
-          <a href="training-planner.html" class="dashboard-summary-primary-btn">Training planen</a>
+          <a href="trainingsplan-add.html" class="dashboard-summary-primary-btn">Jetzt erstellen</a>
         </div>
       </div>
     `;

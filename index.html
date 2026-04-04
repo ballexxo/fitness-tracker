@@ -4,83 +4,85 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="manifest" href="manifest.json">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<meta name="theme-color" content="#28c267">
-<link rel="apple-touch-icon" href="icon-192.png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#071225">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <title>Fitness Tracker</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="auth-layout">
-    <header class="app-header simple-header">
-      <div>
-        <div class="brand">Fitness Tracker</div>
-        <div class="muted">Login und Registrierung</div>
-      </div>
-    </header>
+  <div class="auth-page">
+    <div class="auth-page-inner">
+      <header class="auth-header-modern">
+        <h1 class="auth-brand">Fitness Tracker</h1>
+        <p class="auth-subtitle">Login und Registrierung</p>
+      </header>
 
-    <div class="auth-card">
-      <div class="tabs">
-        <button class="tab-btn active" data-tab="login" type="button">Login</button>
-        <button class="tab-btn" data-tab="register" type="button">Registrieren</button>
-      </div>
+      <section class="app-form-card auth-card-modern">
+        <div class="auth-tabs-modern">
+          <button class="tab-btn auth-tab-btn active" data-tab="login" type="button">Login</button>
+          <button class="tab-btn auth-tab-btn" data-tab="register" type="button">Registrieren</button>
+        </div>
 
-      <div id="loginTab">
-        <h2>Anmelden</h2>
-        <p class="muted">Melde dich mit deiner E-Mail und deinem Passwort an.</p>
+        <div id="loginTab" class="auth-tab-panel">
+          <h2 class="auth-title">Anmelden</h2>
+          <p class="auth-description">Melde dich mit deiner E-Mail und deinem Passwort an.</p>
 
-        <form id="loginForm" class="auth-form">
-          <label>
-            E-Mail
-            <input id="loginEmail" type="email" required>
-          </label>
+          <form id="loginForm" class="auth-form-modern">
+            <div class="auth-field">
+              <label for="loginEmail" class="auth-label">E-Mail</label>
+              <input id="loginEmail" class="auth-input" type="email" required>
+            </div>
 
-          <label>
-            Passwort
-            <input id="loginPassword" type="password" required>
-          </label>
+            <div class="auth-field">
+              <label for="loginPassword" class="auth-label">Passwort</label>
+              <input id="loginPassword" class="auth-input" type="password" required>
+            </div>
 
-          <button id="loginBtn" class="primary" type="submit">Einloggen</button>
-        </form>
+            <button id="loginBtn" class="dashboard-summary-primary-btn auth-submit-btn" type="submit">
+              Einloggen
+            </button>
+          </form>
 
-        <div id="loginStatus" class="status hidden"></div>
-      </div>
+          <div id="loginStatus" class="status hidden"></div>
+        </div>
 
-      <div id="registerTab" class="hidden">
-        <h2>Registrieren</h2>
-        <p class="muted">Erstelle dein Konto mit Name, E-Mail und Passwort.</p>
+        <div id="registerTab" class="auth-tab-panel hidden">
+          <h2 class="auth-title">Registrieren</h2>
+          <p class="auth-description">Erstelle dein Konto mit Name, E-Mail und Passwort.</p>
 
-        <form id="registerForm" class="auth-form">
-          <label>
-            Name
-            <input id="registerName" type="text" required>
-          </label>
+          <form id="registerForm" class="auth-form-modern">
+            <div class="auth-field">
+              <label for="registerName" class="auth-label">Name</label>
+              <input id="registerName" class="auth-input" type="text" required>
+            </div>
 
-          <label>
-            E-Mail
-            <input id="registerEmail" type="email" required>
-          </label>
+            <div class="auth-field">
+              <label for="registerEmail" class="auth-label">E-Mail</label>
+              <input id="registerEmail" class="auth-input" type="email" required>
+            </div>
 
-          <label>
-            Passwort
-            <input id="registerPassword" type="password" required>
-          </label>
+            <div class="auth-field">
+              <label for="registerPassword" class="auth-label">Passwort</label>
+              <input id="registerPassword" class="auth-input" type="password" required>
+            </div>
 
-          <button id="registerBtn" class="primary" type="submit">Registrieren</button>
-        </form>
+            <button id="registerBtn" class="dashboard-summary-primary-btn auth-submit-btn" type="submit">
+              Registrieren
+            </button>
+          </form>
 
-        <div id="registerStatus" class="status hidden"></div>
-      </div>
+          <div id="registerStatus" class="status hidden"></div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script type="module" src="auth.js"></script>
   <script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js");
-}
-</script>
-
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js");
+    }
+  </script>
 </body>
 </html>
-

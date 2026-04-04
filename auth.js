@@ -3,7 +3,6 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./config.js";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Elemente
 const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
 
@@ -17,7 +16,6 @@ const registerBtn = document.getElementById("registerBtn");
 const loginStatus = document.getElementById("loginStatus");
 const registerStatus = document.getElementById("registerStatus");
 
-// Hilfsfunktionen
 function setStatus(element, message, type = "") {
   element.textContent = message;
   element.className = `status ${type}`.trim();
@@ -64,14 +62,12 @@ function getFriendlyAuthError(message) {
   return message;
 }
 
-// Tabs
 tabButtons.forEach((button) => {
   button.addEventListener("click", () => {
     showTab(button.dataset.tab);
   });
 });
 
-// Bereits eingeloggt?
 async function redirectIfLoggedIn() {
   const { data, error } = await supabase.auth.getSession();
 
@@ -85,7 +81,6 @@ async function redirectIfLoggedIn() {
   }
 }
 
-// Login
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   clearStatus();
@@ -117,7 +112,6 @@ loginForm.addEventListener("submit", async (e) => {
   }
 });
 
-// Registrierung
 registerForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   clearStatus();
@@ -168,13 +162,11 @@ registerForm.addEventListener("submit", async (e) => {
   }
 });
 
-// Auth-Änderung
 supabase.auth.onAuthStateChange((_event, session) => {
   if (session?.user) {
     window.location.href = "dashboard.html";
   }
 });
 
-// Start
 showTab("login");
 redirectIfLoggedIn();

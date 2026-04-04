@@ -51,6 +51,8 @@ body {
 
 .muted {
   color: #94a3b8;
+  text-align: center;
+  font-size: 0.85rem;
 }
 
 .brand {
@@ -10663,4 +10665,307 @@ body.modal-open {
   .statistics-body-cards-grid-modern .statistics-mini-value {
     font-size: 1.24rem;
   }
+}
+/* ------------------------------------------------ */
+/* STATISTIK PLANUNG – MODERN */
+/* ------------------------------------------------ */
+
+.statistics-planning-page-card {
+  padding: 16px;
+}
+
+.statistics-planning-range-switch {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto 16px;
+}
+
+.statistics-planning-range-switch button {
+  min-width: 0;
+  width: 100%;
+}
+
+.statistics-planning-hero-modern {
+  padding-top: 0;
+}
+
+.statistics-planning-cards-grid,
+.statistics-planning-insights-grid {
+  margin-top: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.statistics-planning-cards-grid .statistics-mini-card-modern,
+.statistics-planning-insights-grid .statistics-mini-card-modern {
+  min-height: 126px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.statistics-planning-cards-grid .statistics-mini-label,
+.statistics-planning-insights-grid .statistics-mini-label {
+  font-size: 0.9rem;
+}
+
+.statistics-planning-cards-grid .statistics-mini-value,
+.statistics-planning-insights-grid .statistics-mini-value {
+  font-size: 1.52rem;
+}
+
+@media (max-width: 700px) {
+  .statistics-planning-page-card {
+    padding: 14px;
+  }
+
+  .statistics-planning-range-switch {
+    gap: 6px;
+    max-width: 100%;
+    margin-bottom: 14px;
+  }
+
+  .statistics-planning-range-switch button {
+    min-height: 38px;
+    height: 38px;
+    padding: 0 8px;
+    border-radius: 12px;
+    font-size: 0.76rem;
+  }
+
+  .statistics-planning-cards-grid,
+  .statistics-planning-insights-grid {
+    gap: 10px;
+  }
+
+  .statistics-planning-cards-grid .statistics-mini-card-modern,
+  .statistics-planning-insights-grid .statistics-mini-card-modern {
+    min-height: 110px;
+    padding: 12px 10px;
+  }
+
+  .statistics-planning-cards-grid .statistics-mini-label,
+  .statistics-planning-insights-grid .statistics-mini-label {
+    font-size: 0.82rem;
+  }
+
+  .statistics-planning-cards-grid .statistics-mini-value,
+  .statistics-planning-insights-grid .statistics-mini-value {
+    font-size: 1.22rem;
+  }
+}
+
+/* ------------------------------------------------ */
+/* AUTH / LOGIN */
+/* ------------------------------------------------ */
+
+.auth-page {
+  min-height: 100vh;
+  padding: 20px 16px 32px;
+  background:
+    radial-gradient(circle at top, rgba(24, 56, 110, 0.18), transparent 34%),
+    linear-gradient(180deg, #071225 0%, #05101f 100%);
+}
+
+.auth-page-inner {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.auth-header-modern {
+  margin-bottom: 18px;
+}
+
+.auth-brand {
+  margin: 0;
+  color: #f7fbff;
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  line-height: 0.95;
+  font-weight: 900;
+  letter-spacing: -0.06em;
+}
+
+.auth-subtitle {
+  margin: 8px 0 0;
+  color: #aebed1;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.auth-card-modern {
+  padding: 22px 20px 20px;
+}
+
+.auth-tabs-modern {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+
+.auth-tab-btn {
+  min-width: 0;
+  min-height: 46px;
+  padding: 0 26px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(104, 225, 255, 0.20);
+  background: linear-gradient(180deg, rgba(16, 33, 61, 0.96), rgba(9, 20, 38, 0.98));
+  color: #dce7f2;
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.015),
+    0 0 14px rgba(59, 194, 255, 0.04);
+}
+
+.auth-tab-btn.active {
+  border-color: rgba(111, 210, 195, 0.18);
+  background: rgba(111, 210, 195, 0.18);
+  color: #f4fffd;
+  box-shadow:
+    inset 0 0 0 1px rgba(126, 233, 207, 0.16),
+    0 0 16px rgba(111, 210, 195, 0.12);
+}
+
+.auth-title {
+  margin: 0;
+  color: #f7fbff;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 0.95;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+}
+
+.auth-description {
+  margin: 18px 0 0;
+  color: #c7d4e1;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.auth-form-modern {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.auth-label {
+  color: #e4edf6;
+  font-size: 0.98rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.auth-input {
+  width: 100%;
+  min-height: 54px;
+  height: 54px;
+  padding: 0 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(95, 132, 193, 0.16);
+  background: linear-gradient(180deg, rgba(5, 16, 33, 0.96), rgba(3, 11, 24, 0.98));
+  color: #f2f8ff;
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  outline: none;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.015);
+}
+
+.auth-input:focus {
+  border-color: rgba(104, 225, 255, 0.22);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.02),
+    0 0 0 3px rgba(104, 225, 255, 0.06);
+}
+
+.auth-submit-btn {
+  margin-top: 20px;
+}
+
+.auth-tab-panel .status {
+  margin-top: 14px;
+}
+
+@media (max-width: 700px) {
+  .auth-page {
+    padding: 18px 14px 28px;
+  }
+
+  .auth-header-modern {
+    margin-bottom: 16px;
+  }
+
+  .auth-subtitle {
+    font-size: 0.94rem;
+  }
+
+  .auth-card-modern {
+    padding: 18px 14px 16px;
+  }
+
+  .auth-tabs-modern {
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+
+  .auth-tab-btn {
+    flex: 1;
+    padding: 0 14px;
+    min-height: 42px;
+    font-size: 0.94rem;
+  }
+
+  .auth-title {
+    font-size: 2.1rem;
+  }
+
+  .auth-description {
+    margin-top: 14px;
+    font-size: 0.95rem;
+    line-height: 1.45;
+  }
+
+  .auth-form-modern {
+    margin-top: 10px;
+    gap: 12px;
+  }
+
+  .auth-label {
+    font-size: 0.92rem;
+  }
+
+  .auth-input {
+    min-height: 50px;
+    height: 50px;
+    border-radius: 16px;
+    padding: 0 14px;
+  }
+
+  .auth-submit-btn {
+    margin-top: 16px;
+  }
+}
+
+/* Hover FIX für Auth Tabs (kein Grün mehr!) */
+.auth-tab-btn:hover {
+  border-color: rgba(111, 210, 195, 0.25);
+  background: rgba(111, 210, 195, 0.12);
+  color: #f4fffd;
+  box-shadow:
+    inset 0 0 0 1px rgba(126, 233, 207, 0.12),
+    0 0 12px rgba(111, 210, 195, 0.08);
 }
