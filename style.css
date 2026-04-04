@@ -9835,12 +9835,12 @@ body.modal-open {
 }
 
 .statistics-trend-text-modern {
-  margin-top: 16px;
+  margin-top: 4px;
   margin-bottom: 2px;
   text-align: center;
   color: #f3f8fd;
-  font-size: 0.98rem;
-  font-weight: 700;
+  font-size: 0.85rem;
+  font-weight: 110;
   line-height: 1.4;
 }
 
@@ -9940,12 +9940,12 @@ body.modal-open {
 }
 
 .statistics-trend-text-modern {
-  margin-top: 14px;
+  margin-top: 4px;
   margin-bottom: 0;
   text-align: center;
   color: #f3f8fd;
-  font-size: 0.96rem;
-  font-weight: 700;
+  font-size: 0.85rem;
+  font-weight: 110;
   line-height: 1.38;
 }
 
@@ -10154,12 +10154,12 @@ body.modal-open {
 }
 
 .statistics-trend-text-modern {
-  margin-top: 16px;
+  margin-top: 4px;
   margin-bottom: 2px;
   text-align: center;
   color: #f3f8fd;
-  font-size: 0.98rem;
-  font-weight: 700;
+  font-size: 0.85rem;
+  font-weight: 110;
   line-height: 1.38;
 }
 
@@ -10557,5 +10557,110 @@ body.modal-open {
 
   .statistics-training-bottom-link .statistics-nav-subtext {
     font-size: 0.8rem;
+  }
+}
+
+/* ------------------------------------------------ */
+/* STATISTIK KÖRPER – MODERN */
+/* ------------------------------------------------ */
+
+.statistics-body-page-card {
+  padding: 16px;
+}
+
+.statistics-body-range-switch {
+  justify-content: center;
+  margin: 0 auto 12px;
+  max-width: 340px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.statistics-body-range-switch button {
+  min-width: 0;
+  width: 100%;
+}
+
+.statistics-body-type-tabs {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.statistics-body-hero-modern {
+  padding-top: 0;
+}
+
+.statistics-body-cards-wrap {
+  margin-top: 16px;
+}
+
+.statistics-body-cards-grid-modern {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.statistics-body-cards-grid-modern .statistics-mini-card-modern {
+  min-height: 126px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.statistics-body-cards-grid-modern .statistics-mini-label {
+  font-size: 0.9rem;
+}
+
+.statistics-body-cards-grid-modern .statistics-mini-value {
+  font-size: 1.55rem;
+}
+
+@media (max-width: 700px) {
+  .statistics-body-page-card {
+    padding: 14px;
+  }
+
+  .statistics-body-range-switch {
+    gap: 6px;
+    max-width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .statistics-body-range-switch button {
+    min-height: 38px;
+    height: 38px;
+    padding: 0 8px;
+    border-radius: 12px;
+    font-size: 0.76rem;
+  }
+
+  .statistics-body-type-tabs {
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .statistics-body-cards-wrap {
+    margin-top: 14px;
+  }
+
+  .statistics-body-cards-grid-modern {
+    gap: 10px;
+  }
+
+  .statistics-body-cards-grid-modern .statistics-mini-card-modern {
+    min-height: 112px;
+    padding: 12px 10px;
+  }
+
+  .statistics-body-cards-grid-modern .statistics-mini-label {
+    font-size: 0.82rem;
+  }
+
+  .statistics-body-cards-grid-modern .statistics-mini-value {
+    font-size: 1.24rem;
   }
 }

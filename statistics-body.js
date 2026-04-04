@@ -285,13 +285,13 @@ function renderCards(allData, filteredData) {
     if (currentRange === 'total') changeLabel = 'Gesamt';
 
     cardsEl.innerHTML = `
-      <div class="statistics-grid body-cards-grid">
-        <div class="statistics-mini-card fade-up-item fade-up-delay-1">
-          <div class="statistics-mini-label">Aktuelles Gewicht</div>
+      <div class="statistics-grid body-cards-grid statistics-body-cards-grid-modern">
+        <div class="statistics-mini-card statistics-mini-card-modern fade-up-item fade-up-delay-1">
+          <div class="statistics-mini-label">${'Aktuelles Gewicht'}</div>
           <div class="statistics-mini-value statistics-text-neutral">${currentWeight.toFixed(1)} kg</div>
         </div>
 
-        <div class="statistics-mini-card fade-up-item fade-up-delay-2">
+        <div class="statistics-mini-card statistics-mini-card-modern fade-up-item fade-up-delay-2">
           <div class="statistics-mini-label">${changeLabel}</div>
           <div class="statistics-mini-value statistics-text-neutral">
             ${weightDiff > 0 ? '+' : ''}${weightDiff.toFixed(1)} kg
@@ -333,22 +333,22 @@ function renderCards(allData, filteredData) {
   }
 
   cardsEl.innerHTML = `
-    <div class="statistics-grid body-cards-grid">
-      <div class="statistics-mini-card fade-up-item fade-up-delay-1">
+    <div class="statistics-grid body-cards-grid statistics-body-cards-grid-modern">
+      <div class="statistics-mini-card statistics-mini-card-modern fade-up-item fade-up-delay-1">
         <div class="statistics-mini-label">${currentType === 'energy' ? 'Aktuelles Energielevel' : 'Aktuelles Körpergefühl'}</div>
         <div class="statistics-mini-value ${currentState.colorClass}">
           ${currentValue.toFixed(1)} - ${currentState.label}
         </div>
       </div>
 
-      <div class="statistics-mini-card fade-up-item fade-up-delay-2">
+      <div class="statistics-mini-card statistics-mini-card-modern fade-up-item fade-up-delay-2">
         <div class="statistics-mini-label">${secondLabel}</div>
         <div class="statistics-mini-value ${secondClass}">
           ${secondValue}
         </div>
       </div>
     </div>
-    `;
+  `;
 }
 
 function updateActiveButtons(containerSelector, activeValue, dataAttr) {

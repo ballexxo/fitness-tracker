@@ -6,39 +6,47 @@
   <title>Körper Statistik</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#28c267">
+  <meta name="theme-color" content="#071225">
   <link rel="apple-touch-icon" href="icon-192.png">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="page-shell">
-    <header class="page-header">
-      <a class="back-button" href="statistik.html">←</a>
+  <div class="page-shell page-shell-app statistics-page-modern">
+    <header class="page-header app-page-header">
+      <a class="app-back-button" href="statistik.html" aria-label="Zurück">
+        <svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 6L9 12L15 18"></path>
+        </svg>
+      </a>
     </header>
 
-    <section class="page-card">
+    <main class="statistics-overview-page">
+      <section class="app-form-card statistics-overview-card statistics-body-page-card">
 
-      <div class="statistics-switch" id="bodyRangeSwitch">
-        <button class="active" data-range="last" type="button">Letzter Bericht</button>
-        <button data-range="month" type="button">4 Wochen</button>
-        <button data-range="total" type="button">Gesamt</button>
-      </div>
+        <div id="bodyRangeSwitch" class="statistics-switch statistics-switch-modern statistics-body-range-switch">
+          <button class="active" data-range="last" type="button">Letzter Bericht</button>
+          <button data-range="month" type="button">4 Wochen</button>
+          <button data-range="total" type="button">Gesamt</button>
+        </div>
 
-      <div class="statistics-switch" id="bodyTypeSwitch" style="margin-top: 10px;">
-        <button class="active" data-type="weight" type="button">Gewicht</button>
-        <button data-type="energy" type="button">Energie</button>
-        <button data-type="feeling" type="button">Gefühl</button>
-      </div>
+        <div id="bodyTypeSwitch" class="statistics-plan-tabs statistics-plan-tabs-modern statistics-body-type-tabs">
+          <button class="statistics-plan-tab active" data-type="weight" type="button">Gewicht</button>
+          <button class="statistics-plan-tab" data-type="energy" type="button">Energie</button>
+          <button class="statistics-plan-tab" data-type="feeling" type="button">Gefühl</button>
+        </div>
 
-      <div class="statistics-chart-wrap" style="margin-top: 18px;">
-        <canvas id="bodyChart"></canvas>
-      </div>
+        <div class="statistics-hero-box statistics-hero-box-modern statistics-body-hero-modern">
+          <div class="statistics-chart-wrap statistics-chart-wrap-modern">
+            <canvas id="bodyChart"></canvas>
+          </div>
 
-      <div id="bodyText" class="statistics-trend-text"></div>
+          <div id="bodyText" class="statistics-trend-text statistics-trend-text-modern"></div>
 
-      <div id="bodyCards"></div>
+          <div id="bodyCards" class="statistics-body-cards-wrap"></div>
+        </div>
 
-    </section>
+      </section>
+    </main>
   </div>
 
   <script type="module" src="statistics-body.js"></script>
