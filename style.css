@@ -10113,7 +10113,7 @@ body.modal-open {
 
 /* Aktive Seite – flach türkis, kein Verlauf */
 .statistics-switch-modern button.active {
-  background: #67bdb3;
+  background: #67bdb3d1;
   color: #f5fffd;
   box-shadow: none;
   font-weight: 700;
@@ -10264,7 +10264,7 @@ body.modal-open {
 
 /* Aktiver Zustand (clean, ohne Verlauf) */
 .statistics-switch-modern button.active {
-  background: #6fd2c3;
+  background: #6fd2c3d1;
   color: #ffffff;
 }
 
@@ -10321,9 +10321,9 @@ body.modal-open {
 }
 
 .statistics-plan-tab.active {
-  background: rgba(111, 210, 195, 0.18);
+  background: rgba(111, 210, 195, 0.30);
   color: #f5fffd;
-  box-shadow: inset 0 0 0 1px rgba(126, 233, 207, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(126, 233, 207, 0.85);
   font-weight: 700;
 }
 
@@ -10357,7 +10357,7 @@ body.modal-open {
   box-shadow: none;
 }
 .statistics-training-range-switch button.active {
-  background: #6fd2c3;
+  background: #6fd2c3d1;
   color: #ffffff;
   font-weight: 700;
   box-shadow: none;
