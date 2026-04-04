@@ -9844,74 +9844,84 @@ body.modal-open {
   line-height: 1.4;
 }
 
+
+
+/* Untere Nav-Karten kompakter */
+/* ------------------------------------------------ */
+/* STATISTIK – FEINSCHLIFF WIE ALTE VERSION */
+/* ------------------------------------------------ */
+
 .statistics-cards-grid-modern {
-  margin-top: 20px;
+  margin-top: 18px;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
 .statistics-mini-card-modern {
-  padding: 12px 10px 12px;
+  padding: 10px 10px 12px;
   border-radius: 18px;
   background: linear-gradient(180deg, rgba(10, 22, 43, 0.76), rgba(7, 16, 33, 0.90));
-  border: 1px solid rgba(109, 180, 255, 0.10);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
-}
-
-/* Flache Segmented Switches */
-.statistics-switch-modern {
-  display: inline-grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 3px;
-  width: 100%;
-  max-width: 196px;
-  padding: 3px;
-  border-radius: 14px;
-  background: rgba(17, 31, 57, 0.9);
   border: 1px solid rgba(109, 180, 255, 0.08);
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.015);
 }
 
+/* Switch deutlich flacher und dezenter */
+.statistics-switch-modern {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  width: 100%;
+  max-width: 184px;
+  padding: 4px;
+  border-radius: 14px;
+  background: rgba(22, 36, 63, 0.72);
+  border: 0;
+  box-shadow: none;
+}
+
 .statistics-switch-modern button {
   min-width: 0;
-  min-height: 34px;
-  height: 34px;
+  min-height: 30px;
+  height: 30px;
   padding: 0 8px;
   border: 0;
-  border-radius: 11px;
+  border-radius: 10px;
   background: transparent;
-  color: #b9c8d8;
+  color: #c4cfdb;
   font-family: 'Outfit', system-ui, -apple-system, sans-serif;
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
   cursor: pointer;
   white-space: nowrap;
-  line-height: 1;
+  box-shadow: none;
 }
 
+/* Aktiver Switch: türkis, flach, ohne Verlauf, ohne harten Glow */
 .statistics-switch-modern button.active {
-  background: linear-gradient(180deg, rgba(51, 120, 198, 0.96), rgba(34, 88, 156, 0.98));
-  color: #eff8ff;
-  box-shadow:
-    inset 0 0 0 1px rgba(149, 212, 255, 0.18),
-    0 0 10px rgba(57, 170, 246, 0.12);
+  background: rgba(115, 233, 207, 0.18);
+  color: #dffcf6;
+  box-shadow: inset 0 0 0 1px rgba(126, 233, 207, 0.16);
 }
 
+/* Label kleiner und leichter */
 .statistics-mini-card-modern .statistics-mini-label {
-  margin-top: 12px;
-  color: #dce7f2;
-  font-size: 0.9rem;
-  font-weight: 650;
+  margin-top: 10px;
+  color: #d5dfeb;
+  font-size: 0.82rem;
+  font-weight: 500;
   text-align: center;
+  line-height: 1.25;
 }
 
+/* Zahl mehr im Fokus */
 .statistics-mini-card-modern .statistics-mini-value {
-  margin-top: 7px;
-  font-size: 1.52rem;
-  line-height: 1.05;
-  font-weight: 850;
+  margin-top: 6px;
+  font-size: 1.34rem;
+  line-height: 1.02;
+  font-weight: 800;
   text-align: center;
   letter-spacing: -0.04em;
 }
@@ -9920,41 +9930,59 @@ body.modal-open {
   color: #7ee9cf;
 }
 
-/* Untere Nav-Karten kompakter */
+/* Hero-Bereich auch etwas kompakter */
+.statistics-subtitle-modern {
+  text-align: center;
+  color: #dbe6f2;
+  font-size: 0.94rem;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.statistics-trend-text-modern {
+  margin-top: 14px;
+  margin-bottom: 0;
+  text-align: center;
+  color: #f3f8fd;
+  font-size: 0.96rem;
+  font-weight: 700;
+  line-height: 1.38;
+}
+
+/* Untere Karten etwas kompakter */
 .statistics-nav-grid-modern {
-  margin-top: 22px;
+  margin-top: 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
 .statistics-nav-button-modern {
-  min-height: 88px;
-  align-items: center;
-  padding-top: 0;
-  padding-bottom: 0;
+  min-height: 84px;
+}
+
+.statistics-nav-button-modern .nav-text {
+  gap: 4px;
+}
+
+.statistics-nav-button-modern .nav-title {
+  font-size: 0.96rem;
+}
+
+.statistics-nav-subtext {
+  color: #c6d4e2;
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.26;
 }
 
 .statistics-nav-button-modern .nav-left {
   align-items: center;
 }
 
-.statistics-nav-button-modern .nav-text {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
 
-.statistics-nav-button-modern .nav-title {
-  font-size: 1rem;
-}
 
-.statistics-nav-subtext {
-  color: #c6d4e2;
-  font-size: 0.84rem;
-  font-weight: 500;
-  line-height: 1.28;
-}
+
 
 @media (min-width: 701px) {
   .statistics-overview-card {
@@ -9981,9 +10009,8 @@ body.modal-open {
     font-size: 1rem;
   }
 
-  .statistics-cards-grid-modern {
-    margin-top: 24px;
-    gap: 14px;
+  .statistics-mini-card-modern {
+    padding: 12px 12px 14px;
   }
 
   .statistics-mini-card-modern {
@@ -9992,28 +10019,24 @@ body.modal-open {
   }
 
   .statistics-switch-modern {
-    max-width: 210px;
-    gap: 4px;
-    padding: 4px;
-    border-radius: 16px;
+    max-width: 198px;
+    
   }
 
   .statistics-switch-modern button {
-    min-height: 38px;
-    height: 38px;
-    padding: 0 12px;
-    border-radius: 12px;
-    font-size: 0.92rem;
+     min-height: 34px;
+    height: 34px;
+    font-size: 0.84rem;
   }
 
   .statistics-mini-card-modern .statistics-mini-label {
-    margin-top: 14px;
-    font-size: 1rem;
+    margin-top: 12px;
+    font-size: 0.9rem;
   }
 
   .statistics-mini-card-modern .statistics-mini-value {
-    margin-top: 8px;
-    font-size: 1.95rem;
+    margin-top: 7px;
+    font-size: 1.55rem;
   }
 
   .statistics-nav-grid-modern {
@@ -10022,15 +10045,197 @@ body.modal-open {
   }
 
   .statistics-nav-button-modern {
-    min-height: 102px;
+   min-height: 92px;
   }
 
   .statistics-nav-button-modern .nav-title {
-    font-size: 1.04rem;
+     font-size: 1rem;
   }
 
   .statistics-nav-subtext {
-    font-size: 0.95rem;
-    line-height: 1.35;
+    font-size: 0.88rem;
+  }
+}
+/* ------------------------------------------------ */
+/* STATISTIK – 2x2 CARDS EXAKT FLACHER MOCKUP-LOOK */
+/* ------------------------------------------------ */
+
+.statistics-cards-grid-modern {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.statistics-mini-card-modern {
+  padding: 16px 14px 14px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(7, 19, 39, 0.94), rgba(5, 14, 30, 0.98));
+  border: 1px solid rgba(90, 176, 255, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.01);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Switch-Hülle wie im Mockup */
+.statistics-switch-modern {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  max-width: 286px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  justify-content: center;
+}
+
+/* Inaktive Seite */
+.statistics-switch-modern button {
+  min-width: 0;
+  min-height: 52px;
+  height: 52px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 16px;
+  background: rgba(25, 36, 61, 0.95);
+  color: rgba(255,255,255,0.84);
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: none;
+}
+
+/* Aktive Seite – flach türkis, kein Verlauf */
+.statistics-switch-modern button.active {
+  background: #67bdb3;
+  color: #f5fffd;
+  box-shadow: none;
+  font-weight: 700;
+}
+
+/* Label kleiner und leichter */
+.statistics-mini-card-modern .statistics-mini-label {
+  margin-top: 14px;
+  color: rgba(235, 241, 248, 0.92);
+  font-size: 0.92rem;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Zahl im Fokus */
+.statistics-mini-card-modern .statistics-mini-value {
+  margin-top: 10px;
+  color: #79edd9;
+  font-size: 1.72rem;
+  line-height: 1;
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: -0.04em;
+}
+
+.statistics-mini-value-primary {
+  color: #79edd9;
+}
+
+/* Hero und Text etwas ruhiger */
+.statistics-subtitle-modern {
+  text-align: center;
+  color: #dbe6f2;
+  font-size: 0.96rem;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.statistics-trend-text-modern {
+  margin-top: 16px;
+  margin-bottom: 2px;
+  text-align: center;
+  color: #f3f8fd;
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.38;
+}
+
+/* Untere Nav Cards kompakt halten */
+.statistics-nav-grid-modern {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.statistics-nav-button-modern {
+  min-height: 86px;
+}
+
+.statistics-nav-button-modern .nav-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statistics-nav-button-modern .nav-title {
+  font-size: 0.98rem;
+}
+
+.statistics-nav-subtext {
+  color: #c6d4e2;
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+@media (max-width: 700px) {
+  .statistics-cards-grid-modern {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .statistics-mini-card-modern {
+    padding: 12px 10px 12px;
+    border-radius: 18px;
+  }
+
+  .statistics-switch-modern {
+    max-width: 100%;
+    gap: 6px;
+  }
+
+  .statistics-switch-modern button {
+    min-height: 42px;
+    height: 42px;
+    padding: 0 10px;
+    border-radius: 14px;
+    font-size: 0.78rem;
+  }
+
+  .statistics-mini-card-modern .statistics-mini-label {
+    margin-top: 12px;
+    font-size: 0.84rem;
+  }
+
+  .statistics-mini-card-modern .statistics-mini-value {
+    margin-top: 8px;
+    font-size: 1.26rem;
+  }
+
+  .statistics-nav-button-modern {
+    min-height: 84px;
+  }
+
+  .statistics-nav-button-modern .nav-title {
+    font-size: 0.96rem;
+  }
+
+  .statistics-nav-subtext {
+    font-size: 0.8rem;
   }
 }
