@@ -6,99 +6,111 @@
   <title>Fitness Tracker - Statistik</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#28c267">
+  <meta name="theme-color" content="#071225">
   <link rel="apple-touch-icon" href="icon-192.png">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="page-shell">
-    <header class="page-header">
-      <a class="back-button" href="dashboard.html">←</a>
+  <div class="page-shell page-shell-app statistics-page-modern">
+    <header class="page-header app-page-header">
+      <button class="app-back-button" type="button" onclick="history.back()" aria-label="Zurück">
+        <svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 6L9 12L15 18"></path>
+        </svg>
+      </button>
     </header>
 
-    <section class="page-card">
+    <main class="statistics-overview-page">
+      <section class="app-form-card statistics-overview-card">
+        <div class="statistics-hero-box statistics-hero-box-modern">
+          <div class="statistics-subtitle statistics-subtitle-modern">Letzte 3 Monate</div>
 
-      <div class="statistics-hero-box">
-        <div class="statistics-subtitle">Letzte 3 Monate</div>
-
-        <div class="statistics-chart-wrap">
-          <canvas id="weightChart"></canvas>
-        </div>
-
-        <div id="weightTrendText" class="statistics-trend-text">
-          Lade Statistik...
-        </div>
-      </div>
-
-      <div class="statistics-cards-grid" style="margin-top: 24px;">
-
-        <div class="statistics-mini-card">
-          <div class="statistics-switch">
-            <button class="active" data-type="week" data-target="workouts" type="button">Woche</button>
-            <button data-type="total" data-target="workouts" type="button">Gesamt</button>
+          <div class="statistics-chart-wrap statistics-chart-wrap-modern">
+            <canvas id="weightChart"></canvas>
           </div>
-          <div class="statistics-mini-label">Trainings</div>
-          <div id="statsWorkouts" class="statistics-mini-value">-</div>
+
+          <div id="weightTrendText" class="statistics-trend-text statistics-trend-text-modern">
+            Lade Statistik...
+          </div>
         </div>
 
-        <div class="statistics-mini-card">
-          <div class="statistics-switch">
-            <button class="active" data-type="week" data-target="calories" type="button">Woche</button>
-            <button data-type="total" data-target="calories" type="button">Gesamt</button>
-          </div>
-          <div class="statistics-mini-label">Kalorien</div>
-          <div id="statsCalories" class="statistics-mini-value">-</div>
-        </div>
-
-        <div class="statistics-mini-card">
-          <div class="statistics-switch">
-            <button class="active" data-type="week" data-target="duration" type="button">Woche</button>
-            <button data-type="total" data-target="duration" type="button">Gesamt</button>
-          </div>
-          <div class="statistics-mini-label">Trainingszeit</div>
-          <div id="statsDuration" class="statistics-mini-value">-</div>
-        </div>
-
-        <div class="statistics-mini-card">
-          <div class="statistics-switch">
-            <button class="active" data-type="current" data-target="streak" type="button">Aktuell</button>
-            <button data-type="best" data-target="streak" type="button">Beste</button>
-          </div>
-          <div class="statistics-mini-label">Live Streak</div>
-          <div id="statsStreak" class="statistics-mini-value">-</div>
-        </div>
-
-      </div>
-
-      <div class="statistics-nav-grid" style="margin-top: 28px;">
-
-        <a href="statistics-training.html" class="statistics-nav-card is-active">
-          <div class="statistics-nav-left">
-            <div class="statistics-nav-title">Training</div>
-            <div class="statistics-nav-sub">Progression, Leistung und Übungsfortschritt</div>
-          </div>
-          <div class="statistics-nav-arrow">→</div>
-        </a>
-
-        <a href="statistics-body.html" class="statistics-nav-card is-active">
-            <div class="statistics-nav-left">
-             <div class="statistics-nav-title">Körper</div>
-             <div class="statistics-nav-sub">Gewicht, Wochenbericht und Entwicklung</div>
+        <div class="statistics-cards-grid statistics-cards-grid-modern">
+          <div class="statistics-mini-card statistics-mini-card-modern">
+            <div class="statistics-switch statistics-switch-modern">
+              <button class="active" data-type="week" data-target="workouts" type="button">Woche</button>
+              <button data-type="total" data-target="workouts" type="button">Gesamt</button>
             </div>
-            <div class="statistics-nav-arrow">→</div>
-        </a>
+            <div class="statistics-mini-label">Trainings</div>
+            <div id="statsWorkouts" class="statistics-mini-value statistics-mini-value-primary">-</div>
+          </div>
 
-        <a href="statistics-planning.html" class="statistics-nav-card is-active">
-            <div class="statistics-nav-left">
-            <div class="statistics-nav-title">Planung</div>
-            <div class="statistics-nav-sub">Live Streak, Planung und Einhaltung</div>
+          <div class="statistics-mini-card statistics-mini-card-modern">
+            <div class="statistics-switch statistics-switch-modern">
+              <button class="active" data-type="week" data-target="calories" type="button">Woche</button>
+              <button data-type="total" data-target="calories" type="button">Gesamt</button>
             </div>
-            <div class="statistics-nav-arrow">→</div>
-        </a>
+            <div class="statistics-mini-label">Kalorien</div>
+            <div id="statsCalories" class="statistics-mini-value statistics-mini-value-primary">-</div>
+          </div>
 
-      </div>
+          <div class="statistics-mini-card statistics-mini-card-modern">
+            <div class="statistics-switch statistics-switch-modern">
+              <button class="active" data-type="week" data-target="duration" type="button">Woche</button>
+              <button data-type="total" data-target="duration" type="button">Gesamt</button>
+            </div>
+            <div class="statistics-mini-label">Trainingszeit</div>
+            <div id="statsDuration" class="statistics-mini-value statistics-mini-value-primary">-</div>
+          </div>
 
-    </section>
+          <div class="statistics-mini-card statistics-mini-card-modern">
+            <div class="statistics-switch statistics-switch-modern">
+              <button class="active" data-type="current" data-target="streak" type="button">Aktuell</button>
+              <button data-type="best" data-target="streak" type="button">Beste</button>
+            </div>
+            <div class="statistics-mini-label">Live Streak</div>
+            <div id="statsStreak" class="statistics-mini-value statistics-mini-value-primary">-</div>
+          </div>
+        </div>
+
+        <div class="statistics-nav-grid statistics-nav-grid-modern">
+          <a href="statistics-training.html" class="dashboard-nav-button statistics-nav-button-modern">
+            <span class="nav-left nav-left-no-icon">
+              <span class="nav-text">
+                <span class="nav-title">Training</span>
+                <span class="statistics-nav-subtext">Progression, Leistung und Übungsfortschritt</span>
+              </span>
+            </span>
+            <span class="nav-chevron-wrap">
+              <img class="nav-chevron-img" src="icon-chevron.svg" alt="">
+            </span>
+          </a>
+
+          <a href="statistics-body.html" class="dashboard-nav-button statistics-nav-button-modern">
+            <span class="nav-left nav-left-no-icon">
+              <span class="nav-text">
+                <span class="nav-title">Körper</span>
+                <span class="statistics-nav-subtext">Gewicht, Wochenbericht und Entwicklung</span>
+              </span>
+            </span>
+            <span class="nav-chevron-wrap">
+              <img class="nav-chevron-img" src="icon-chevron.svg" alt="">
+            </span>
+          </a>
+
+          <a href="statistics-planning.html" class="dashboard-nav-button statistics-nav-button-modern">
+            <span class="nav-left nav-left-no-icon">
+              <span class="nav-text">
+                <span class="nav-title">Planung</span>
+                <span class="statistics-nav-subtext">Live Streak, Planung und Einhaltung</span>
+              </span>
+            </span>
+            <span class="nav-chevron-wrap">
+              <img class="nav-chevron-img" src="icon-chevron.svg" alt="">
+            </span>
+          </a>
+        </div>
+      </section>
+    </main>
   </div>
 
   <script type="module" src="statistik.js"></script>
