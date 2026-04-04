@@ -6,65 +6,75 @@
   <title>Fitness Tracker - Training Statistik</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#28c267">
+  <meta name="theme-color" content="#071225">
   <link rel="apple-touch-icon" href="icon-192.png">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="page-shell">
-    <header class="page-header">
-      <a class="back-button" href="statistik.html">←</a>
+  <div class="page-shell page-shell-app statistics-page-modern">
+    <header class="page-header app-page-header">
+      <a class="app-back-button" href="statistik.html" aria-label="Zurück">
+        <svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 6L9 12L15 18"></path>
+        </svg>
+      </a>
     </header>
 
-    <section class="page-card">
+    <main class="statistics-overview-page">
+      <section class="app-form-card statistics-overview-card statistics-training-page-card">
 
-      <div id="trainingPlanTabs" class="statistics-plan-tabs" style="margin-bottom: 16px;">
-        Lade Trainingspläne...
-      </div>
-
-      <div class="statistics-switch statistics-progression-switch" style="margin-bottom: 14px;">
-        <button class="active" data-progression-range="last" type="button">Letztes Training</button>
-        <button data-progression-range="month" type="button">1 Monat</button>
-        <button data-progression-range="total" type="button">Gesamt</button>
-      </div>
-
-      <div class="statistics-training-hero">
-        <div class="statistics-chart-wrap">
-          <canvas id="trainingVolumeChart"></canvas>
+        <div id="trainingPlanTabs" class="statistics-plan-tabs statistics-plan-tabs-modern">
+          Lade Trainingspläne...
         </div>
 
-        <div id="trainingVolumeText" class="statistics-trend-text">
-          Lade Trainingsentwicklung...
+        <div class="statistics-switch statistics-switch-modern statistics-training-range-switch">
+          <button class="active" data-progression-range="last" type="button">Letztes Training</button>
+          <button data-progression-range="month" type="button">1 Monat</button>
+          <button data-progression-range="total" type="button">Gesamt</button>
         </div>
-      </div>
 
-      <div class="profile-section-title centered-title" style="margin-top: 28px; margin-bottom: 14px;">
-        <div class="line"></div>
-        <span>Deine Top 3 Übungen</span>
-        <div class="line"></div>
-      </div>
-
-      <div class="statistics-switch statistics-top3-switch" style="margin-bottom: 14px;">
-        <button class="active" data-top-range="last" type="button">Letztes Training</button>
-        <button data-top-range="month" type="button">1 Monat</button>
-        <button data-top-range="total" type="button">Gesamt</button>
-      </div>
-
-      <div id="topProgressionList" class="statistics-compact-top-list">
-        Lade Progression...
-      </div>
-
-      <div style="margin-top: 24px;">
-        <a href="statistics-training-all.html" class="statistics-nav-card is-active">
-          <div class="statistics-nav-left">
-            <div class="statistics-nav-title">Alle Übungen</div>
-            <div class="statistics-nav-sub">Alle Übungen nach Trainingsplan und Progression sortiert</div>
+        <div class="statistics-hero-box statistics-hero-box-modern statistics-training-hero-modern">
+          <div class="statistics-chart-wrap statistics-chart-wrap-modern">
+            <canvas id="trainingVolumeChart"></canvas>
           </div>
-          <div class="statistics-nav-arrow">→</div>
-        </a>
-      </div>
 
-    </section>
+          <div id="trainingVolumeText" class="statistics-trend-text statistics-trend-text-modern">
+            Lade Trainingsentwicklung...
+          </div>
+        </div>
+
+        <div class="profile-section-title centered-title statistics-section-divider">
+          <div class="line"></div>
+          <span>Deine Top 3 Übungen</span>
+          <div class="line"></div>
+        </div>
+
+        <div class="statistics-switch statistics-switch-modern statistics-training-range-switch">
+          <button class="active" data-top-range="last" type="button">Letztes Training</button>
+          <button data-top-range="month" type="button">1 Monat</button>
+          <button data-top-range="total" type="button">Gesamt</button>
+        </div>
+
+        <div id="topProgressionList" class="statistics-compact-top-list statistics-compact-top-list-modern">
+          Lade Progression...
+        </div>
+
+        <div class="statistics-training-bottom-link">
+          <a href="statistics-training-all.html" class="dashboard-nav-button statistics-nav-button-modern">
+            <span class="nav-left nav-left-no-icon">
+              <span class="nav-text">
+                <span class="nav-title">Alle Übungen</span>
+                <span class="statistics-nav-subtext">Alle Übungen nach Trainingsplan und Progression sortiert</span>
+              </span>
+            </span>
+            <span class="nav-chevron-wrap">
+              <img class="nav-chevron-img" src="icon-chevron.svg" alt="">
+            </span>
+          </a>
+        </div>
+
+      </section>
+    </main>
   </div>
 
   <script type="module" src="statistics-training.js"></script>

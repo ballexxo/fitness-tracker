@@ -6,32 +6,38 @@
   <title>Fitness Tracker - Alle Übungen</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#28c267">
+  <meta name="theme-color" content="#071225">
   <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
-  <div class="page-shell">
-    <header class="page-header">
-      <a class="back-button" href="statistics-training.html">←</a>
+  <div class="page-shell page-shell-app statistics-page-modern">
+    <header class="page-header app-page-header">
+      <a class="app-back-button" href="statistics-training.html" aria-label="Zurück">
+        <svg class="app-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 6L9 12L15 18"></path>
+        </svg>
+      </a>
     </header>
 
-    <section class="page-card">
+    <main class="statistics-overview-page">
+      <section class="app-form-card statistics-overview-card statistics-training-page-card">
 
-      <div id="trainingPlanTabs" class="statistics-plan-tabs" style="margin-bottom: 16px;">
-        Lade Trainingspläne...
-      </div>
+        <div id="trainingPlanTabs" class="statistics-plan-tabs statistics-plan-tabs-modern">
+          Lade Trainingspläne...
+        </div>
 
-      <div class="statistics-switch statistics-progression-switch" style="margin-bottom: 16px;">
-        <button class="active" data-progression-range="last" type="button">Letztes Training</button>
-        <button data-progression-range="month" type="button">1 Monat</button>
-        <button data-progression-range="total" type="button">Gesamt</button>
-      </div>
+        <div class="statistics-switch statistics-switch-modern statistics-training-range-switch">
+          <button class="active" data-progression-range="last" type="button">Letztes Training</button>
+          <button data-progression-range="month" type="button">1 Monat</button>
+          <button data-progression-range="total" type="button">Gesamt</button>
+        </div>
 
-      <div id="allExerciseProgressionList" class="statistics-compact-top-list">
-        Lade Übungen...
-      </div>
+        <div id="allExerciseProgressionList" class="statistics-compact-top-list statistics-compact-top-list-modern">
+          Lade Übungen...
+        </div>
 
-    </section>
+      </section>
+    </main>
   </div>
 
   <script type="module" src="statistics-training-all.js"></script>

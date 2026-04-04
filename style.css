@@ -10290,3 +10290,272 @@ body.modal-open {
 .statistics-switch-modern {
   background: none;
 }
+
+/* ------------------------------------------------ */
+/* STATISTIK TRAINING – MODERN */
+/* ------------------------------------------------ */
+
+.statistics-training-page-card {
+  padding: 16px;
+}
+
+.statistics-plan-tabs-modern {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.statistics-plan-tab {
+  min-height: 38px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 14px;
+  background: rgba(25, 36, 61, 0.95);
+  color: rgba(255,255,255,0.84);
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  font-size: 0.84rem;
+  font-weight: 100;
+  line-height: 1;
+}
+
+.statistics-plan-tab.active {
+  background: rgba(111, 210, 195, 0.18);
+  color: #f5fffd;
+  box-shadow: inset 0 0 0 1px rgba(126, 233, 207, 0.16);
+  font-weight: 700;
+}
+
+.statistics-training-range-switch {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto 14px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.statistics-training-range-switch button {
+  min-width: 0;
+  width: 100%;
+  min-height: 40px;
+  height: 40px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 14px;
+  background: rgba(25, 36, 61, 0.95);
+  color: rgba(255,255,255,0.84);
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 100;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: none;
+}
+.statistics-training-range-switch button.active {
+  background: #6fd2c3;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: none;
+}
+
+.statistics-training-hero-modern {
+  padding-top: 0;
+}
+
+.statistics-section-divider {
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+.statistics-compact-top-list-modern {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.statistics-top-card-modern,
+.statistics-top-card.compact-top-card {
+  padding: 18px 16px 16px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(7, 19, 39, 0.94), rgba(5, 14, 30, 0.98));
+  border: 1px solid rgba(90, 176, 255, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.01);
+}
+
+.statistics-medal-row,
+.statistics-rank-row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.statistics-medal-emoji,
+.statistics-rank-number {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #f4f8fd;
+}
+
+.statistics-top-name-compact {
+  text-align: center;
+  color: #f4f8fd;
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 10px;
+}
+
+.statistics-top-detail-line {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 5px;
+  text-align: center;
+}
+
+.statistics-top-detail-label {
+  color: #cfd9e6;
+  font-size: 0.94rem;
+  font-weight: 600;
+}
+
+.statistics-top-detail-value-white {
+  color: #f1f5f9;
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.statistics-top-detail-value-green {
+  color: #68d88f;
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.statistics-top-detail-value-red {
+  color: #f07b86;
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.statistics-top-detail-value-yellow {
+  color: #f0d15d;
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.statistics-top-detail-arrow {
+  color: #a9c0d8;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.statistics-training-bottom-link {
+  margin-top: 20px;
+}
+
+.statistics-training-bottom-link .dashboard-nav-button {
+  min-height: 86px;
+}
+
+.statistics-training-bottom-link .nav-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statistics-training-bottom-link .nav-title {
+  font-size: 0.98rem;
+}
+
+.statistics-training-bottom-link .statistics-nav-subtext {
+  font-size: 0.82rem;
+}
+
+/* ------------------------------------------------ */
+/* MOBILE */
+/* ------------------------------------------------ */
+
+@media (max-width: 700px) {
+  .statistics-training-page-card {
+    padding: 14px;
+  }
+
+  .statistics-plan-tabs-modern {
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .statistics-plan-tab {
+    min-height: 34px;
+    padding: 0 14px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+  }
+
+  .statistics-training-range-switch {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    max-width: 100%;
+    margin-bottom: 12px;
+  }
+  .statistics-training-range-switch button {
+    min-height: 38px;
+    height: 38px;
+    padding: 0 8px;
+    border-radius: 12px;
+    font-size: 0.76rem;
+  }
+
+  .statistics-section-divider {
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  .statistics-top-card-modern,
+  .statistics-top-card.compact-top-card {
+    padding: 16px 12px 14px;
+    border-radius: 18px;
+  }
+
+  .statistics-medal-emoji,
+  .statistics-rank-number {
+    font-size: 1.05rem;
+  }
+
+  .statistics-top-name-compact {
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+
+  .statistics-top-detail-line {
+    gap: 5px;
+    margin-top: 4px;
+  }
+
+  .statistics-top-detail-label,
+  .statistics-top-detail-value-white,
+  .statistics-top-detail-value-green,
+  .statistics-top-detail-value-red,
+  .statistics-top-detail-value-yellow {
+    font-size: 0.84rem;
+  }
+
+  .statistics-training-bottom-link .dashboard-nav-button {
+    min-height: 82px;
+  }
+
+  .statistics-training-bottom-link .nav-title {
+    font-size: 0.95rem;
+  }
+
+  .statistics-training-bottom-link .statistics-nav-subtext {
+    font-size: 0.8rem;
+  }
+}
