@@ -3,9 +3,11 @@ const CACHE_NAME = "fitness-tracker-v1";
 const APP_SHELL = [
   "/",
   "/index.html",
+  "/dashboard.html",
   "/style.css",
   "/auth.js",
   "/config.js",
+  "/dashboard.js",
   "/manifest.json",
   "/icon-192.png",
   "/icon-512.png",
@@ -50,34 +52,38 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  event.respondWith(
-    caches.match(request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
+  event.respondWith((async () => {
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+
+    try {
+      const networkResponse = await fetch(request);
+
+      if (
+        request.url.startsWith(self.location.origin) &&
+        networkResponse &&
+        networkResponse.status === 200 &&
+        !networkResponse.redirected
+      ) {
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(request, networkResponse.clone());
       }
 
-      return fetch(request)
-        .then((networkResponse) => {
-          const clonedResponse = networkResponse.clone();
+      return networkResponse;
+    } catch (error) {
+      if (request.mode === "navigate") {
+        const fallback = await caches.match("/dashboard.html");
+        if (fallback) return fallback;
 
-          if (
-            request.url.startsWith(self.location.origin) &&
-            networkResponse.status === 200
-          ) {
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, clonedResponse);
-            });
-          }
+        const indexFallback = await caches.match("/index.html");
+        if (indexFallback) return indexFallback;
+      }
 
-          return networkResponse;
-        })
-        .catch(() => {
-          if (request.mode === "navigate") {
-            return caches.match("/index.html");
-          }
-        });
-    })
-  );
+      throw error;
+    }
+  })());
 });
 
 self.addEventListener("push", event => {
