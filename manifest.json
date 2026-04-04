@@ -1,7 +1,7 @@
 {
   "name": "Fitness Tracker",
   "short_name": "Fitness",
-  "start_url": "/index.html",
+  "start_url": "/dashboard.html",
   "scope": "/",
   "display": "standalone",
   "background_color": "#071225",

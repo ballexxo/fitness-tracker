@@ -165,6 +165,8 @@ async function sendTestPush() {
   console.log('Test Push Ergebnis:', data);
 }
 
+
+
 async function getExistingSubscriptionFromBrowser() {
   if (!('serviceWorker' in navigator)) return null;
   if (!('PushManager' in window)) return null;
@@ -445,6 +447,9 @@ async function loadProfile() {
     `);
   }
 }
+
+
+
 
 pushToggle.addEventListener('click', handlePushToggle);
 
