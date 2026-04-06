@@ -2,39 +2,78 @@ name: Daily Reminders
 
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "Welcher Reminder soll gesendet werden?"
+        required: true
+        default: "all"
+        type: choice
+        options:
+          - all
+          - morning
+          - evening
+          - weekly-report
+      date:
+        description: "Optionales Test-Datum im Format YYYY-MM-DD"
+        required: false
+        default: ""
+
   schedule:
-    # 08:00 Deutschland ungefähr:
-    # Winterzeit = 07:00 UTC
-    # Sommerzeit = 06:00 UTC
-    #
-    # Wir starten hier mit 06:00 UTC und 17:00 UTC.
-    # Wenn du später feinjustieren willst, passen wir es an.
     - cron: "0 6 * * *"
     - cron: "0 17 * * *"
     - cron: "0 8 * * *"
 
 jobs:
-  send-reminders:
+  morning-reminder:
+    if: |
+      (github.event_name == 'schedule' && github.event.schedule == '0 6 * * *') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.mode == 'morning' || inputs.mode == 'all'))
     runs-on: ubuntu-latest
-
     steps:
-      - name: Decide mode from current UTC hour
-        id: mode
+      - name: Send morning reminder
         run: |
-          HOUR=$(date -u +%H)
-
-          if [ "$HOUR" = "06" ]; then
-            echo "mode=morning" >> $GITHUB_OUTPUT
-          elif [ "$HOUR" = "17" ]; then
-            echo "mode=evening" >> $GITHUB_OUTPUT
-          elif [ "$HOUR" = "08" ]; then
-            echo "mode=weekly-report" >> $GITHUB_OUTPUT
+          if [ -n "${{ inputs.date }}" ]; then
+            curl -X POST "${{ secrets.SUPABASE_FUNCTION_URL }}" \
+              -H "Content-Type: application/json" \
+              -d "{\"mode\":\"morning\",\"date\":\"${{ inputs.date }}\"}"
           else
-            echo "mode=morning" >> $GITHUB_OUTPUT
+            curl -X POST "${{ secrets.SUPABASE_FUNCTION_URL }}" \
+              -H "Content-Type: application/json" \
+              -d "{\"mode\":\"morning\"}"
           fi
 
-      - name: Call Supabase Edge Function
+  evening-reminder:
+    if: |
+      (github.event_name == 'schedule' && github.event.schedule == '0 17 * * *') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.mode == 'evening' || inputs.mode == 'all'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send evening reminder
         run: |
-          curl -X POST "${{ secrets.SUPABASE_FUNCTION_URL }}" \
-            -H "Content-Type: application/json" \
-            -d "{\"mode\":\"${{ steps.mode.outputs.mode }}\"}"
+          if [ -n "${{ inputs.date }}" ]; then
+            curl -X POST "${{ secrets.SUPABASE_FUNCTION_URL }}" \
+              -H "Content-Type: application/json" \
+              -d "{\"mode\":\"evening\",\"date\":\"${{ inputs.date }}\"}"
+          else
+            curl -X POST "${{ secrets.SUPABASE_FUNCTION_URL }}" \
+              -H "Content-Type: application/json" \
+              -d "{\"mode\":\"evening\"}"
+          fi
+
+  weekly-report-reminder:
+    if: |
+      (github.event_name == 'schedule' && github.event.schedule == '0 8 * * *') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.mode == 'weekly-report' || inputs.mode == 'all'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send weekly report reminder
+        run: |
+          if [ -n "${{ inputs.date }}" ]; then
+            curl -X POST "${{ secrets.SUPABASE_FUNCTION_URL }}" \
+              -H "Content-Type: application/json" \
+              -d "{\"mode\":\"weekly-report\",\"date\":\"${{ inputs.date }}\"}"
+          else
+            curl -X POST "${{ secrets.SUPABASE_FUNCTION_URL }}" \
+              -H "Content-Type: application/json" \
+              -d "{\"mode\":\"weekly-report\"}"
+          fi
