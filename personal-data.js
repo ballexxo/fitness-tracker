@@ -13,14 +13,10 @@ let currentPushEnabled = false;
 let currentUserId = null;
 let isPushBusy = false;
 
-const testPushBtn = document.getElementById('testPushBtn');
-
-if (testPushBtn) {
-  testPushBtn.addEventListener('click', sendTestPush);
-}
-
 function renderMessage(html) {
-  profileOverview.innerHTML = html;
+  if (profileOverview) {
+    profileOverview.innerHTML = html;
+  }
 }
 
 function calculateAge(birthdate) {
@@ -117,23 +113,24 @@ function urlBase64ToUint8Array(base64String) {
 
 function setPushUiState(enabled, text = '') {
   currentPushEnabled = enabled;
-  pushToggle.classList.toggle('is-on', enabled);
-  pushToggle.setAttribute('aria-checked', enabled ? 'true' : 'false');
 
-  if (text) {
-    pushStatusText.textContent = text;
-    return;
+  if (pushToggle) {
+    pushToggle.classList.toggle('is-on', enabled);
+    pushToggle.setAttribute('aria-checked', enabled ? 'true' : 'false');
   }
 
-  pushStatusText.textContent = enabled
-    ? 'Aktiviert'
-    : 'Deaktiviert';
+  if (pushStatusText) {
+    pushStatusText.textContent = text || (enabled ? 'Aktiviert' : 'Deaktiviert');
+  }
 }
 
 function setPushBusyState(busy) {
   isPushBusy = busy;
-  pushToggle.disabled = busy;
-  pushToggle.classList.toggle('is-busy', busy);
+
+  if (pushToggle) {
+    pushToggle.disabled = busy;
+    pushToggle.classList.toggle('is-busy', busy);
+  }
 }
 
 async function getCurrentUser() {
@@ -146,26 +143,6 @@ async function getCurrentUser() {
 
   return data.session.user;
 }
-
-async function sendTestPush() {
-  const user = await getCurrentUser();
-  if (!user) return;
-
-  const { data, error } = await supabase.functions.invoke('send-test-push', {
-    body: {
-      user_id: user.id,
-    },
-  });
-
-  if (error) {
-    console.error('Fehler beim Test Push:', error);
-    return;
-  }
-
-  console.log('Test Push Ergebnis:', data);
-}
-
-
 
 async function getExistingSubscriptionFromBrowser() {
   if (!('serviceWorker' in navigator)) return null;
@@ -193,12 +170,7 @@ async function syncPushStatus() {
   try {
     const browserSubscription = await getExistingSubscriptionFromBrowser();
 
-    if (!browserSubscription) {
-      setPushUiState(false, 'Deaktiviert');
-      return;
-    }
-
-    if (!currentUserId) {
+    if (!browserSubscription || !currentUserId) {
       setPushUiState(false, 'Deaktiviert');
       return;
     }
@@ -237,7 +209,6 @@ async function subscribeToPush() {
   }
 
   const registration = await navigator.serviceWorker.ready;
-
   let subscription = await registration.pushManager.getSubscription();
 
   if (!subscription) {
@@ -249,17 +220,18 @@ async function subscribeToPush() {
 
   const subscriptionJson = subscription.toJSON();
 
-  const payload = {
-    user_id: currentUserId,
-    endpoint: subscription.endpoint,
-    p256dh: subscriptionJson.keys.p256dh,
-    auth: subscriptionJson.keys.auth,
-  };
+  await supabase
+    .from('push_subscriptions')
+    .delete()
+    .eq('user_id', currentUserId);
 
   const { error } = await supabase
     .from('push_subscriptions')
-    .upsert(payload, {
-      onConflict: 'endpoint',
+    .insert({
+      user_id: currentUserId,
+      endpoint: subscription.endpoint,
+      p256dh: subscriptionJson.keys.p256dh,
+      auth: subscriptionJson.keys.auth,
     });
 
   if (error) {
@@ -272,7 +244,8 @@ async function subscribeToPush() {
 }
 
 async function unsubscribeFromPush() {
-  const subscription = await getExistingSubscriptionFromBrowser();
+  const registration = await navigator.serviceWorker.ready;
+  const subscription = await registration.pushManager.getSubscription();
 
   if (!subscription) {
     setPushUiState(false, 'Deaktiviert');
@@ -280,7 +253,6 @@ async function unsubscribeFromPush() {
   }
 
   await removeSubscriptionFromDatabase(subscription.endpoint);
-
   const unsubscribed = await subscription.unsubscribe();
 
   if (!unsubscribed) {
@@ -448,9 +420,8 @@ async function loadProfile() {
   }
 }
 
-
-
-
-pushToggle.addEventListener('click', handlePushToggle);
+if (pushToggle) {
+  pushToggle.addEventListener('click', handlePushToggle);
+}
 
 loadProfile();
