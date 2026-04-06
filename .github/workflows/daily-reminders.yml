@@ -1,0 +1,40 @@
+name: Daily Reminders
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 08:00 Deutschland ungefähr:
+    # Winterzeit = 07:00 UTC
+    # Sommerzeit = 06:00 UTC
+    #
+    # Wir starten hier mit 06:00 UTC und 17:00 UTC.
+    # Wenn du später feinjustieren willst, passen wir es an.
+    - cron: "0 6 * * *"
+    - cron: "0 17 * * *"
+    - cron: "0 8 * * *"
+
+jobs:
+  send-reminders:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Decide mode from current UTC hour
+        id: mode
+        run: |
+          HOUR=$(date -u +%H)
+
+          if [ "$HOUR" = "06" ]; then
+            echo "mode=morning" >> $GITHUB_OUTPUT
+          elif [ "$HOUR" = "17" ]; then
+            echo "mode=evening" >> $GITHUB_OUTPUT
+          elif [ "$HOUR" = "08" ]; then
+            echo "mode=weekly-report" >> $GITHUB_OUTPUT
+          else
+            echo "mode=morning" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Call Supabase Edge Function
+        run: |
+          curl -X POST "${{ secrets.SUPABASE_FUNCTION_URL }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"mode\":\"${{ steps.mode.outputs.mode }}\"}"
