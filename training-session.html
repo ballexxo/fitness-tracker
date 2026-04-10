@@ -24,8 +24,16 @@
         <div class="training-session-hero-label">Aktueller Trainingsplan</div>
         <div class="training-session-hero-name" id="sessionPlanName">-</div>
         <div class="training-session-hero-timer-row">
-          
           <span class="training-session-hero-timer-value" id="sessionTimer">00:00:00</span>
+        </div>
+
+        <div class="training-progress-wrapper">
+          <div class="training-progress-bar">
+            <div id="trainingProgressFill"></div>
+          </div>
+          <div id="trainingProgressText" class="training-progress-text">
+            0 / 0 Übungen
+          </div>
         </div>
       </section>
 
@@ -80,5 +88,6 @@
   </div>
 
   <script type="module" src="training-session.js"></script>
+  <script src="app-update.js"></script>
 </body>
 </html>

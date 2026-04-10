@@ -18,13 +18,14 @@ const plannedTrainingWarningText = document.getElementById('plannedTrainingWarni
 const cancelPlannedTrainingBtn = document.getElementById('cancelPlannedTrainingBtn');
 const continuePlannedTrainingBtn = document.getElementById('continuePlannedTrainingBtn');
 
-/* neues Leave-Modal */
 const leaveTrainingModal = document.getElementById('leaveTrainingModal');
 const resumeTrainingBtn = document.getElementById('resumeTrainingBtn');
 const backgroundTrainingBtn = document.getElementById('backgroundTrainingBtn');
 const leaveAndFinishTrainingBtn = document.getElementById('leaveAndFinishTrainingBtn');
 
-/* Back-Button aus dem Header */
+const trainingProgressFill = document.getElementById('trainingProgressFill');
+const trainingProgressText = document.getElementById('trainingProgressText');
+
 const backButton = document.querySelector('.app-back-button');
 
 let currentUser = null;
@@ -139,6 +140,95 @@ async function guardPage() {
   return currentUser;
 }
 
+function isSetCompleted(setItem) {
+  const repsFilled =
+    setItem.reps_done !== null &&
+    setItem.reps_done !== undefined &&
+    setItem.reps_done !== '';
+
+  const weightFilled =
+    setItem.weight_used !== null &&
+    setItem.weight_used !== undefined &&
+    setItem.weight_used !== '';
+
+  return repsFilled && weightFilled;
+}
+
+function isExerciseCompleted(exercise) {
+  if (!exercise?.sets?.length) return false;
+  return exercise.sets.every(isSetCompleted);
+}
+
+function getLastTrainingBaseWeight(lastData) {
+  if (!lastData?.sets?.length) return null;
+
+  const firstWithWeight = lastData.sets.find((setItem) => {
+    return setItem.weight_used !== null && setItem.weight_used !== undefined;
+  });
+
+  return firstWithWeight ? Number(firstWithWeight.weight_used) : null;
+}
+
+function formatWeightForInput(value) {
+  if (value === null || value === undefined || value === '') return '';
+
+  const num = Number(value);
+  if (Number.isNaN(num)) return '';
+
+  return Number.isInteger(num) ? String(num) : String(num).replace('.', ',');
+}
+
+function formatWeightForState(value) {
+  if (value === null || value === undefined || value === '') return null;
+
+  const normalized = String(value).replace(',', '.');
+  const parsed = Number(normalized);
+
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
+function updateTrainingProgress() {
+  if (!draftSession) return;
+
+  const total = draftSession.exercises.length;
+  let completed = 0;
+
+  draftSession.exercises.forEach((exercise) => {
+    if (isExerciseCompleted(exercise)) completed++;
+  });
+
+  const percent = total === 0 ? 0 : (completed / total) * 100;
+
+  if (trainingProgressFill) {
+    trainingProgressFill.style.width = `${percent}%`;
+  }
+
+  if (trainingProgressText) {
+    trainingProgressText.textContent = `${completed} / ${total} Übungen`;
+  }
+}
+
+function updateExerciseCompletionUI(card, exercise) {
+  if (!card || !exercise) return;
+
+  const isDone = isExerciseCompleted(exercise);
+
+  if (isDone) {
+    card.classList.add('exercise-completed');
+
+    if (!card.querySelector('.exercise-done-badge')) {
+      const badge = document.createElement('div');
+      badge.className = 'exercise-done-badge';
+      badge.textContent = 'Erledigt';
+      card.querySelector('.training-exercise-head')?.appendChild(badge);
+    }
+  } else {
+    card.classList.remove('exercise-completed');
+    const badge = card.querySelector('.exercise-done-badge');
+    if (badge) badge.remove();
+  }
+}
+
 /* ------------------------------------------------------------ */
 /* Planung / Konflikt prüfen */
 /* ------------------------------------------------------------ */
@@ -164,7 +254,7 @@ async function checkPlannedTrainingConflict(planId) {
   plannedTrainingWarningText.textContent =
     `Heute ist ${data.plan_name} geplant. Plane dein Training um, da sonst deine Live Streak kaputt geht.`;
 
-openModal(plannedTrainingWarningModal);
+  openModal(plannedTrainingWarningModal);
 
   return false;
 }
@@ -264,6 +354,8 @@ function getPerformanceBadgeMeta(lastData, repsMax) {
 
 function applySuggestedWeightsFromHistory(exercise, lastData, badgeMeta) {
   if (!exercise || !lastData || !lastData.sets || !badgeMeta) return;
+
+  exercise.last_training_base_weight = getLastTrainingBaseWeight(lastData);
 
   const shouldPrefillWeights = badgeMeta.className === 'training-badge-keep';
   if (!shouldPrefillWeights) return;
@@ -539,6 +631,8 @@ async function renderSessionExercises() {
 
     applySuggestedWeightsFromHistory(exercise, lastData, badge);
 
+    const selectedIncrement = exercise.selected_increment ?? null;
+
     htmlParts.push(`
       <article class="training-exercise-card" style="--training-set-count:${exercise.sets_planned};">
         <div class="training-exercise-head">
@@ -553,6 +647,18 @@ async function renderSessionExercises() {
             <div class="training-section-title">Letztes Training</div>
             <span class="training-badge ${badge.className}">${badge.label}</span>
           </div>
+
+          ${badge.className === 'training-badge-up' ? `
+            <div class="weight-suggestion">
+              <span class="weight-suggestion-label">Empfohlen:</span>
+              <div class="weight-suggestion-buttons">
+                <button class="weight-btn ${selectedIncrement === 2 ? 'weight-btn-active' : ''}" type="button" data-inc="2" data-exercise-index="${exerciseIndex}">+2 kg</button>
+                <button class="weight-btn ${selectedIncrement === 2.5 ? 'weight-btn-active' : ''}" type="button" data-inc="2.5" data-exercise-index="${exerciseIndex}">+2,5 kg</button>
+                <button class="weight-btn ${selectedIncrement === 4 ? 'weight-btn-active' : ''}" type="button" data-inc="4" data-exercise-index="${exerciseIndex}">+4 kg</button>
+                <button class="weight-btn ${selectedIncrement === 5 ? 'weight-btn-active' : ''}" type="button" data-inc="5" data-exercise-index="${exerciseIndex}">+5 kg</button>
+              </div>
+            </div>
+          ` : ''}
 
           ${renderLastTrainingMatrix(lastData, exercise.sets_planned)}
         </div>
@@ -574,17 +680,29 @@ async function renderSessionExercises() {
       const rawValue = input.value;
 
       if (field === 'reps') {
-        draftSession.exercises[exerciseIndex].sets[setIndex].reps_done = rawValue === '' ? null : Number(rawValue);
+        draftSession.exercises[exerciseIndex].sets[setIndex].reps_done =
+          rawValue === '' ? null : Number(rawValue);
       }
 
       if (field === 'weight') {
-        draftSession.exercises[exerciseIndex].sets[setIndex].weight_used = rawValue === '' ? null : Number(rawValue);
+        draftSession.exercises[exerciseIndex].sets[setIndex].weight_used =
+          rawValue === '' ? null : formatWeightForState(rawValue);
+
+        draftSession.exercises[exerciseIndex].selected_increment = null;
       }
 
+      const card = input.closest('.training-exercise-card');
+      updateExerciseCompletionUI(card, draftSession.exercises[exerciseIndex]);
+      updateTrainingProgress();
       saveDraftLocally();
     });
   });
 
+  sessionExerciseList.querySelectorAll('.training-exercise-card').forEach((card, index) => {
+    updateExerciseCompletionUI(card, draftSession.exercises[index]);
+  });
+
+  updateTrainingProgress();
   saveDraftLocally();
 }
 
@@ -671,6 +789,8 @@ async function loadPlanAndCreateDraft() {
       reps_min: exercise.reps_min,
       reps_max: exercise.reps_max,
       rest_seconds: exercise.rest_seconds,
+      last_training_base_weight: null,
+      selected_increment: null,
       sets: Array.from({ length: exercise.sets }, (_, index) => ({
         set_number: index + 1,
         reps_done: null,
@@ -898,6 +1018,37 @@ if (leaveAndFinishTrainingBtn) {
     await finishTraining();
   });
 }
+
+document.addEventListener('click', async (event) => {
+  const button = event.target.closest('.weight-btn');
+  if (!button) return;
+
+  const exerciseIndex = Number(button.dataset.exerciseIndex);
+  const increment = Number(button.dataset.inc);
+
+  if (Number.isNaN(exerciseIndex) || Number.isNaN(increment)) return;
+
+  const exercise = draftSession.exercises[exerciseIndex];
+  if (!exercise) return;
+
+  let baseWeight = exercise.last_training_base_weight;
+
+  if (baseWeight === null || baseWeight === undefined) {
+    const lastData = await fetchLastExerciseData(exercise.exercise_name);
+    baseWeight = getLastTrainingBaseWeight(lastData);
+    exercise.last_training_base_weight = baseWeight;
+  }
+
+  if (baseWeight === null || baseWeight === undefined) return;
+
+  exercise.selected_increment = increment;
+
+  exercise.sets.forEach((setItem) => {
+    setItem.weight_used = Number((baseWeight + increment).toFixed(2));
+  });
+
+  await renderSessionExercises();
+});
 
 /* ------------------------------------------------------------ */
 /* Init */
