@@ -520,6 +520,10 @@ function getImprovementSummaryBadge(improvement) {
     return '<span class="training-badge training-badge-reduced">Reduziert</span>';
   }
 
+  if (improvement.className === 'improvement-neutral') {
+    return '<span class="training-badge training-badge-neutral">Gleich geblieben</span>';
+  }
+
   return '<span class="training-badge training-badge-neutral">Keine Vergleichsdaten</span>';
 }
 
@@ -543,6 +547,10 @@ function getImprovementSummaryLine(improvement) {
     const clean = improvement.text.replace('Steigerung zum letzten Training: ', '');
     emphasizedText = clean;
     emphasizedClass = 'training-summary-improvement-negative';
+  } else if (improvement.className === 'improvement-neutral') {
+    const clean = improvement.text.replace('Steigerung zum letzten Training: ', '');
+    emphasizedText = clean;
+    emphasizedClass = 'training-summary-improvement-neutral';
   }
 
   return `
@@ -609,12 +617,27 @@ async function calculateExerciseImprovement(exercise, excludeSessionId = null) {
 
   const percent = ((currentVolume - lastVolume) / lastVolume) * 100;
   const rounded = Math.round(percent * 10) / 10;
-  const sign = rounded > 0 ? '+' : '';
+
+  if (rounded > 0) {
+    return {
+      type: 'percent',
+      text: `Steigerung zum letzten Training: +${rounded}%`,
+      className: 'improvement-positive',
+    };
+  }
+
+  if (rounded < 0) {
+    return {
+      type: 'percent',
+      text: `Steigerung zum letzten Training: ${rounded}%`,
+      className: 'improvement-negative',
+    };
+  }
 
   return {
-    type: 'percent',
-    text: `Steigerung zum letzten Training: ${sign}${rounded}%`,
-    className: rounded >= 0 ? 'improvement-positive' : 'improvement-negative',
+    type: 'equal',
+    text: 'Steigerung zum letzten Training: gleich geblieben',
+    className: 'improvement-neutral',
   };
 }
 

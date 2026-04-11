@@ -140,6 +140,10 @@ function getImprovementSummaryBadge(improvement) {
     return '<span class="training-badge training-badge-reduced">Reduziert</span>';
   }
 
+  if (improvement.className === 'improvement-neutral') {
+    return '<span class="training-badge training-badge-neutral">Gleich geblieben</span>';
+  }
+
   return '<span class="training-badge training-badge-neutral">Keine Vergleichsdaten</span>';
 }
 
@@ -365,11 +369,24 @@ async function calculateExerciseImprovement(exercise, currentSessionId) {
 
   const percent = ((currentVolume - previousVolume) / previousVolume) * 100;
   const rounded = Math.round(percent * 10) / 10;
-  const sign = rounded > 0 ? '+' : '';
+
+  if (rounded > 0) {
+    return {
+      text: `Steigerung zum letzten Training: +${rounded}%`,
+      className: 'improvement-positive',
+    };
+  }
+
+  if (rounded < 0) {
+    return {
+      text: `Steigerung zum letzten Training: ${rounded}%`,
+      className: 'improvement-negative',
+    };
+  }
 
   return {
-    text: `Steigerung zum letzten Training: ${sign}${rounded}%`,
-    className: rounded >= 0 ? 'improvement-positive' : 'improvement-negative',
+    text: 'Steigerung zum letzten Training: gleich geblieben',
+    className: 'improvement-neutral',
   };
 }
 

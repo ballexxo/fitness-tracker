@@ -61,6 +61,18 @@ async function guardPage() {
   return currentUser;
 }
 
+function openModal(modal) {
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  document.body.classList.add('modal-open');
+}
+
+function closeModal(modal) {
+  if (!modal) return;
+  modal.classList.add('hidden');
+  document.body.classList.remove('modal-open');
+}
+
 async function checkPlannedTrainingConflict(planId) {
   const today = getLocalDateString();
 
@@ -310,19 +322,11 @@ function getImprovementSummaryBadge(improvement) {
     return '<span class="training-badge training-badge-reduced">Reduziert</span>';
   }
 
+  if (improvement.className === 'improvement-neutral') {
+    return '<span class="training-badge training-badge-neutral">Gleich geblieben</span>';
+  }
+
   return '<span class="training-badge training-badge-neutral">Keine Vergleichsdaten</span>';
-}
-
-function openModal(modal) {
-  if (!modal) return;
-  modal.classList.remove('hidden');
-  document.body.classList.add('modal-open');
-}
-
-function closeModal(modal) {
-  if (!modal) return;
-  modal.classList.add('hidden');
-  document.body.classList.remove('modal-open');
 }
 
 function getImprovementSummaryLine(improvement) {
@@ -345,6 +349,10 @@ function getImprovementSummaryLine(improvement) {
     const clean = improvement.text.replace('Steigerung zum letzten Training: ', '');
     emphasizedText = clean;
     emphasizedClass = 'training-summary-improvement-negative';
+  } else if (improvement.className === 'improvement-neutral') {
+    const clean = improvement.text.replace('Steigerung zum letzten Training: ', '');
+    emphasizedText = clean;
+    emphasizedClass = 'training-summary-improvement-neutral';
   }
 
   return `
@@ -454,11 +462,24 @@ async function calculateExerciseImprovement(exercise, excludeSessionId = null) {
 
   const percent = ((currentVolume - lastVolume) / lastVolume) * 100;
   const rounded = Math.round(percent * 10) / 10;
-  const sign = rounded > 0 ? '+' : '';
+
+  if (rounded > 0) {
+    return {
+      text: `Steigerung zum letzten Training: +${rounded}%`,
+      className: 'improvement-positive',
+    };
+  }
+
+  if (rounded < 0) {
+    return {
+      text: `Steigerung zum letzten Training: ${rounded}%`,
+      className: 'improvement-negative',
+    };
+  }
 
   return {
-    text: `Steigerung zum letzten Training: ${sign}${rounded}%`,
-    className: rounded >= 0 ? 'improvement-positive' : 'improvement-negative',
+    text: 'Steigerung zum letzten Training: gleich geblieben',
+    className: 'improvement-neutral',
   };
 }
 
@@ -758,6 +779,7 @@ saveManualTrainingBtn.addEventListener('click', async () => {
       `);
     }
 
+    manualSummaryContent.innerHTML = summaryParts.join('');
     openModal(manualSummaryModal);
   } catch (error) {
     console.error(error);
@@ -767,7 +789,6 @@ saveManualTrainingBtn.addEventListener('click', async () => {
     saveManualTrainingBtn.textContent = 'Training speichern';
   }
 });
-
 
 manualSummaryModal.addEventListener('click', (event) => {
   if (event.target === manualSummaryModal) {
@@ -780,7 +801,6 @@ plannedTrainingWarningModal.addEventListener('click', (event) => {
     closeModal(plannedTrainingWarningModal);
   }
 });
-
 
 manualSummaryOkBtn.addEventListener('click', () => {
   closeModal(manualSummaryModal);
