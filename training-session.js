@@ -679,6 +679,7 @@ async function renderSessionExercises() {
                 <button class="weight-btn ${selectedIncrement === 2.5 ? 'weight-btn-active' : ''}" type="button" data-inc="2.5" data-exercise-index="${exerciseIndex}">+2,5 kg</button>
                 <button class="weight-btn ${selectedIncrement === 4 ? 'weight-btn-active' : ''}" type="button" data-inc="4" data-exercise-index="${exerciseIndex}">+4 kg</button>
                 <button class="weight-btn ${selectedIncrement === 5 ? 'weight-btn-active' : ''}" type="button" data-inc="5" data-exercise-index="${exerciseIndex}">+5 kg</button>
+                <button class="weight-btn ${selectedIncrement === 10 ? 'weight-btn-active' : ''}" type="button" data-inc="10" data-exercise-index="${exerciseIndex}">+10 kg</button>
               </div>
             </div>
           ` : ''}
