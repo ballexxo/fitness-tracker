@@ -11238,3 +11238,92 @@ body.modal-open {
     width: 100%;
   }
 }
+
+.exercise-rest-row {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.exercise-rest-btn {
+  min-width: 160px;
+  height: 46px;
+  border-radius: 16px;
+  border: 1px solid rgba(111, 210, 195, 0.45);
+  background: rgba(111, 210, 195, 0.18);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.exercise-rest-btn.is-running,
+.exercise-rest-btn.is-done {
+  border-color: rgba(111, 210, 195, 0.45);
+  background: rgba(111, 210, 195, 0.18);
+  color: #ffffff;
+}
+
+.exercise-rest-timer {
+  min-width: 150px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 900;
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: 1px;
+  border: none;
+  background: transparent;
+}
+
+.rest-state-idle {
+  color: rgba(255,255,255,0.72);
+}
+
+.rest-state-active {
+  color: #8ef0e2;
+  border: none;
+  background: transparent;
+}
+
+.rest-state-warning {
+  color: #ffd45c;
+  border: none;
+  background: transparent;
+}
+
+.rest-state-done {
+  color: #ff7b83;
+  border: none;
+  background: transparent;
+}
+
+.exercise-rest-row-stopwatch {
+  gap: 12px;
+}
+
+.exercise-stopwatch-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.stopwatch-start-btn {
+  min-width: 86px;
+}
+
+.stopwatch-stop-btn {
+  min-width: 86px;
+  border-color: rgba(255, 110, 118, 0.6);
+  background: rgba(255, 110, 118, 0.18);
+}
+
+.stopwatch-reset-btn {
+  min-width: 86px;
+  border-color: rgba(255, 212, 92, 0.55);
+  background: rgba(255, 212, 92, 0.16);
+}

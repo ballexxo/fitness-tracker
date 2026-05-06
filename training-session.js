@@ -661,7 +661,7 @@ async function renderSessionExercises() {
         <div class="training-exercise-head">
           <div>
             <div class="training-exercise-title">${exerciseIndex + 1}. ${exercise.exercise_name}</div>
-            <div class="training-exercise-meta">${exercise.sets_planned} Sätze · ${exercise.reps_min}-${exercise.reps_max} Wdh.</div>
+            <div class="training-exercise-meta">${exercise.sets_planned} Sätze · ${exercise.reps_min}-${exercise.reps_max} Wdh. · ${exercise.rest_seconds || 0}s Pause</div>
           </div>
         </div>
 
@@ -688,6 +688,49 @@ async function renderSessionExercises() {
 
         <div class="training-input-card">
           ${renderSetInputMatrix(exercise, exerciseIndex)}
+
+         ${Number(exercise.rest_seconds || 0) > 0 ? `
+  <div class="exercise-rest-row">
+    <button
+      class="exercise-rest-btn"
+      type="button"
+      data-rest-btn="${exerciseIndex}"
+      data-rest-seconds="${exercise.rest_seconds || 0}"
+    >
+      Pause
+    </button>
+
+    <div
+      class="exercise-rest-timer rest-state-idle"
+      id="restTimer-${exerciseIndex}"
+    >
+      ${formatRestTimer(exercise.rest_seconds || 0)}
+    </div>
+  </div>
+` : `
+  <div class="exercise-rest-row exercise-rest-row-stopwatch">
+    <div class="exercise-stopwatch-actions">
+      <button class="exercise-rest-btn stopwatch-start-btn" type="button" data-stopwatch-start="${exerciseIndex}">
+        Start
+      </button>
+
+      <button class="exercise-rest-btn stopwatch-stop-btn" type="button" data-stopwatch-stop="${exerciseIndex}">
+        Stop
+      </button>
+
+      <button class="exercise-rest-btn stopwatch-reset-btn" type="button" data-stopwatch-reset="${exerciseIndex}">
+        Reset
+      </button>
+    </div>
+
+    <div
+      class="exercise-rest-timer rest-state-idle"
+      id="restTimer-${exerciseIndex}"
+    >
+      00:00:00
+    </div>
+  </div>
+`}
         </div>
       </article>
     `);
@@ -1072,6 +1115,148 @@ document.addEventListener('click', async (event) => {
 
   await renderSessionExercises();
 });
+
+/* ------------------------------------------------------------ */
+/* Pause Timer */
+/* ------------------------------------------------------------ */
+const activeRestTimers = {};
+const activeStopwatches = {};
+const stopwatchSeconds = {};
+
+function formatRestTimer(seconds) {
+  const safeSeconds = Math.max(0, Number(seconds || 0));
+
+  const hours = String(Math.floor(safeSeconds / 3600)).padStart(2, '0');
+  const minutes = String(Math.floor((safeSeconds % 3600) / 60)).padStart(2, '0');
+  const secs = String(safeSeconds % 60).padStart(2, '0');
+
+  return `${hours}:${minutes}:${secs}`;
+}
+
+function startStopwatch(exerciseIndex, timerEl) {
+  if (!timerEl) return;
+
+  if (!stopwatchSeconds[exerciseIndex]) {
+    stopwatchSeconds[exerciseIndex] = 0;
+  }
+
+  if (activeStopwatches[exerciseIndex]) return;
+
+  timerEl.className = 'exercise-rest-timer rest-state-active';
+
+  activeStopwatches[exerciseIndex] = setInterval(() => {
+    stopwatchSeconds[exerciseIndex] += 1;
+    timerEl.textContent = formatRestTimer(stopwatchSeconds[exerciseIndex]);
+  }, 1000);
+}
+
+function stopStopwatch(exerciseIndex, timerEl) {
+  if (activeStopwatches[exerciseIndex]) {
+    clearInterval(activeStopwatches[exerciseIndex]);
+    delete activeStopwatches[exerciseIndex];
+  }
+
+  if (timerEl) {
+    timerEl.className = 'exercise-rest-timer rest-state-idle';
+  }
+}
+
+function resetStopwatch(exerciseIndex, timerEl) {
+  stopStopwatch(exerciseIndex, timerEl);
+
+  stopwatchSeconds[exerciseIndex] = 0;
+
+  if (timerEl) {
+    timerEl.textContent = '00:00:00';
+    timerEl.className = 'exercise-rest-timer rest-state-idle';
+  }
+}
+
+function vibrateDevice() {
+  if ('vibrate' in navigator) {
+    navigator.vibrate([200, 120, 200]);
+  }
+}
+
+function stopRestTimer(exerciseIndex) {
+  if (activeRestTimers[exerciseIndex]) {
+    clearInterval(activeRestTimers[exerciseIndex]);
+    delete activeRestTimers[exerciseIndex];
+  }
+}
+
+function setRestTimerState(timerEl, stateClass, text) {
+  if (!timerEl) return;
+  timerEl.className = `exercise-rest-timer ${stateClass}`;
+  timerEl.textContent = text;
+}
+
+document.addEventListener('click', (event) => {
+  const btn = event.target.closest('[data-rest-btn]');
+  if (!btn) return;
+
+  const exerciseIndex = btn.dataset.restBtn;
+  const timerEl = document.getElementById(`restTimer-${exerciseIndex}`);
+  const totalSeconds = Number(btn.dataset.restSeconds || 0);
+
+  if (!timerEl || totalSeconds <= 0) return;
+
+  stopRestTimer(exerciseIndex);
+
+  let remaining = totalSeconds;
+
+  btn.classList.remove('is-done');
+  btn.classList.add('is-running');
+
+  setRestTimerState(timerEl, 'rest-state-active', formatRestTimer(remaining));
+
+  activeRestTimers[exerciseIndex] = setInterval(() => {
+    remaining -= 1;
+
+    if (remaining <= 0) {
+      stopRestTimer(exerciseIndex);
+      setRestTimerState(timerEl, 'rest-state-done', '00:00:00');
+      btn.classList.remove('is-running');
+      btn.classList.add('is-done');
+      vibrateDevice();
+      return;
+    }
+
+    if (remaining <= 30) {
+      setRestTimerState(timerEl, 'rest-state-warning', formatRestTimer(remaining));
+    } else {
+      setRestTimerState(timerEl, 'rest-state-active', formatRestTimer(remaining));
+    }
+  }, 1000);
+});
+
+document.addEventListener('click', (event) => {
+  const startBtn = event.target.closest('[data-stopwatch-start]');
+  const stopBtn = event.target.closest('[data-stopwatch-stop]');
+  const resetBtn = event.target.closest('[data-stopwatch-reset]');
+
+  if (!startBtn && !stopBtn && !resetBtn) return;
+
+  const exerciseIndex =
+    startBtn?.dataset.stopwatchStart ||
+    stopBtn?.dataset.stopwatchStop ||
+    resetBtn?.dataset.stopwatchReset;
+
+  const timerEl = document.getElementById(`restTimer-${exerciseIndex}`);
+
+  if (startBtn) {
+    startStopwatch(exerciseIndex, timerEl);
+  }
+
+  if (stopBtn) {
+    stopStopwatch(exerciseIndex, timerEl);
+  }
+
+  if (resetBtn) {
+    resetStopwatch(exerciseIndex, timerEl);
+  }
+});
+
 
 /* ------------------------------------------------------------ */
 /* Init */
