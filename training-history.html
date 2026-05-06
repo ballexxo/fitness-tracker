@@ -48,23 +48,47 @@
 
   <div id="viewHistoryModal" class="modal-overlay hidden">
     <div class="modal-card app-modal-card history-modal-card">
-        <button id="closeViewHistoryIconBtn" class="modal-close-x" type="button" aria-label="Schließen">×</button>
-        <h2 class="app-modal-title">Training anzeigen</h2>
-        <div id="viewHistoryContent" class="app-modal-content"></div>
+      <button id="closeViewHistoryIconBtn" class="modal-close-x" type="button" aria-label="Schließen">×</button>
+      <h2 class="app-modal-title">Training anzeigen</h2>
+      <div id="viewHistoryContent" class="app-modal-content"></div>
     </div>
-    
   </div>
 
   <div id="editHistoryModal" class="modal-overlay hidden">
     <div class="modal-card app-modal-card history-modal-card history-edit-modal-card">
-  <button id="closeEditHistoryIconBtn" class="modal-close-x" type="button" aria-label="Abbrechen">×</button>
-  <h2 class="app-modal-title">Training bearbeiten</h2>
-  <div id="editHistoryContent" class="app-modal-content"></div>
-  <div id="editHistoryStatus" class="status hidden"></div>
-  <div class="modal-actions app-modal-actions">
-    <button id="saveEditHistoryBtn" class="dashboard-summary-primary-btn" type="button">Speichern</button>
+      <button id="closeEditHistoryIconBtn" class="modal-close-x" type="button" aria-label="Abbrechen">×</button>
+      <h2 class="app-modal-title">Training bearbeiten</h2>
+      <div id="editHistoryContent" class="app-modal-content"></div>
+      <div id="editHistoryStatus" class="status hidden"></div>
+      <div class="modal-actions app-modal-actions">
+        <button id="saveEditHistoryBtn" class="dashboard-summary-primary-btn" type="button">Speichern</button>
+      </div>
+    </div>
   </div>
-</div>
+
+  <div id="deleteHistoryModal" class="modal-overlay hidden">
+    <div class="modal-card app-modal-card history-delete-modal-card">
+      <h2 class="app-modal-title">Training löschen?</h2>
+      <div id="deleteHistoryContent" class="app-modal-content"></div>
+
+      <div class="modal-actions app-modal-actions app-modal-actions-split">
+        <button
+          id="cancelDeleteHistoryBtn"
+          class="history-action-btn history-action-btn-primary"
+          type="button"
+        >
+          Abbrechen
+        </button>
+
+        <button
+          id="confirmDeleteHistoryBtn"
+          class="history-action-btn history-action-btn-danger"
+          type="button"
+        >
+          Löschen
+        </button>
+      </div>
+    </div>
   </div>
 
   <script type="module" src="training-history.js"></script>

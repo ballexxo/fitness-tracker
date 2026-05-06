@@ -11327,3 +11327,44 @@ body.modal-open {
   border-color: rgba(255, 212, 92, 0.55);
   background: rgba(255, 212, 92, 0.16);
 }
+
+.history-delete-modal-card {
+  max-width: 420px;
+}
+
+.history-delete-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: center;
+  padding-top: 6px;
+}
+
+.history-delete-name {
+  font-size: 20px;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.history-delete-meta {
+  color: rgba(255,255,255,0.72);
+  font-size: 15px;
+}
+
+.history-delete-confirm-btn {
+  min-width: 140px;
+  height: 46px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 110, 118, 0.55);
+  background: rgba(255, 110, 118, 0.18);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 15px;
+}
+.history-delete-meta {
+  color: rgba(255,255,255,0.72);
+  font-size: 15px;
+}
+.history-delete-modal-card {
+  max-width: 420px;
+}

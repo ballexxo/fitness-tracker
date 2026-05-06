@@ -12,18 +12,23 @@ const historyList = document.getElementById('historyList');
 const viewHistoryModal = document.getElementById('viewHistoryModal');
 const viewHistoryContent = document.getElementById('viewHistoryContent');
 const closeViewHistoryIconBtn = document.getElementById('closeViewHistoryIconBtn');
-const closeEditHistoryIconBtn = document.getElementById('closeEditHistoryIconBtn');
 
 const editHistoryModal = document.getElementById('editHistoryModal');
 const editHistoryContent = document.getElementById('editHistoryContent');
 const editHistoryStatus = document.getElementById('editHistoryStatus');
-
+const closeEditHistoryIconBtn = document.getElementById('closeEditHistoryIconBtn');
 const saveEditHistoryBtn = document.getElementById('saveEditHistoryBtn');
+
+const deleteHistoryModal = document.getElementById('deleteHistoryModal');
+const deleteHistoryContent = document.getElementById('deleteHistoryContent');
+const cancelDeleteHistoryBtn = document.getElementById('cancelDeleteHistoryBtn');
+const confirmDeleteHistoryBtn = document.getElementById('confirmDeleteHistoryBtn');
 
 let currentUser = null;
 let currentWeekOffset = 0;
 let currentSessions = [];
 let currentEditSession = null;
+let pendingDeleteSessionId = null;
 
 /* ------------------------------------------------------------ */
 /* Helpers */
@@ -35,6 +40,7 @@ function setStatus(element, message, type = '') {
 }
 
 function setModalState(modal, isOpen) {
+  if (!modal) return;
   modal.classList.toggle('hidden', !isOpen);
   document.body.classList.toggle('modal-open', isOpen);
 }
@@ -92,6 +98,11 @@ function getDisplayRangeText(monday, sunday) {
   const start = monday.toLocaleDateString('de-DE');
   const end = sunday.toLocaleDateString('de-DE');
   return `${start} - ${end}`;
+}
+
+function getLocalTodayString() {
+  const today = new Date();
+  return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 }
 
 function renderSummarySetMatrix(sets) {
@@ -165,6 +176,9 @@ function getImprovementSummaryLine(improvement) {
   } else if (improvement.className === 'improvement-negative') {
     emphasizedText = improvement.text.replace('Steigerung zum letzten Training: ', '');
     emphasizedClass = 'training-summary-improvement-negative';
+  } else if (improvement.className === 'improvement-neutral') {
+    emphasizedText = improvement.text.replace('Steigerung zum letzten Training: ', '');
+    emphasizedClass = 'training-summary-improvement-neutral';
   }
 
   return `
@@ -553,52 +567,105 @@ async function loadHistory() {
   });
 
   document.querySelectorAll('.delete-session-btn').forEach((button) => {
-    button.addEventListener('click', async () => {
+    button.addEventListener('click', () => {
       const sessionId = button.dataset.id;
+      const session = currentSessions.find((item) => String(item.id) === String(sessionId));
 
-      const { data: linkedPlannedWorkout, error: linkedError } = await supabase
-        .from('planned_workouts')
-        .select('id, planned_date, status, completed_session_id')
-        .eq('completed_session_id', sessionId)
-        .maybeSingle();
-
-      if (linkedError) {
-        console.error(linkedError);
-      }
-
-      const { error: deleteError } = await supabase
-        .from('workout_sessions')
-        .delete()
-        .eq('id', sessionId);
-
-      if (deleteError) {
-        console.error(deleteError);
-        setStatus(historyStatus, 'Training konnte nicht gelöscht werden.', 'error');
+      if (!session) {
+        setStatus(historyStatus, 'Training konnte nicht gefunden werden.', 'error');
         return;
       }
 
-      if (linkedPlannedWorkout) {
-        const today = new Date();
-        const localTodayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-        const newStatus = linkedPlannedWorkout.planned_date < localTodayString ? 'missed' : 'planned';
+      pendingDeleteSessionId = sessionId;
 
-        const { error: resetError } = await supabase
-          .from('planned_workouts')
-          .update({
-            status: newStatus,
-            completed_session_id: null,
-          })
-          .eq('id', linkedPlannedWorkout.id);
+      deleteHistoryContent.innerHTML = `
+        <div class="history-delete-info">
+          <div class="history-delete-name">${session.plan_name}</div>
+          <div class="history-delete-meta">${formatDate(session.training_date)}</div>
+          <div class="history-delete-meta">Dauer: ${formatSeconds(session.duration_seconds)}</div>
+        </div>
+      `;
 
-        if (resetError) {
-          console.error(resetError);
-        }
-      }
-
-      await loadHistory();
+      setModalState(deleteHistoryModal, true);
     });
   });
 }
+
+/* ------------------------------------------------------------ */
+/* Delete Modal */
+/* ------------------------------------------------------------ */
+cancelDeleteHistoryBtn.addEventListener('click', () => {
+  pendingDeleteSessionId = null;
+  setModalState(deleteHistoryModal, false);
+});
+
+confirmDeleteHistoryBtn.addEventListener('click', async () => {
+  if (!pendingDeleteSessionId) return;
+
+  confirmDeleteHistoryBtn.disabled = true;
+  confirmDeleteHistoryBtn.textContent = 'Wird gelöscht...';
+
+  try {
+    const sessionId = pendingDeleteSessionId;
+
+    const { data: linkedPlannedWorkout, error: linkedError } = await supabase
+      .from('planned_workouts')
+      .select('id, planned_date, status, completed_session_id')
+      .eq('completed_session_id', sessionId)
+      .maybeSingle();
+
+    if (linkedError) {
+      console.error(linkedError);
+    }
+
+    const { error: deleteError } = await supabase
+      .from('workout_sessions')
+      .delete()
+      .eq('id', sessionId);
+
+    if (deleteError) {
+      console.error(deleteError);
+      setStatus(historyStatus, 'Training konnte nicht gelöscht werden.', 'error');
+      return;
+    }
+
+    if (linkedPlannedWorkout) {
+      const newStatus =
+        linkedPlannedWorkout.planned_date < getLocalTodayString()
+          ? 'missed'
+          : 'planned';
+
+      const { error: resetError } = await supabase
+        .from('planned_workouts')
+        .update({
+          status: newStatus,
+          completed_session_id: null,
+        })
+        .eq('id', linkedPlannedWorkout.id);
+
+      if (resetError) {
+        console.error(resetError);
+      }
+    }
+
+    pendingDeleteSessionId = null;
+    setModalState(deleteHistoryModal, false);
+    await loadHistory();
+  } catch (error) {
+    console.error(error);
+    setStatus(historyStatus, 'Beim Löschen ist ein Fehler aufgetreten.', 'error');
+  } finally {
+    confirmDeleteHistoryBtn.disabled = false;
+    confirmDeleteHistoryBtn.textContent = 'Löschen';
+  }
+});
+
+deleteHistoryModal.addEventListener('click', (event) => {
+  if (event.target === deleteHistoryModal) {
+    pendingDeleteSessionId = null;
+    setModalState(deleteHistoryModal, false);
+  }
+});
 
 /* ------------------------------------------------------------ */
 /* Modal Events */
