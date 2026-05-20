@@ -333,6 +333,8 @@ function calculateLongestStreak(plans) {
 function calculateCurrentStreak(plans) {
   if (!plans || plans.length === 0) return 0;
 
+  const today = getLocalDateString();
+
   const sorted = [...plans].sort((a, b) => {
     if (a.planned_date < b.planned_date) return -1;
     if (a.planned_date > b.planned_date) return 1;
@@ -342,11 +344,24 @@ function calculateCurrentStreak(plans) {
   let current = 0;
 
   for (let i = sorted.length - 1; i >= 0; i -= 1) {
-    if (sorted[i].status === 'completed') {
-      current += 1;
-    } else {
-      break;
+    const item = sorted[i];
+
+    // Heute offen = zählt NICHT als Streak-Verlust
+    if (
+      item.planned_date === today &&
+      item.status === 'planned'
+    ) {
+      continue;
     }
+
+    // Abgeschlossen = Streak erhöhen
+    if (item.status === 'completed') {
+      current += 1;
+      continue;
+    }
+
+    // Vergangene offene/verpasste Einheit beendet die Streak
+    break;
   }
 
   return current;

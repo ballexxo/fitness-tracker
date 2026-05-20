@@ -339,18 +339,28 @@ async function loadPlanningDashboard(user) {
   const completedThisWeek = weekPlans.filter((item) => item.status === 'completed').length;
   const totalThisWeek = weekPlans.length;
 
-  const pastAndToday = plans
-    .filter((item) => item.planned_date <= today)
-    .sort((a, b) => (a.planned_date < b.planned_date ? 1 : -1));
+ const pastAndToday = plans
+  .filter((item) => item.planned_date <= today)
+  .sort((a, b) => (a.planned_date < b.planned_date ? 1 : -1));
 
-  let streak = 0;
-  for (const item of pastAndToday) {
-    if (item.status === 'completed') {
-      streak += 1;
-    } else {
-      break;
-    }
+let streak = 0;
+
+for (const item of pastAndToday) {
+
+  // Heute darf offen sein ohne Streak-Verlust
+  if (item.planned_date === today && item.status === 'planned') {
+    continue;
   }
+
+  // Abgeschlossen = Streak erhöhen
+  if (item.status === 'completed') {
+    streak += 1;
+    continue;
+  }
+
+  // Vergangen & verpasst = Streak abbrechen
+  break;
+}
 
   const nextWorkout = plans.find((item) => (
     item.planned_date >= today && item.status === 'planned'

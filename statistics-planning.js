@@ -89,15 +89,33 @@ function calculateLongestStreak(plans) {
 function calculateCurrentStreak(plans) {
   if (!plans.length) return 0;
 
-  const sorted = [...plans].sort((a, b) => a.planned_date.localeCompare(b.planned_date));
+  const today = getLocalDateString();
+
+  const sorted = [...plans].sort((a, b) =>
+    a.planned_date.localeCompare(b.planned_date)
+  );
 
   let current = 0;
+
   for (let i = sorted.length - 1; i >= 0; i -= 1) {
-    if (sorted[i].status === 'completed') {
-      current += 1;
-    } else {
-      break;
+    const item = sorted[i];
+
+    // Heute offen = Streak bleibt bestehen
+    if (
+      item.planned_date === today &&
+      item.status === 'planned'
+    ) {
+      continue;
     }
+
+    // Abgeschlossen = Streak erhöhen
+    if (item.status === 'completed') {
+      current += 1;
+      continue;
+    }
+
+    // Vergangene verpasste Einheit = Streak endet
+    break;
   }
 
   return current;
