@@ -1118,14 +1118,17 @@ document.addEventListener('click', async (event) => {
 });
 
 /* ------------------------------------------------------------ */
-/* Pause Timer */
+/* Pause Timer mit echter Zeitberechnung */
 /* ------------------------------------------------------------ */
+
 const activeRestTimers = {};
+const restCountdowns = {};
+
 const activeStopwatches = {};
-const stopwatchSeconds = {};
+const stopwatchStates = {};
 
 function formatRestTimer(seconds) {
-  const safeSeconds = Math.max(0, Number(seconds || 0));
+  const safeSeconds = Math.max(0, Math.floor(Number(seconds || 0)));
 
   const hours = String(Math.floor(safeSeconds / 3600)).padStart(2, '0');
   const minutes = String(Math.floor((safeSeconds % 3600) / 60)).padStart(2, '0');
@@ -1134,49 +1137,23 @@ function formatRestTimer(seconds) {
   return `${hours}:${minutes}:${secs}`;
 }
 
-function startStopwatch(exerciseIndex, timerEl) {
-  if (!timerEl) return;
-
-  if (!stopwatchSeconds[exerciseIndex]) {
-    stopwatchSeconds[exerciseIndex] = 0;
-  }
-
-  if (activeStopwatches[exerciseIndex]) return;
-
-  timerEl.className = 'exercise-rest-timer rest-state-active';
-
-  activeStopwatches[exerciseIndex] = setInterval(() => {
-    stopwatchSeconds[exerciseIndex] += 1;
-    timerEl.textContent = formatRestTimer(stopwatchSeconds[exerciseIndex]);
-  }, 1000);
-}
-
-function stopStopwatch(exerciseIndex, timerEl) {
-  if (activeStopwatches[exerciseIndex]) {
-    clearInterval(activeStopwatches[exerciseIndex]);
-    delete activeStopwatches[exerciseIndex];
-  }
-
-  if (timerEl) {
-    timerEl.className = 'exercise-rest-timer rest-state-idle';
-  }
-}
-
-function resetStopwatch(exerciseIndex, timerEl) {
-  stopStopwatch(exerciseIndex, timerEl);
-
-  stopwatchSeconds[exerciseIndex] = 0;
-
-  if (timerEl) {
-    timerEl.textContent = '00:00:00';
-    timerEl.className = 'exercise-rest-timer rest-state-idle';
-  }
-}
-
 function vibrateDevice() {
   if ('vibrate' in navigator) {
     navigator.vibrate([200, 120, 200]);
   }
+}
+
+function getRestElements(exerciseIndex) {
+  return {
+    btn: document.querySelector(`[data-rest-btn="${exerciseIndex}"]`),
+    timerEl: document.getElementById(`restTimer-${exerciseIndex}`),
+  };
+}
+
+function setRestTimerState(timerEl, stateClass, text) {
+  if (!timerEl) return;
+  timerEl.className = `exercise-rest-timer ${stateClass}`;
+  timerEl.textContent = text;
 }
 
 function stopRestTimer(exerciseIndex) {
@@ -1186,10 +1163,44 @@ function stopRestTimer(exerciseIndex) {
   }
 }
 
-function setRestTimerState(timerEl, stateClass, text) {
+function updateRestCountdown(exerciseIndex) {
+  const state = restCountdowns[exerciseIndex];
+  if (!state) return;
+
+  const { btn, timerEl } = getRestElements(exerciseIndex);
   if (!timerEl) return;
-  timerEl.className = `exercise-rest-timer ${stateClass}`;
-  timerEl.textContent = text;
+
+  const remaining = Math.max(0, Math.ceil((state.endAt - Date.now()) / 1000));
+
+  if (remaining <= 0) {
+    stopRestTimer(exerciseIndex);
+    delete restCountdowns[exerciseIndex];
+
+    setRestTimerState(timerEl, 'rest-state-done', '00:00:00');
+
+    if (btn) {
+      btn.classList.remove('is-running');
+      btn.classList.add('is-done');
+    }
+
+    if (!state.vibrated) {
+      state.vibrated = true;
+      vibrateDevice();
+    }
+
+    return;
+  }
+
+  if (remaining <= 30) {
+    setRestTimerState(timerEl, 'rest-state-warning', formatRestTimer(remaining));
+  } else {
+    setRestTimerState(timerEl, 'rest-state-active', formatRestTimer(remaining));
+  }
+
+  if (btn) {
+    btn.classList.remove('is-done');
+    btn.classList.add('is-running');
+  }
 }
 
 document.addEventListener('click', (event) => {
@@ -1197,39 +1208,117 @@ document.addEventListener('click', (event) => {
   if (!btn) return;
 
   const exerciseIndex = btn.dataset.restBtn;
-  const timerEl = document.getElementById(`restTimer-${exerciseIndex}`);
   const totalSeconds = Number(btn.dataset.restSeconds || 0);
 
-  if (!timerEl || totalSeconds <= 0) return;
+  if (totalSeconds <= 0) return;
 
   stopRestTimer(exerciseIndex);
 
-  let remaining = totalSeconds;
+  restCountdowns[exerciseIndex] = {
+    endAt: Date.now() + totalSeconds * 1000,
+    vibrated: false,
+  };
 
-  btn.classList.remove('is-done');
-  btn.classList.add('is-running');
-
-  setRestTimerState(timerEl, 'rest-state-active', formatRestTimer(remaining));
+  updateRestCountdown(exerciseIndex);
 
   activeRestTimers[exerciseIndex] = setInterval(() => {
-    remaining -= 1;
-
-    if (remaining <= 0) {
-      stopRestTimer(exerciseIndex);
-      setRestTimerState(timerEl, 'rest-state-done', '00:00:00');
-      btn.classList.remove('is-running');
-      btn.classList.add('is-done');
-      vibrateDevice();
-      return;
-    }
-
-    if (remaining <= 30) {
-      setRestTimerState(timerEl, 'rest-state-warning', formatRestTimer(remaining));
-    } else {
-      setRestTimerState(timerEl, 'rest-state-active', formatRestTimer(remaining));
-    }
+    updateRestCountdown(exerciseIndex);
   }, 1000);
 });
+
+/* ------------------------------------------------------------ */
+/* Stoppuhr für Übungen ohne feste Pause */
+/* ------------------------------------------------------------ */
+
+function getStopwatchTimerEl(exerciseIndex) {
+  return document.getElementById(`restTimer-${exerciseIndex}`);
+}
+
+function getStopwatchElapsedSeconds(exerciseIndex) {
+  const state = stopwatchStates[exerciseIndex];
+
+  if (!state) return 0;
+
+  if (!state.running) {
+    return state.elapsedBefore || 0;
+  }
+
+  return Math.floor(
+    (state.elapsedBefore || 0) +
+    (Date.now() - state.startedAt) / 1000
+  );
+}
+
+function updateStopwatchDisplay(exerciseIndex) {
+  const timerEl = getStopwatchTimerEl(exerciseIndex);
+  if (!timerEl) return;
+
+  const elapsed = getStopwatchElapsedSeconds(exerciseIndex);
+
+  timerEl.textContent = formatRestTimer(elapsed);
+  timerEl.className = stopwatchStates[exerciseIndex]?.running
+    ? 'exercise-rest-timer rest-state-active'
+    : 'exercise-rest-timer rest-state-idle';
+}
+
+function startStopwatch(exerciseIndex) {
+  if (!stopwatchStates[exerciseIndex]) {
+    stopwatchStates[exerciseIndex] = {
+      elapsedBefore: 0,
+      startedAt: Date.now(),
+      running: true,
+    };
+  }
+
+  const state = stopwatchStates[exerciseIndex];
+
+  if (state.running) return;
+
+  state.startedAt = Date.now();
+  state.running = true;
+
+  if (activeStopwatches[exerciseIndex]) {
+    clearInterval(activeStopwatches[exerciseIndex]);
+  }
+
+  updateStopwatchDisplay(exerciseIndex);
+
+  activeStopwatches[exerciseIndex] = setInterval(() => {
+    updateStopwatchDisplay(exerciseIndex);
+  }, 1000);
+}
+
+function stopStopwatch(exerciseIndex) {
+  const state = stopwatchStates[exerciseIndex];
+  if (!state) return;
+
+  if (state.running) {
+    state.elapsedBefore = getStopwatchElapsedSeconds(exerciseIndex);
+    state.running = false;
+  }
+
+  if (activeStopwatches[exerciseIndex]) {
+    clearInterval(activeStopwatches[exerciseIndex]);
+    delete activeStopwatches[exerciseIndex];
+  }
+
+  updateStopwatchDisplay(exerciseIndex);
+}
+
+function resetStopwatch(exerciseIndex) {
+  if (activeStopwatches[exerciseIndex]) {
+    clearInterval(activeStopwatches[exerciseIndex]);
+    delete activeStopwatches[exerciseIndex];
+  }
+
+  stopwatchStates[exerciseIndex] = {
+    elapsedBefore: 0,
+    startedAt: null,
+    running: false,
+  };
+
+  updateStopwatchDisplay(exerciseIndex);
+}
 
 document.addEventListener('click', (event) => {
   const startBtn = event.target.closest('[data-stopwatch-start]');
@@ -1243,20 +1332,41 @@ document.addEventListener('click', (event) => {
     stopBtn?.dataset.stopwatchStop ||
     resetBtn?.dataset.stopwatchReset;
 
-  const timerEl = document.getElementById(`restTimer-${exerciseIndex}`);
-
   if (startBtn) {
-    startStopwatch(exerciseIndex, timerEl);
+    startStopwatch(exerciseIndex);
   }
 
   if (stopBtn) {
-    stopStopwatch(exerciseIndex, timerEl);
+    stopStopwatch(exerciseIndex);
   }
 
   if (resetBtn) {
-    resetStopwatch(exerciseIndex, timerEl);
+    resetStopwatch(exerciseIndex);
   }
 });
+
+/* ------------------------------------------------------------ */
+/* Aktualisieren nach App-Wechsel */
+/* ------------------------------------------------------------ */
+
+function refreshAllTimersAfterReturn() {
+  Object.keys(restCountdowns).forEach((exerciseIndex) => {
+    updateRestCountdown(exerciseIndex);
+  });
+
+  Object.keys(stopwatchStates).forEach((exerciseIndex) => {
+    updateStopwatchDisplay(exerciseIndex);
+  });
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    refreshAllTimersAfterReturn();
+  }
+});
+
+window.addEventListener('focus', refreshAllTimersAfterReturn);
+window.addEventListener('pageshow', refreshAllTimersAfterReturn);
 
 
 /* ------------------------------------------------------------ */
