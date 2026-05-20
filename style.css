@@ -11368,3 +11368,271 @@ body.modal-open {
 .history-delete-modal-card {
   max-width: 420px;
 }
+
+
+/* ------------------------------------------------------------ */
+/* Alternativübungen im Trainingsplan */
+/* ------------------------------------------------------------ */
+
+.plan-add-exercise-card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  grid-template-columns: 1fr !important;
+}
+
+.plan-add-exercise-main {
+  width: 100% !important;
+  grid-column: 1 / -1 !important;
+}
+
+.plan-add-alternative-area {
+  width: 100% !important;
+  grid-column: 1 / -1 !important;
+  order: 3;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(111, 210, 195, 0.14);
+}
+
+.plan-add-exercise-bottom {
+  width: 100% !important;
+  grid-column: 1 / -1 !important;
+  order: 2;
+  margin-top: 18px;
+}
+
+.plan-add-alternative-title {
+  text-align: center;
+  color: rgba(255,255,255,0.86);
+  font-size: 16px;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+.plan-add-alternative-plus-btn {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px auto;
+  border-radius: 50%;
+  border: 1px solid rgba(77, 195, 240, 0.65);
+  background: rgba(13, 35, 68, 0.55);
+  color: #ffffff;
+  font-size: 26px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 14px rgba(77, 195, 240, 0.12);
+}
+
+.plan-add-alternative-empty {
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255,255,255,0.42);
+  margin-bottom: 4px;
+}
+
+.plan-add-alternative-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.plan-add-alternative-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.035);
+  border: 1px solid rgba(255,255,255,0.07);
+}
+
+.plan-add-alternative-name {
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.plan-add-alternative-meta {
+  margin-top: 4px;
+  color: rgba(190, 213, 245, 0.82);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.plan-add-alternative-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.plan-add-alternative-edit-btn,
+.plan-add-alternative-delete-btn {
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.plan-add-alternative-edit-btn {
+  border: 1px solid rgba(77, 195, 240, 0.55);
+  background: rgba(13, 35, 68, 0.55);
+  color: #ffffff;
+}
+
+.plan-add-alternative-delete-btn {
+  border: 1px solid rgba(255, 110, 118, 0.55);
+  background: rgba(255, 110, 118, 0.16);
+  color: #ffffff;
+}
+
+@media (max-width: 640px) {
+  .plan-add-alternative-item {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .plan-add-alternative-actions {
+    width: 100%;
+  }
+
+  .plan-add-alternative-edit-btn,
+  .plan-add-alternative-delete-btn {
+    flex: 1;
+  }
+}
+/* ------------------------------------------------------------ */
+/* Live Training: Übung wechseln */
+/* ------------------------------------------------------------ */
+
+.training-exercise-title-block {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.training-switch-exercise-btn {
+  align-self: flex-start;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(111, 210, 195, 0.45);
+  background: rgba(111, 210, 195, 0.18);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: 0 0 14px rgba(111, 210, 195, 0.10);
+}
+
+.training-switch-exercise-btn:active {
+  transform: scale(0.98);
+}
+
+.exercise-switch-modal-card {
+  max-width: 520px;
+}
+
+.exercise-switch-current-box {
+  margin-bottom: 16px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.035);
+  border: 1px solid rgba(111, 210, 195, 0.16);
+  text-align: center;
+}
+
+.exercise-switch-label {
+  color: rgba(255,255,255,0.58);
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.exercise-switch-current-name {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.exercise-switch-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.exercise-switch-option {
+  width: 100%;
+  text-align: left;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.035);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.exercise-switch-option.active {
+  border-color: rgba(111, 210, 195, 0.60);
+  background: rgba(111, 210, 195, 0.16);
+  box-shadow: 0 0 18px rgba(111, 210, 195, 0.12);
+}
+
+.exercise-switch-option-name {
+  font-size: 16px;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.exercise-switch-option-meta {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(190, 213, 245, 0.82);
+}
+
+.exercise-switch-add-area {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(111, 210, 195, 0.14);
+  text-align: center;
+}
+
+.exercise-switch-add-title {
+  color: rgba(255,255,255,0.82);
+  font-size: 15px;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+.exercise-switch-add-btn {
+  margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .training-switch-exercise-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .exercise-switch-option {
+    text-align: center;
+  }
+}
+/* Fix: X beim Übung-wechseln-Modal am Modal ausrichten */
+.exercise-switch-modal-card {
+  position: relative !important;
+}
+
+.exercise-switch-modal-card .modal-close-x {
+  position: absolute !important;
+  top: 14px !important;
+  right: 14px !important;
+  z-index: 5;
+}

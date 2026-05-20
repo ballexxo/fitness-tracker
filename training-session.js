@@ -36,6 +36,24 @@ let draftStorageKey = null;
 let timerInterval = null;
 let startedAt = null;
 
+let exerciseSwitchModal = null;
+let exerciseSwitchContent = null;
+let closeExerciseSwitchModalBtn = null;
+let currentSwitchExerciseIndex = null;
+let currentSwitchOptions = [];
+
+let liveAlternativeModal = null;
+let liveAlternativeTitle = null;
+let liveAlternativeName = null;
+let liveAlternativeSets = null;
+let liveAlternativeRepsMin = null;
+let liveAlternativeRepsMax = null;
+let liveAlternativeRest = null;
+let liveAlternativeStatus = null;
+let closeLiveAlternativeModalBtn = null;
+let confirmLiveAlternativeBtn = null;
+let currentLiveAlternativeExerciseIndex = null;
+
 /* ------------------------------------------------------------ */
 /* Helpers */
 /* ------------------------------------------------------------ */
@@ -185,6 +203,83 @@ function formatWeightForState(value) {
   const parsed = Number(normalized);
 
   return Number.isNaN(parsed) ? null : parsed;
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function normalizeName(value) {
+  return String(value || '').trim().replace(/\s+/g, ' ');
+}
+
+function ensureExerciseBaseData(exercise) {
+  if (!exercise) return;
+
+  if (!exercise.main_exercise_name) {
+    exercise.main_exercise_name = exercise.exercise_name;
+  }
+
+  if (!exercise.main_sets_planned) {
+    exercise.main_sets_planned = exercise.sets_planned;
+  }
+
+  if (!exercise.main_reps_min) {
+    exercise.main_reps_min = exercise.reps_min;
+  }
+
+  if (!exercise.main_reps_max) {
+    exercise.main_reps_max = exercise.reps_max;
+  }
+
+  if (exercise.main_rest_seconds === null || exercise.main_rest_seconds === undefined) {
+    exercise.main_rest_seconds = exercise.rest_seconds || 0;
+  }
+}
+
+function normalizeDraftExercise(exercise) {
+  const normalized = {
+    ...exercise,
+    sets: Array.isArray(exercise.sets) ? exercise.sets : [],
+  };
+
+  ensureExerciseBaseData(normalized);
+
+  if (!normalized.sets.length) {
+    normalized.sets = Array.from({ length: Number(normalized.sets_planned || 0) }, (_, index) => ({
+      set_number: index + 1,
+      reps_done: null,
+      weight_used: null,
+    }));
+  }
+
+  return normalized;
+}
+
+function createEmptySets(setCount) {
+  return Array.from({ length: Number(setCount || 0) }, (_, index) => ({
+    set_number: index + 1,
+    reps_done: null,
+    weight_used: null,
+  }));
+}
+
+function getMainExerciseOption(exercise) {
+  ensureExerciseBaseData(exercise);
+
+  return {
+    type: 'main',
+    name: exercise.main_exercise_name,
+    sets: Number(exercise.main_sets_planned || exercise.sets_planned || 1),
+    repsMin: Number(exercise.main_reps_min || exercise.reps_min || 1),
+    repsMax: Number(exercise.main_reps_max || exercise.reps_max || 1),
+    restSeconds: Number(exercise.main_rest_seconds ?? exercise.rest_seconds ?? 0),
+  };
 }
 
 function updateTrainingProgress() {
@@ -642,6 +737,486 @@ async function calculateExerciseImprovement(exercise, excludeSessionId = null) {
 }
 
 /* ------------------------------------------------------------ */
+/* Übung wechseln / Alternativen im Live-Training */
+/* ------------------------------------------------------------ */
+function createExerciseSwitchModal() {
+  document.body.insertAdjacentHTML('beforeend', `
+    <div id="exerciseSwitchModal" class="modal-overlay hidden">
+      <div class="modal-card app-modal-card exercise-switch-modal-card">
+        <button id="closeExerciseSwitchModalBtn" class="modal-close-x" type="button" aria-label="Schließen">×</button>
+
+        <h2 class="app-modal-title">Übung wechseln</h2>
+
+        <div id="exerciseSwitchContent" class="app-modal-content"></div>
+      </div>
+    </div>
+  `);
+
+  exerciseSwitchModal = document.getElementById('exerciseSwitchModal');
+  exerciseSwitchContent = document.getElementById('exerciseSwitchContent');
+  closeExerciseSwitchModalBtn = document.getElementById('closeExerciseSwitchModalBtn');
+
+  closeExerciseSwitchModalBtn.addEventListener('click', closeExerciseSwitchModal);
+
+  exerciseSwitchModal.addEventListener('click', (event) => {
+    if (event.target === exerciseSwitchModal) {
+      closeExerciseSwitchModal();
+    }
+  });
+}
+
+function createLiveAlternativeModal() {
+  document.body.insertAdjacentHTML('beforeend', `
+    <div id="liveAlternativeModal" class="modal-overlay hidden">
+      <div class="modal-card app-modal-card plan-exercise-modal-card">
+        <button id="closeLiveAlternativeModalBtn" class="modal-close-x" type="button" aria-label="Schließen">×</button>
+
+        <h2 id="liveAlternativeTitle" class="app-modal-title">Alternativübung hinzufügen</h2>
+
+        <div class="app-modal-content">
+          <form id="liveAlternativeForm" class="app-form plan-exercise-form">
+            <div class="plan-exercise-row">
+              <label class="plan-add-label" for="liveAlternativeName">Übung</label>
+              <input
+                id="liveAlternativeName"
+                class="plan-add-input"
+                type="text"
+                placeholder="Zum Beispiel KH Bankdrücken"
+                required
+              >
+            </div>
+
+            <div class="plan-exercise-row">
+              <label class="plan-add-label" for="liveAlternativeSets">Sätze</label>
+              <select id="liveAlternativeSets" class="plan-add-input" required>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+              </select>
+            </div>
+
+            <div class="plan-exercise-row">
+              <label class="plan-add-label">Wdh.</label>
+
+              <div class="plan-reps-group">
+                <input
+                  id="liveAlternativeRepsMin"
+                  class="plan-add-input"
+                  type="number"
+                  min="1"
+                  placeholder="min"
+                  required
+                >
+
+                <span class="plan-reps-separator">–</span>
+
+                <input
+                  id="liveAlternativeRepsMax"
+                  class="plan-add-input"
+                  type="number"
+                  min="1"
+                  placeholder="max"
+                  required
+                >
+              </div>
+            </div>
+
+            <div class="plan-exercise-row">
+              <label class="plan-add-label" for="liveAlternativeRest">Pause in Sekunden</label>
+              <input
+                id="liveAlternativeRest"
+                class="plan-add-input"
+                type="number"
+                min="0"
+                placeholder="120"
+                required
+              >
+            </div>
+          </form>
+
+          <div id="liveAlternativeStatus" class="status hidden"></div>
+        </div>
+
+        <div class="modal-actions app-modal-actions">
+          <button id="confirmLiveAlternativeBtn" class="dashboard-summary-primary-btn" type="button">
+            Hinzufügen
+          </button>
+        </div>
+      </div>
+    </div>
+  `);
+
+  liveAlternativeModal = document.getElementById('liveAlternativeModal');
+  liveAlternativeTitle = document.getElementById('liveAlternativeTitle');
+  liveAlternativeName = document.getElementById('liveAlternativeName');
+  liveAlternativeSets = document.getElementById('liveAlternativeSets');
+  liveAlternativeRepsMin = document.getElementById('liveAlternativeRepsMin');
+  liveAlternativeRepsMax = document.getElementById('liveAlternativeRepsMax');
+  liveAlternativeRest = document.getElementById('liveAlternativeRest');
+  liveAlternativeStatus = document.getElementById('liveAlternativeStatus');
+  closeLiveAlternativeModalBtn = document.getElementById('closeLiveAlternativeModalBtn');
+  confirmLiveAlternativeBtn = document.getElementById('confirmLiveAlternativeBtn');
+
+  closeLiveAlternativeModalBtn.addEventListener('click', closeLiveAlternativeModal);
+
+  liveAlternativeModal.addEventListener('click', (event) => {
+    if (event.target === liveAlternativeModal) {
+      closeLiveAlternativeModal();
+    }
+  });
+
+  confirmLiveAlternativeBtn.addEventListener('click', confirmLiveAlternative);
+}
+
+function closeExerciseSwitchModal() {
+  closeModal(exerciseSwitchModal);
+  currentSwitchExerciseIndex = null;
+  currentSwitchOptions = [];
+  if (exerciseSwitchContent) exerciseSwitchContent.innerHTML = '';
+}
+
+function closeLiveAlternativeModal() {
+  closeModal(liveAlternativeModal);
+  currentLiveAlternativeExerciseIndex = null;
+
+  if (liveAlternativeName) liveAlternativeName.value = '';
+  if (liveAlternativeSets) liveAlternativeSets.value = '3';
+  if (liveAlternativeRepsMin) liveAlternativeRepsMin.value = '';
+  if (liveAlternativeRepsMax) liveAlternativeRepsMax.value = '';
+  if (liveAlternativeRest) liveAlternativeRest.value = '';
+  if (liveAlternativeStatus) setStatus(liveAlternativeStatus, '');
+}
+
+async function fetchExerciseAlternatives(mainExerciseName) {
+  const cleanMainName = normalizeName(mainExerciseName);
+
+  if (!currentUser || !currentPlanId || !cleanMainName) return [];
+
+  const { data, error } = await supabase
+    .from('exercise_alternatives')
+    .select('alternative_exercise_name, sets, reps_min, reps_max, rest_seconds')
+    .eq('user_id', currentUser.id)
+    .eq('plan_id', currentPlanId)
+    .eq('main_exercise_name', cleanMainName)
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error('Alternativübungen konnten nicht geladen werden:', error);
+    setStatus(sessionStatus, 'Alternativübungen konnten nicht geladen werden.', 'error');
+    return [];
+  }
+
+  return (data || []).map((row) => ({
+    type: 'alternative',
+    name: row.alternative_exercise_name,
+    sets: Number(row.sets || 1),
+    repsMin: Number(row.reps_min || 1),
+    repsMax: Number(row.reps_max || 1),
+    restSeconds: Number(row.rest_seconds || 0),
+  }));
+}
+
+function renderExerciseSwitchOptions() {
+  const exercise = draftSession?.exercises?.[currentSwitchExerciseIndex];
+  if (!exercise || !exerciseSwitchContent) return;
+
+  const currentName = normalizeName(exercise.exercise_name).toLowerCase();
+
+  const optionsHtml = currentSwitchOptions.map((option, optionIndex) => {
+    const isActive = normalizeName(option.name).toLowerCase() === currentName;
+
+    return `
+      <button
+        class="exercise-switch-option ${isActive ? 'active' : ''}"
+        type="button"
+        data-switch-option-index="${optionIndex}"
+      >
+        <span class="exercise-switch-option-name">${escapeHtml(option.name)}</span>
+        <span class="exercise-switch-option-meta">
+          ${option.sets} Sätze · ${option.repsMin}-${option.repsMax} Wdh. · ${option.restSeconds}s Pause
+        </span>
+      </button>
+    `;
+  }).join('');
+
+  exerciseSwitchContent.innerHTML = `
+    <div class="exercise-switch-current-box">
+      <div class="exercise-switch-label">Aktuelle Übung</div>
+      <div class="exercise-switch-current-name">${escapeHtml(exercise.exercise_name)}</div>
+    </div>
+
+    <div class="exercise-switch-options">
+      ${optionsHtml}
+    </div>
+
+    <div class="exercise-switch-add-area">
+      <div class="exercise-switch-add-title">Neue Alternativübung</div>
+
+      <button
+        class="plan-add-alternative-plus-btn exercise-switch-add-btn"
+        type="button"
+        data-open-live-alternative="${currentSwitchExerciseIndex}"
+        aria-label="Neue Alternativübung hinzufügen"
+      >
+        +
+      </button>
+    </div>
+  `;
+}
+
+async function openExerciseSwitchModal(exerciseIndex) {
+  const exercise = draftSession?.exercises?.[exerciseIndex];
+  if (!exercise) return;
+
+  ensureExerciseBaseData(exercise);
+
+  currentSwitchExerciseIndex = exerciseIndex;
+
+  const mainOption = getMainExerciseOption(exercise);
+  const alternativeOptions = await fetchExerciseAlternatives(exercise.main_exercise_name);
+
+  currentSwitchOptions = [mainOption, ...alternativeOptions];
+
+  renderExerciseSwitchOptions();
+  openModal(exerciseSwitchModal);
+}
+
+function stopTimersForExercise(exerciseIndex) {
+  stopRestTimer(exerciseIndex);
+  delete restCountdowns[exerciseIndex];
+
+  if (activeStopwatches[exerciseIndex]) {
+    clearInterval(activeStopwatches[exerciseIndex]);
+    delete activeStopwatches[exerciseIndex];
+  }
+
+  delete stopwatchStates[exerciseIndex];
+}
+
+async function applyExerciseSwitchOption(exerciseIndex, option) {
+  const exercise = draftSession?.exercises?.[exerciseIndex];
+  if (!exercise || !option) return;
+
+  ensureExerciseBaseData(exercise);
+  stopTimersForExercise(exerciseIndex);
+
+  exercise.exercise_name = option.name;
+  exercise.sets_planned = Number(option.sets || 1);
+  exercise.reps_min = Number(option.repsMin || 1);
+  exercise.reps_max = Number(option.repsMax || 1);
+  exercise.rest_seconds = Number(option.restSeconds || 0);
+  exercise.selected_increment = null;
+  exercise.last_training_base_weight = null;
+  exercise.sets = createEmptySets(exercise.sets_planned);
+
+  saveDraftLocally();
+  closeExerciseSwitchModal();
+
+  await renderSessionExercises();
+}
+
+function openLiveAlternativeModal(exerciseIndex) {
+  const exercise = draftSession?.exercises?.[exerciseIndex];
+  if (!exercise) return;
+
+  currentLiveAlternativeExerciseIndex = exerciseIndex;
+
+  liveAlternativeTitle.textContent = 'Alternativübung hinzufügen';
+  confirmLiveAlternativeBtn.textContent = 'Hinzufügen';
+
+  liveAlternativeName.value = '';
+  liveAlternativeSets.value = String(exercise.sets_planned || 3);
+  liveAlternativeRepsMin.value = String(exercise.reps_min || '');
+  liveAlternativeRepsMax.value = String(exercise.reps_max || '');
+  liveAlternativeRest.value = String(exercise.rest_seconds ?? 0);
+
+  setStatus(liveAlternativeStatus, '');
+  openModal(liveAlternativeModal);
+
+  setTimeout(() => {
+    liveAlternativeName.focus();
+  }, 50);
+}
+
+async function saveLiveAlternativeToDatabase(exercise, alternative) {
+  ensureExerciseBaseData(exercise);
+
+  const mainName = normalizeName(exercise.main_exercise_name);
+  const altName = normalizeName(alternative.name);
+
+  const row = {
+    user_id: currentUser.id,
+    plan_id: currentPlanId,
+    main_exercise_name: mainName,
+    alternative_exercise_name: altName,
+    sets: Number(alternative.sets || exercise.sets_planned || 1),
+    reps_min: Number(alternative.repsMin || exercise.reps_min || 1),
+    reps_max: Number(alternative.repsMax || exercise.reps_max || 1),
+    rest_seconds: Number(alternative.restSeconds ?? exercise.rest_seconds ?? 0),
+  };
+
+  const { data: existingRows, error: existingError } = await supabase
+    .from('exercise_alternatives')
+    .select('id')
+    .eq('user_id', currentUser.id)
+    .eq('plan_id', currentPlanId)
+    .eq('main_exercise_name', mainName)
+    .eq('alternative_exercise_name', altName)
+    .limit(1);
+
+  if (existingError) {
+    console.error('Fehler beim Prüfen der Alternativübung:', existingError);
+    return existingError;
+  }
+
+  const existing = existingRows?.[0];
+
+  if (existing) {
+    const { error: updateError } = await supabase
+      .from('exercise_alternatives')
+      .update({
+        sets: row.sets,
+        reps_min: row.reps_min,
+        reps_max: row.reps_max,
+        rest_seconds: row.rest_seconds,
+      })
+      .eq('id', existing.id);
+
+    if (updateError) {
+      console.error('Fehler beim Aktualisieren der Alternativübung:', updateError);
+      return updateError;
+    }
+
+    return null;
+  }
+
+  const { error: insertError } = await supabase
+    .from('exercise_alternatives')
+    .insert(row);
+
+  if (insertError) {
+    console.error('Fehler beim Speichern der Alternativübung:', insertError);
+    return insertError;
+  }
+
+  return null;
+}
+
+async function confirmLiveAlternative() {
+  if (currentLiveAlternativeExerciseIndex === null) return;
+
+  const exercise = draftSession?.exercises?.[currentLiveAlternativeExerciseIndex];
+  if (!exercise) return;
+
+  ensureExerciseBaseData(exercise);
+
+  const altName = normalizeName(liveAlternativeName.value);
+  const altSets = Number(liveAlternativeSets.value);
+  const altRepsMin = Number(liveAlternativeRepsMin.value);
+  const altRepsMax = Number(liveAlternativeRepsMax.value);
+  const altRestSeconds = Number(liveAlternativeRest.value);
+
+  if (!altName) {
+    setStatus(liveAlternativeStatus, 'Bitte gib einen Namen für die Alternativübung ein.', 'error');
+    return;
+  }
+
+  if (altName.toLowerCase() === normalizeName(exercise.main_exercise_name).toLowerCase()) {
+    setStatus(liveAlternativeStatus, 'Die Alternativübung darf nicht genauso heißen wie die Hauptübung.', 'error');
+    return;
+  }
+
+  if (!altSets || altSets < 1) {
+    setStatus(liveAlternativeStatus, 'Bitte gib eine gültige Satzanzahl ein.', 'error');
+    return;
+  }
+
+  if (!altRepsMin || !altRepsMax) {
+    setStatus(liveAlternativeStatus, 'Bitte gib min und max Wiederholungen ein.', 'error');
+    return;
+  }
+
+  if (altRepsMin > altRepsMax) {
+    setStatus(liveAlternativeStatus, 'Min-Wiederholungen dürfen nicht größer als Max-Wiederholungen sein.', 'error');
+    return;
+  }
+
+  if (Number.isNaN(altRestSeconds) || altRestSeconds < 0) {
+    setStatus(liveAlternativeStatus, 'Pause darf nicht negativ sein.', 'error');
+    return;
+  }
+
+  const newAlternative = {
+    type: 'alternative',
+    name: altName,
+    sets: altSets,
+    repsMin: altRepsMin,
+    repsMax: altRepsMax,
+    restSeconds: altRestSeconds,
+  };
+
+  confirmLiveAlternativeBtn.disabled = true;
+  confirmLiveAlternativeBtn.textContent = 'Wird gespeichert...';
+
+  try {
+    const saveError = await saveLiveAlternativeToDatabase(exercise, newAlternative);
+
+    if (saveError) {
+      setStatus(liveAlternativeStatus, 'Alternativübung konnte nicht gespeichert werden.', 'error');
+      return;
+    }
+
+    closeLiveAlternativeModal();
+    closeExerciseSwitchModal();
+
+    await applyExerciseSwitchOption(currentLiveAlternativeExerciseIndex, newAlternative);
+  } catch (error) {
+    console.error('Unerwarteter Fehler beim Speichern der Alternativübung:', error);
+    setStatus(liveAlternativeStatus, 'Beim Speichern ist ein Fehler aufgetreten.', 'error');
+  } finally {
+    confirmLiveAlternativeBtn.disabled = false;
+    confirmLiveAlternativeBtn.textContent = 'Hinzufügen';
+  }
+}
+
+document.addEventListener('click', async (event) => {
+  const switchBtn = event.target.closest('[data-switch-exercise]');
+  if (!switchBtn) return;
+
+  const exerciseIndex = Number(switchBtn.dataset.switchExercise);
+  if (Number.isNaN(exerciseIndex)) return;
+
+  await openExerciseSwitchModal(exerciseIndex);
+});
+
+document.addEventListener('click', async (event) => {
+  const optionBtn = event.target.closest('[data-switch-option-index]');
+  if (!optionBtn) return;
+
+  const optionIndex = Number(optionBtn.dataset.switchOptionIndex);
+  const option = currentSwitchOptions[optionIndex];
+
+  if (!option || currentSwitchExerciseIndex === null) return;
+
+  await applyExerciseSwitchOption(currentSwitchExerciseIndex, option);
+});
+
+document.addEventListener('click', (event) => {
+  const addBtn = event.target.closest('[data-open-live-alternative]');
+  if (!addBtn) return;
+
+  const exerciseIndex = Number(addBtn.dataset.openLiveAlternative);
+  if (Number.isNaN(exerciseIndex)) return;
+
+  openLiveAlternativeModal(exerciseIndex);
+});
+
+/* ------------------------------------------------------------ */
 /* Übungen rendern */
 /* ------------------------------------------------------------ */
 async function renderSessionExercises() {
@@ -649,6 +1224,8 @@ async function renderSessionExercises() {
 
   for (let exerciseIndex = 0; exerciseIndex < draftSession.exercises.length; exerciseIndex++) {
     const exercise = draftSession.exercises[exerciseIndex];
+    ensureExerciseBaseData(exercise);
+
     const lastData = await fetchLastExerciseData(exercise.exercise_name);
     const badge = getPerformanceBadgeMeta(lastData, exercise.reps_max);
 
@@ -659,9 +1236,19 @@ async function renderSessionExercises() {
     htmlParts.push(`
       <article class="training-exercise-card" style="--training-set-count:${exercise.sets_planned};">
         <div class="training-exercise-head">
-          <div>
-            <div class="training-exercise-title">${exerciseIndex + 1}. ${exercise.exercise_name}</div>
-            <div class="training-exercise-meta">${exercise.sets_planned} Sätze · ${exercise.reps_min}-${exercise.reps_max} Wdh. · ${exercise.rest_seconds || 0}s Pause</div>
+          <div class="training-exercise-title-block">
+            <div>
+              <div class="training-exercise-title">${exerciseIndex + 1}. ${escapeHtml(exercise.exercise_name)}</div>
+              <div class="training-exercise-meta">${exercise.sets_planned} Sätze · ${exercise.reps_min}-${exercise.reps_max} Wdh. · ${exercise.rest_seconds || 0}s Pause</div>
+            </div>
+
+            <button
+              class="training-switch-exercise-btn"
+              type="button"
+              data-switch-exercise="${exerciseIndex}"
+            >
+              Übung wechseln
+            </button>
           </div>
         </div>
 
@@ -690,48 +1277,48 @@ async function renderSessionExercises() {
         <div class="training-input-card">
           ${renderSetInputMatrix(exercise, exerciseIndex)}
 
-         ${Number(exercise.rest_seconds || 0) > 0 ? `
-  <div class="exercise-rest-row">
-    <button
-      class="exercise-rest-btn"
-      type="button"
-      data-rest-btn="${exerciseIndex}"
-      data-rest-seconds="${exercise.rest_seconds || 0}"
-    >
-      Pause
-    </button>
+          ${Number(exercise.rest_seconds || 0) > 0 ? `
+            <div class="exercise-rest-row">
+              <button
+                class="exercise-rest-btn"
+                type="button"
+                data-rest-btn="${exerciseIndex}"
+                data-rest-seconds="${exercise.rest_seconds || 0}"
+              >
+                Pause
+              </button>
 
-    <div
-      class="exercise-rest-timer rest-state-idle"
-      id="restTimer-${exerciseIndex}"
-    >
-      ${formatRestTimer(exercise.rest_seconds || 0)}
-    </div>
-  </div>
-` : `
-  <div class="exercise-rest-row exercise-rest-row-stopwatch">
-    <div class="exercise-stopwatch-actions">
-      <button class="exercise-rest-btn stopwatch-start-btn" type="button" data-stopwatch-start="${exerciseIndex}">
-        Start
-      </button>
+              <div
+                class="exercise-rest-timer rest-state-idle"
+                id="restTimer-${exerciseIndex}"
+              >
+                ${formatRestTimer(exercise.rest_seconds || 0)}
+              </div>
+            </div>
+          ` : `
+            <div class="exercise-rest-row exercise-rest-row-stopwatch">
+              <div class="exercise-stopwatch-actions">
+                <button class="exercise-rest-btn stopwatch-start-btn" type="button" data-stopwatch-start="${exerciseIndex}">
+                  Start
+                </button>
 
-      <button class="exercise-rest-btn stopwatch-stop-btn" type="button" data-stopwatch-stop="${exerciseIndex}">
-        Stop
-      </button>
+                <button class="exercise-rest-btn stopwatch-stop-btn" type="button" data-stopwatch-stop="${exerciseIndex}">
+                  Stop
+                </button>
 
-      <button class="exercise-rest-btn stopwatch-reset-btn" type="button" data-stopwatch-reset="${exerciseIndex}">
-        Reset
-      </button>
-    </div>
+                <button class="exercise-rest-btn stopwatch-reset-btn" type="button" data-stopwatch-reset="${exerciseIndex}">
+                  Reset
+                </button>
+              </div>
 
-    <div
-      class="exercise-rest-timer rest-state-idle"
-      id="restTimer-${exerciseIndex}"
-    >
-      00:00:00
-    </div>
-  </div>
-`}
+              <div
+                class="exercise-rest-timer rest-state-idle"
+                id="restTimer-${exerciseIndex}"
+              >
+                00:00:00
+              </div>
+            </div>
+          `}
         </div>
       </article>
     `);
@@ -812,7 +1399,11 @@ async function loadPlanAndCreateDraft() {
 
   const savedDraft = loadDraftLocally();
   if (savedDraft) {
-    draftSession = savedDraft;
+    draftSession = {
+      ...savedDraft,
+      exercises: (savedDraft.exercises || []).map(normalizeDraftExercise),
+    };
+
     currentPlanName = savedDraft.plan_name;
     sessionPlanName.textContent = currentPlanName;
     startTimer(savedDraft.started_at);
@@ -852,10 +1443,15 @@ async function loadPlanAndCreateDraft() {
     exercises: exerciseData.map((exercise) => ({
       plan_exercise_id: exercise.id,
       exercise_name: exercise.name,
+      main_exercise_name: exercise.name,
       sets_planned: exercise.sets,
+      main_sets_planned: exercise.sets,
       reps_min: exercise.reps_min,
+      main_reps_min: exercise.reps_min,
       reps_max: exercise.reps_max,
+      main_reps_max: exercise.reps_max,
       rest_seconds: exercise.rest_seconds,
+      main_rest_seconds: exercise.rest_seconds,
       last_training_base_weight: null,
       selected_increment: null,
       sets: Array.from({ length: exercise.sets }, (_, index) => ({
@@ -1368,12 +1964,14 @@ document.addEventListener('visibilitychange', () => {
 window.addEventListener('focus', refreshAllTimersAfterReturn);
 window.addEventListener('pageshow', refreshAllTimersAfterReturn);
 
-
 /* ------------------------------------------------------------ */
 /* Init */
 /* ------------------------------------------------------------ */
 async function initTrainingSession() {
   await guardPage();
+
+  createExerciseSwitchModal();
+  createLiveAlternativeModal();
 
   currentPlanId = getPlanIdFromUrl();
   if (!currentPlanId) {
